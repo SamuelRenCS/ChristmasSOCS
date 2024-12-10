@@ -73,6 +73,8 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // TODO: Move the api routes to separate file
 
+// app.use('/api', require('./routes/api'));
+
 // Serve the login api route
 app.post("/api/login", async (req, res) => {
   console.log(req.body);

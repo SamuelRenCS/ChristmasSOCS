@@ -30,4 +30,46 @@ const MeetingSchema = new Schema({
     type: String,
     required: true,
   },
+  interval: {
+    type: Number,
+    required: true,
+  },
+  seatsPerSlot: {
+    type: Number,
+    required: true,
+  },
+  repeat: {
+    type: String,
+    enum: ["none", "daily", "weekly", "monthly", "yearly"],
+    default: "none",
+  },
+  endDate: {
+    type: Date, // When the repeating meetings end
+  },
+  daysOfWeek: {
+    type: [String], // Days of the week for repeating meetings
+    enum: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+    validate: {
+      validator: function (days) {
+        return this.repeat === "weekly" ? days.length > 0 : days.length === 0;
+      },
+      message: "daysOfWeek can only be set for weekly repeating meetings.",
+    },
+  },
+  meetingSlots: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "MeetingSlot",
+    },
+  ],
 });
+
+module.exports = mongoose.model("Meeting", MeetingSchema);

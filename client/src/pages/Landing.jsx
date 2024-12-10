@@ -22,9 +22,9 @@ export default function Landing() {
               <button className="dashboard-button"><b>Access Dashboard</b></button>
             </div>
           </div>
-          <div className="image-section">
+          {/* <div className="image-section">
             <img  src={mcgillImage} alt="McGill Campus" />
-          </div>
+          </div> */}
         </main>
         </>
     );
