@@ -1,15 +1,14 @@
 export default function Button({ type, text, onClick }) {
     const styles = {
         button: {
-            padding: '16px 40px',
-            border: '1px solid #2F2F30',
+            backgroundColor: '#175EAB',
+            color: 'white',
+            border: 'none',
             borderRadius: '30px',
-            backgroundColor: '#2F2F30',
-            color: '#fff',
+            padding: '15px 40px',
             cursor: 'pointer',
             fontSize: '1rem',
-            fontWeight: 'bold',
-            width: '250px',
+            marginTop: '20px',
         }
     }
     return (

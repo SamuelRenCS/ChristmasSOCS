@@ -2,6 +2,7 @@ import React from 'react';
 import "./Login.css";
 //import mcgillImage from './images/mcgill.jpg';
 import Input from '../components/Input';
+import Button from '../components/Button';
 
 function Registration() {
    return (
@@ -16,12 +17,14 @@ function Registration() {
                                     type="text"
                                     name="firstName"
                                     placeholder="Enter first name"
+                                    formType="register"
                                 />
                                 <Input
                                     label="Last Name"
                                     type="text"
                                     name="lastName"
                                     placeholder="Enter last name"
+                                    formType="register"
                                 />
                             </div>
                             <Input
@@ -29,23 +32,23 @@ function Registration() {
                                 type="email"
                                 name="email"
                                 placeholder="Enter email"
-                                style={{ marginBottom: '12px' }}
+                                formType="register"
                             />
                             <Input
                                 label="Password"
                                 type="password"
                                 name="password"
                                 placeholder="Enter password"
-                                style={{ marginBottom: '12px' }}
+                                formType="register"
                             />
                             <Input
                                 label="Confirm Password"
                                 type="password"
                                 name="confirmPassword"
                                 placeholder="Re-enter password"
-                                style={{ marginBottom: '12px' }}
+                                formType="register"
                             />
-                            <button type="submit" className="login-button" style={{marginTop:'0px'}}>Register</button >
+                            <Button type="submit" text="Register" />
                         </form>
                     </div>
                     {/* <div className="image-box">

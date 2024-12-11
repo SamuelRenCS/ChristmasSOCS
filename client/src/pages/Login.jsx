@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { login } from '../api/api.js'; // import the login function from api.js
 import "./Login.css";
 import Input from '../components/Input';
+import Button from '../components/Button';
 
 function Login() {
     return (
@@ -15,14 +16,16 @@ function Login() {
                             type="email"
                             name="email"
                             placeholder="Enter email"
+                            formType="login"
                         />
                         <Input  
                             label="Password"
                             type="password"
                             name="password"
                             placeholder="Enter password"
+                            formType="login"
                         />
-                        <button type="submit" className="login-button">Login</button>
+                        <Button type="submit" text="Login" />
                     </form>
                     </div>
                     {/* <div className="image-box">

@@ -8,12 +8,14 @@ const Input = ({
   value,
   onChange,
   placeholder,
+  formType,
 }) => {
 
     const styles = { 
         inputGroup: {
             display: 'flex',
             flexDirection: 'column',
+            marginBottom: formType === 'login' ? '30px' : '12px',
         },
         label: {
             display: 'block',
