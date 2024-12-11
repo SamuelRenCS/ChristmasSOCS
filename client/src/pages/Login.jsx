@@ -41,7 +41,8 @@ function Login() {
     
             toast.success('Login successful');
     
-            navigate('/dashboard');
+            // redirect to dashboard after successful login with some delay
+            setTimeout(() => navigate('/dashboard'), 200);
     
         } catch (error) {
             const errorMessage = error.response?.data?.message 
