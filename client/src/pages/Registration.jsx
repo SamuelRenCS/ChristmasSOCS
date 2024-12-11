@@ -10,27 +10,40 @@ function Registration() {
                         <h2 style={{margin:'0px', padding:'0px'}}>Create an Account</h2>
                         <form className="login-form">
                             <div className="form-row" style={{display: 'flex', gap: '10px'}}>
-                                <div className="form-group">
-                                    <label htmlFor="firstName">First Name</label>
-                                    <input type="text" id="firstName" placeholder="Enter first name" style={{marginBottom:'12px'}}/>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="lastName">Last Name</label>
-                                    <input type="text" id="lastName" placeholder="Enter last name" style={{marginBottom:'12px'}}/>
-                                </div>
+                                <Input 
+                                    label="First Name"
+                                    type="text"
+                                    name="firstName"
+                                    placeholder="Enter first name"
+                                />
+                                <Input
+                                    label="Last Name"
+                                    type="text"
+                                    name="lastName"
+                                    placeholder="Enter last name"
+                                />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="email">Email</label>
-                                <input type="email" id="email" placeholder="Enter email" style={{marginBottom:'12px'}}/>
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="password">Password</label>
-                                <input type="password" id="password" placeholder="Enter password" style={{marginBottom:'12px'}}/>
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="confirmPassword">Confirm Password</label>
-                                <input type="password" id="confirm" placeholder="Re-enter password" style={{marginBottom:'15px'}}/>
-                            </div>
+                            <Input
+                                label="Email"
+                                type="email"
+                                name="email"
+                                placeholder="Enter email"
+                                style={{ marginBottom: '12px' }}
+                            />
+                            <Input
+                                label="Password"
+                                type="password"
+                                name="password"
+                                placeholder="Enter password"
+                                style={{ marginBottom: '12px' }}
+                            />
+                            <Input
+                                label="Confirm Password"
+                                type="password"
+                                name="confirmPassword"
+                                placeholder="Re-enter password"
+                                style={{ marginBottom: '12px' }}
+                            />
                             <button type="submit" className="login-button" style={{marginTop:'0px'}}>Register</button >
                         </form>
                     </div>
