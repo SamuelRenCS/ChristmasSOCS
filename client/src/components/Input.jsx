@@ -45,6 +45,7 @@ const Input = ({
         onChange={onChange}
         placeholder={placeholder}
         style={styles.input}
+        required
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import './Landing.css';
+import '../styles/Landing.css';
 
 export default function Landing() {
     return (

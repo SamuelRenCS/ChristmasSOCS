@@ -80,6 +80,11 @@ app.post("/api/login", async (req, res) => {
   console.log(req.body);
   const { email, password } = req.body;
 
+  // basic input validation
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
+
   try {
     // Find user by email
     const user = await User.findOne({ email });
@@ -93,26 +98,39 @@ app.post("/api/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    console.log("Login successful");
+
     // Generate JWT
     const token = jwt.sign(
       {
         id: user._id,
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        isMcGillMember: user.isMcGillMember,
       },
       SECRET_KEY,
       { expiresIn: "1h" }
     );
 
+    // send successful login response
     res.status(200).json({
-      token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+      message: "Login successful",
+      data: {
+        token,
+        user: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isMcGillMember: user.isMcGillMember,
+        },
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
+
+    // handle any unexpected errors
     res.status(500).json({ message: "Login failed", error: error.message });
   }
 });
@@ -120,7 +138,23 @@ app.post("/api/login", async (req, res) => {
 // Serve the register api route
 app.post("/api/register", async (req, res) => {
   console.log(req.body);
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, confirmPassword } = req.body;
+
+  // server-side validation
+  if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  // password validation
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
+
+  // email validation
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+
   // Implement user creation
   try {
     // Check if user already exists
@@ -141,9 +175,21 @@ app.post("/api/register", async (req, res) => {
     });
 
     await newUser.save();
+
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("Registration error:", error);
+
+    // handle specific mongoose validation errors
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: messages,
+      });
+    }
+
+    // generic server error
     res
       .status(500)
       .json({ message: "Registration failed", error: error.message });

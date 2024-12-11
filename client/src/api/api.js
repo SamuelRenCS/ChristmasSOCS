@@ -9,13 +9,25 @@ const api = axios.create({
 });
 
 // login function to send a POST request to /login
-export const login = (data) => {
-  api.post("/login", data);
+export const login = async (credentials) => {
+  try {
+    const response = await api.post("/login", credentials);
+    return response;
+  } catch (error) {
+    // this will throw an error that can be caught in the component
+    throw error;
+  }
 };
 
 // register function to send a POST request to /register
-export const register = (data) => {
-  api.post("/register", data);
+export const register = async (formData) => {
+  try {
+    const response = await api.post("/register", formData);
+    return response.data;
+  } catch (error) {
+    // this will throw an error that can be caught in the component
+    throw error;
+  }
 };
 
 export default api;
