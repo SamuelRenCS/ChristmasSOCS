@@ -1,6 +1,7 @@
 import React from 'react';
 import "./Login.css";
 //import mcgillImage from './images/mcgill.jpg';
+import Input from '../components/Input';
 
 function Registration() {
    return (
