@@ -177,11 +177,16 @@ app.post("/api/register", validateUser, async (req, res) => {
 // Check if user is authenticated
 app.post("/api/meetings", async (req, res) => {
   console.log(req.body);
-  const { title, date, startTime, endTime, location, description } = req.body;
+  const { title, date, host, startTime, endTime, location, description, repeat, endDate, seats, interval } = req.body;
 
   // server-side validation
-  if (!title || !date || !startTime || !endTime || !location) {
+  if (!title || !date || !startTime || !endTime || !location || !seats || !interval || !host) {
     return res.status(400).json({ message: "All fields are required" });
+  }
+
+  // If repeat is selected, check for an endDate
+  if (repeat !== "none" && !endDate) {
+    return res.status(400).json({ message: "End date is required for repeating meetings" });
   }
 
   try {
@@ -189,10 +194,15 @@ app.post("/api/meetings", async (req, res) => {
     const newMeeting = new Meeting({
       title,
       date,
+      host,
       startTime,
       endTime,
       location,
       description,
+      interval,
+      seatsPerSlot: seats, 
+      repeat,
+      endDate,
     });
 
     await newMeeting.save();

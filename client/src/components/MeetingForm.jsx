@@ -18,7 +18,7 @@ const MeetingForm = () => {
   const [formData, setFormData] = useState({
 
     // Retrieve the host's name from the token
-    host: token ? token.user.name : "", //TODO: ChECK THIS
+    host: token ? token.user : "", //TODO: ChECK THIS
 
     title: "",
     meetingDate: "",

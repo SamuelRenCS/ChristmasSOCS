@@ -9,6 +9,7 @@ const MeetingSchema = new Schema({
   host: {
     type: Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
   date: {
     type: Date,
@@ -39,12 +40,13 @@ const MeetingSchema = new Schema({
   },
   repeat: {
     type: String,
-    enum: ["none", "daily", "weekly", "monthly", "yearly"],
+    enum: ["none", "daily", "weekly"],
     default: "none",
   },
   endDate: {
     type: Date, // When the repeating meetings end
   },
+  /*
   daysOfWeek: {
     type: [String], // Days of the week for repeating meetings
     enum: [
@@ -63,6 +65,7 @@ const MeetingSchema = new Schema({
       message: "daysOfWeek can only be set for weekly repeating meetings.",
     },
   },
+  */
   meetingSlots: [
     {
       type: Schema.Types.ObjectId,
