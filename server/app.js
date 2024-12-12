@@ -10,6 +10,7 @@ const { validateUser } = require("./middleware");
 
 // models
 const User = require("./models/user");
+const Meeting = require("./models/meeting");
 
 const SECRET_KEY = "ChristmasSOCS";
 
@@ -169,6 +170,50 @@ app.post("/api/register", validateUser, async (req, res) => {
     res
       .status(500)
       .json({ message: "Registration failed", error: error.message });
+  }
+});
+
+// Serve the meetings creation api route
+// Check if user is authenticated
+app.post("/api/meetings", async (req, res) => {
+  console.log(req.body);
+  const { title, date, startTime, endTime, location, description } = req.body;
+
+  // server-side validation
+  if (!title || !date || !startTime || !endTime || !location) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    // Create new meeting
+    const newMeeting = new Meeting({
+      title,
+      date,
+      startTime,
+      endTime,
+      location,
+      description,
+    });
+
+    await newMeeting.save();
+
+    res.status(201).json({ message: "Meeting created successfully" });
+  } catch (error) {
+    console.error("Meeting creation error:", error);
+
+    // handle specific mongoose validation errors
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: messages,
+      });
+    }
+
+    // generic server error
+    res
+      .status(500)
+      .json({ message: "Meeting creation failed", error: error.message });
   }
 });
 

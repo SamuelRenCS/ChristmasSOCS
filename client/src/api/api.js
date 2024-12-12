@@ -30,4 +30,15 @@ export const register = async (formData) => {
   }
 };
 
+// createMeeting function to send a POST request to /meetings
+export const createMeeting = async (meetingData) => {
+  try {
+    const response = await api.post("/meetings", meetingData);
+    return response.data;
+  } catch (error) {
+    // this will throw an error that can be caught in the component
+    throw error;
+  }
+};
+
 export default api;

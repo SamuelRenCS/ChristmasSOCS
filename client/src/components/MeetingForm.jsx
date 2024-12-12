@@ -1,12 +1,25 @@
 import React, { useState } from "react";
+import { createMeeting } from "../api/api";
 import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import TextareaField from "./TextAreaField";
 import './MeetingForm.css';
 
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 const MeetingForm = () => {
+
+  const navigate = useNavigate();
+  const { token } = useAuth(); // get the token from AuthContext
+
   const [formData, setFormData] = useState({
+
+    // Retrieve the host's name from the token
+    host: token ? token.user.name : "", //TODO: ChECK THIS
+
     title: "",
     meetingDate: "",
     startTime: "",
@@ -32,12 +45,22 @@ const MeetingForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      //const response = await axios.post("http://localhost:5000/api/meetings", formData);
-      alert("Meeting created successfully!");
+      const response = await createMeeting(formData);
+
+      if (!response) {
+        toast.error("Failed to create the meeting.");
+        return;
+      }
+
+      toast.success("Meeting created successfully");
       console.log(formData);
+
+      // redirect to dashboard after successful meeting creation with some delay
+      setTimeout(() => navigate("/dashboard"), 200);
+      
     } catch (error) {
-      console.error("Error creating meeting:", error);
-      alert("Failed to create the meeting.");
+      const errorMessage = error.response?.data?.message || error.message || "Meeting creation failed";
+      toast.error(errorMessage);
     }
   };
 
@@ -114,7 +137,7 @@ const MeetingForm = () => {
             required={true}
             min="1"
         />
-        </div>
+      </div>
 
       <div className="form-location">
         <InputField
