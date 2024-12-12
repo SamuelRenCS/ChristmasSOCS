@@ -24,6 +24,7 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/private" element={<PrivatePage />} />
+          {/* <Route path="/meeting/:id" element={<MeetingPage />} /> */}
         </Route>
       </Routes>
       <ToastContainer />

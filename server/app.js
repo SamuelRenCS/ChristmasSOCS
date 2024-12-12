@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 
+// middleware
+const { validateUser } = require("./middleware");
+
 // models
 const User = require("./models/user");
 
@@ -40,33 +43,6 @@ app.use(
     credentials: true,
   })
 );
-
-// generate JWT
-function generateToken(user) {
-  return jwt.sign();
-}
-
-// middleware to authenticate JWT
-function authenticateJWT(req, res, next) {
-  const token = req.header.authorizatio?.split(" ")[1]; // Bearer <token>
-  if (!token) return res.status(401).json({ message: "Token missing" });
-
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ message: "Invalid token" });
-
-    req.user = user;
-    next();
-  });
-}
-
-// login route
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  // find user in database
-
-  const token = generateToken(user);
-  res.status(200).json({ token });
-});
 
 // Serve static files from the React (Vite) app
 app.use(express.static(path.join(__dirname, "../client/dist")));
@@ -136,7 +112,7 @@ app.post("/api/login", async (req, res) => {
 });
 
 // Serve the register api route
-app.post("/api/register", async (req, res) => {
+app.post("/api/register", validateUser, async (req, res) => {
   console.log(req.body);
   const { firstName, lastName, email, password, confirmPassword } = req.body;
 
