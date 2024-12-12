@@ -28,7 +28,6 @@ const MeetingSchema = new Schema({
   },
   description: {
     type: String,
-    required: true,
   },
   interval: {
     type: Number,
