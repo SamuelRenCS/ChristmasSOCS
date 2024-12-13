@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import Header from '../partials/Header';
+import Footer from '../partials/Footer';
 import '../styles/CreateMeeting.css';
 import MeetingForm from '../components/MeetingForm';
 const CreateMeeting = () => {
@@ -8,7 +8,7 @@ const CreateMeeting = () => {
 
   return (
     <div className="create-meeting">
-      <Navbar />
+      <Header />
       <div className="form-container">
         <h2>Create a New Meeting</h2>
         <MeetingForm />

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import Header from '../partials/Header';
+import Footer from '../partials/Footer';
 import '../styles/CreateBooking.css';
 import BookingForm from '../components/BookingForm';
 const CreateMeeting = () => {
@@ -8,7 +8,7 @@ const CreateMeeting = () => {
 
   return (
     <div className="create-meeting">
-      <Navbar />
+      <Header />
       <div className="form-container">
         <h2>Book a meeting</h2>
         <BookingForm />
