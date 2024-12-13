@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createMeeting } from "../api/api";
-import CalendarDateInput from "./CalendarDateDblInput";
+import CalendarDateDblInput from "./CalendarDateDblInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import TextareaField from "./TextAreaField";
