@@ -11,10 +11,10 @@ import { toast } from "react-toastify";
 
 const MeetingForm = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
-    host: token ? token.user : "",
+    host: user ? user.id : "",
     title: "",
     meetingDate: "",
     repeatEndDate: "",

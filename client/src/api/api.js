@@ -33,7 +33,7 @@ export const register = async (formData) => {
 // createMeeting function to send a POST request to /meetings
 export const createMeeting = async (meetingData) => {
   try {
-    const response = await api.post("/meetings", meetingData);
+    const response = await api.post("/meetings/new", meetingData);
     return response.data;
   } catch (error) {
     // this will throw an error that can be caught in the component

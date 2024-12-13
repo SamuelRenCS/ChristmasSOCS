@@ -12,6 +12,7 @@ const { validateUser } = require("./middleware");
 const User = require("./models/user");
 const Meeting = require("./models/meeting");
 
+// PUT IN ENV FILE LATER
 const SECRET_KEY = "ChristmasSOCS";
 
 // helper functions (MOVE TO SEPARATE FILE LATER)
@@ -175,34 +176,57 @@ app.post("/api/register", validateUser, async (req, res) => {
 
 // Serve the meetings creation api route
 // Check if user is authenticated
-app.post("/api/meetings", async (req, res) => {
+app.post("/api/meetings/new", async (req, res) => {
   console.log(req.body);
-  const { title, date, host, startTime, endTime, location, description, repeat, endDate, seats, interval } = req.body;
+  const {
+    host,
+    title,
+    meetingDate,
+    repeatEndDate,
+    startTime,
+    endTime,
+    repeat,
+    interval,
+    seats,
+    location,
+    description,
+  } = req.body;
 
   // server-side validation
-  if (!title || !date || !startTime || !endTime || !location || !seats || !interval || !host) {
+  if (
+    !title ||
+    !meetingDate ||
+    !startTime ||
+    !endTime ||
+    !location ||
+    !seats ||
+    !interval ||
+    !host
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   // If repeat is selected, check for an endDate
-  if (repeat !== "none" && !endDate) {
-    return res.status(400).json({ message: "End date is required for repeating meetings" });
+  if (repeat !== "none" && !repeatEndDate) {
+    return res
+      .status(400)
+      .json({ message: "End date is required for repeating meetings" });
   }
 
   try {
     // Create new meeting
     const newMeeting = new Meeting({
       title,
-      date,
+      meetingDate,
       host,
       startTime,
       endTime,
       location,
       description,
       interval,
-      seatsPerSlot: seats, 
+      seatsPerSlot: seats,
       repeat,
-      endDate,
+      endDate: repeatEndDate,
     });
 
     await newMeeting.save();

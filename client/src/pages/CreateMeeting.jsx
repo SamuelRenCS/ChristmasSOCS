@@ -14,7 +14,7 @@ const CreateMeeting = () => {
         <MeetingForm />
       </div>
       <div className="img-container">
-        <img src="../../public/Mcgill.jpg" alt="Meeting" />
+        <img src="/Mcgill.jpg" alt="Meeting" />
       </div>
       <Footer />
     </div>
