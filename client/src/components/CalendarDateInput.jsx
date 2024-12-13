@@ -11,8 +11,6 @@ const CalendarDateInput = ({ label, value, onChange }) => {
     onChange(formattedDate); // Pass the formatted date to the parent component
   };
 
-  
-
   return (
     <div className="calendar-date-input">
       <label>

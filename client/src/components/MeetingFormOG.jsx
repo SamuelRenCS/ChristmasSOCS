@@ -1,23 +1,27 @@
 import React, { useState } from "react";
 import { createMeeting } from "../api/api";
-import CalendarDateInput from "./CalendarDateDblInput";
+import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import TextareaField from "./TextAreaField";
-import "./MeetingForm.css";
+import './MeetingForm.css';
+
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const MeetingForm = () => {
+
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token } = useAuth(); // get the token from AuthContext
 
   const [formData, setFormData] = useState({
-    host: token ? token.user : "",
+
+    // Retrieve the host's name from the token
+    host: token ? token.user : "", //TODO: ChECK THIS
+
     title: "",
     meetingDate: "",
-    repeatEndDate: "",
     startTime: "",
     endTime: "",
     repeat: "None",
@@ -32,23 +36,28 @@ const MeetingForm = () => {
   };
 
   const handleDateChange = (date) => {
-    setFormData({ ...formData, meetingDate: date });
-  };
-
-  const handleEndDateChange = (date) => {
-    setFormData({ ...formData, repeatEndDate: date });
+    setFormData({
+      ...formData,
+      meetingDate: date,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await createMeeting(formData);
+
       if (!response) {
         toast.error("Failed to create the meeting.");
         return;
       }
+
       toast.success("Meeting created successfully");
+      console.log(formData);
+
+      // redirect to dashboard after successful meeting creation with some delay
       setTimeout(() => navigate("/dashboard"), 200);
+      
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Meeting creation failed";
       toast.error(errorMessage);
@@ -68,16 +77,15 @@ const MeetingForm = () => {
         />
       </div>
 
-      <div className="form-date">
-        <CalendarDateDblInput
+      {/* <div className="form-date">
+        <CalendarDateInput
           label="Date:"
           value={formData.meetingDate}
           onChange={handleDateChange}
-          showEndDate={formData.repeat !== "None"} // Show end date field if repeat is selected
-          endDate={formData.repeatEndDate}
-          onEndDateChange={handleEndDateChange}
         />
-      </div>
+      </div> */}
+
+      
 
       <div className="form-time">
         <InputField
@@ -123,13 +131,13 @@ const MeetingForm = () => {
 
       <div className="form-seats">
         <InputField
-          label="Seats Available:"
-          name="seats"
-          type="number"
-          value={formData.seats}
-          onChange={handleChange}
-          required={true}
-          min="1"
+            label="Seats Available:"
+            name="seats"
+            type="number"
+            value={formData.seats}
+            onChange={handleChange}
+            required={true}
+            min="1"
         />
       </div>
 
