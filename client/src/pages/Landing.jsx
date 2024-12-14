@@ -4,7 +4,7 @@ import '../styles/Landing.css';
 export default function Landing() {
     return (
         <>
-        <main className="main-section">
+        
           <div className="info-section">
             <div className="booking-section">
               <h1>Book a meeting now!</h1>
@@ -25,7 +25,7 @@ export default function Landing() {
           {/* <div className="image-section">
             <img  src={mcgillImage} alt="McGill Campus" />
           </div> */}
-        </main>
+        
         </>
     );
 }

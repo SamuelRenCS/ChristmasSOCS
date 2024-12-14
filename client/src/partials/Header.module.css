@@ -1,0 +1,46 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .navbarContent {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .desktopNavigation {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .mobileMenuToggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .desktopNavigation {
+      display: none;
+    }
+  
+    .mobileMenuToggle {
+      display: block;
+    }
+  }
+
+  .navbar.hidden {
+    transform: translateY(-100%);
+  }

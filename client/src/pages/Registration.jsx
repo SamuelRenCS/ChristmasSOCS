@@ -55,7 +55,7 @@ function Registration() {
     }
 
    return (
-    <main className="main">
+    
         <div className="login-container">
             <div className="login-box">
                 <h2 style={{margin:'0px', padding:'0px'}}>Create an Account</h2>
@@ -109,7 +109,7 @@ function Registration() {
                        <img src={mcgillImage} alt="McGill Campus" />
                      </div> */}
         </div>
-    </main>
+   
     );
 }
 

@@ -1,7 +1,8 @@
 import React from 'react';
+import styles from './Footer.module.css';
 
 const Footer = () => (
-  <footer className="footer">
+  <footer className={styles.footer}>
     <div>
       <h4>Quick Links</h4>
       <ul>

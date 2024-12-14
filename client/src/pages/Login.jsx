@@ -54,7 +54,7 @@ function Login() {
     }
 
     return (
-        <main className="main">
+    
             <div className="login-container">
                 <div className="login-box">
                     <h2>Login</h2>
@@ -82,7 +82,7 @@ function Login() {
                       <img src={mcgillImage} alt="McGill Campus" />
                     </div> */}
                 </div>
-        </main>
+    
     );
 }
 

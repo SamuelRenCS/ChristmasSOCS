@@ -1,4 +1,21 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f0f0f0;
+}
+
 #root {
   /* Define fonts here */
   text-align: center;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.main-section {
+  margin-top: 120px;
+  min-height: calc(100vh - 120px);
+  background-color: white;
 }

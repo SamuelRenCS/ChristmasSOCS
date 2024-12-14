@@ -1,0 +1,46 @@
+.authButtonContainer {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .loginButton,
+  .registerButton,
+  .logoutButton {
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .loginButton {
+    background-color: #8c0d0d; /* McGill red */
+    color: white;
+    border: none;
+  }
+  
+  .loginButton:hover {
+    background-color: #6c0909;
+  }
+  
+  .registerButton {
+    background-color: white;
+    color: #8c0d0d;
+    border: 1px solid #8c0d0d;
+  }
+  
+  .registerButton:hover {
+    background-color: #f8f8f8;
+  }
+  
+  .logoutButton {
+    background-color: #8c0d0d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+  
+  .logoutButton:hover {
+    background-color: #6c0909;
+  }
