@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Registration from './pages/Registration';
-import './App.css'
-import { ToastContainer, toast } from 'react-toastify';
-import Dashboard from './pages/Dashboard';
-import PrivateRoute from './components/PrivateRoute';
-import PrivatePage from './pages/PrivatePage';
-import { AuthProvider } from './context/AuthContext';
-import CreateMeeting from './pages/CreateMeeting';
-import Header from './partials/Header';
-import Footer from './partials/Footer';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Registration from "./pages/Registration";
+import "./App.css";
+import { ToastContainer, toast } from "react-toastify";
+import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
+import PrivatePage from "./pages/PrivatePage";
+import { AuthProvider } from "./context/AuthContext";
+import CreateMeeting from "./pages/CreateMeeting";
+import Header from "./partials/Header";
+import Footer from "./partials/Footer";
 
 function App() {
   const [isHeaderHidden, setHeaderHidden] = useState(false);
@@ -32,49 +32,48 @@ function App() {
         setHeaderHidden(true);
       }
     } else if (currentScrollPos === 0) {
-      // When near the top of the page
+      // When back to the top of the page
       setAppearable(false);
       setHeaderHidden(false);
     }
 
     setPrevScrollPos(currentScrollPos);
-  }
+  };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [prevScrollPos]);
 
   return (
     <AuthProvider>
-      <Header hidden={isHeaderHidden} isAppearable={isAppearable} isAuthenticated={false} />
-      <div className="main-section">
       <Router>
-      <Routes>
-        
-        {/* Public Routes */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Registration />} />
+        <Header hidden={isHeaderHidden} isAppearable={isAppearable} />
+        <div className="main-section">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Registration />} />
 
-        {/* Private Routes */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/meetings/new" element={<CreateMeeting />} />
-          <Route path="/private" element={<PrivatePage />} />
-          {/* <Route path="/meeting/:id" element={<MeetingPage />} /> */}
-        </Route>
-      </Routes>
-      <ToastContainer />
-    </Router>
-      </div>
+            {/* Private Routes */}
+            <Route element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/meetings/new" element={<CreateMeeting />} />
+              <Route path="/private" element={<PrivatePage />} />
+              {/* <Route path="/meeting/:id" element={<MeetingPage />} /> */}
+            </Route>
+          </Routes>
+        </div>
+        <ToastContainer />
+      </Router>
 
       <Footer />
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,13 +1,11 @@
-import React from 'react';
-import styles from './AuthButtons.module.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import styles from "./AuthButtons.module.css";
 
 const AuthButtons = ({ isAuthenticated, onLogout }) => {
   if (isAuthenticated) {
     return (
-      <button 
-        className={styles.logoutButton}
-        onClick={onLogout}
-      >
+      <button className={styles.logoutButton} onClick={onLogout}>
         Logout
       </button>
     );
@@ -15,12 +13,12 @@ const AuthButtons = ({ isAuthenticated, onLogout }) => {
 
   return (
     <div className={styles.authButtonContainer}>
-      <a href="/login" className={styles.loginButton}>
+      <Link to="/login" className={styles.loginButton}>
         Login
-      </a>
-      <a href="/register" className={styles.registerButton}>
+      </Link>
+      <Link to="/register" className={styles.registerButton}>
         Register
-      </a>
+      </Link>
     </div>
   );
 };
