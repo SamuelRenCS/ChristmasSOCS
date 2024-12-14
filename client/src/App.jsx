@@ -15,14 +15,25 @@ import Footer from './partials/Footer';
 
 function App() {
   const [isHeaderHidden, setHeaderHidden] = useState(false);
+  const [isAppearable, setAppearable] = useState(false);
   const [prevScrollPos, setPrevScrollPos] = useState(0);
 
   const handleScroll = () => {
     const currentScrollPos = window.scrollY;
 
-    if (currentScrollPos > prevScrollPos) {
-      setHeaderHidden(true);
-    } else {
+    if (currentScrollPos > 120) {
+      // When scrolled down past 120px
+      if (currentScrollPos < prevScrollPos) {
+        // Scrolling up
+        setAppearable(true);
+        setHeaderHidden(false);
+      } else if (currentScrollPos > prevScrollPos) {
+        // Scrolling down
+        setHeaderHidden(true);
+      }
+    } else if (currentScrollPos === 0) {
+      // When near the top of the page
+      setAppearable(false);
       setHeaderHidden(false);
     }
 
@@ -39,7 +50,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <Header hidden={isHeaderHidden} isAuthenticated={false} />
+      <Header hidden={isHeaderHidden} isAppearable={isAppearable} isAuthenticated={false} />
       <div className="main-section">
       <Router>
       <Routes>

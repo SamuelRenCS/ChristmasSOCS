@@ -5,7 +5,7 @@ import AuthButtons from '../components/Header/AuthButtons';
 import MobileMenu from '../components/Header/MobileMenu';
 import styles from './Header.module.css';
 
-const Header = ({ isAuthenticated = false, hidden = false }) => {
+const Header = ({ isAuthenticated = false, hidden = false, isAppearable = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -20,7 +20,7 @@ const Header = ({ isAuthenticated = false, hidden = false }) => {
 
   return (
     <header>
-      <nav className={`${styles.navbar} ${hidden ? styles.hidden : ''}`}>
+      <nav className={`${styles.navbar} ${hidden ? styles.hidden : ''} ${isAppearable ? styles.appearable : ''}`}>
       <div className={styles.navbarContent}>
         <NavbarLogo />
         
