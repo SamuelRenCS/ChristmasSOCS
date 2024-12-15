@@ -25,29 +25,14 @@ const MeetingForm = () => {
     seatsPerSlot: "",
     repeat: "None",
     endDate: "",
-    token: "",
+    //token: "UNSET",
   });
 
   const [tokenPopup, setTokenPopup] = useState({ show: false, token: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
-    // If the 'interval' field is being updated, convert the value to a numeric format
-    if (name === "interval") {
-      const intervalMapping = {
-        "10 min": 10,
-        "15 min": 15,
-        "20 min": 20,
-        "30 min": 30,
-        "1 hour": 60
-      };
-      // Convert the selected interval to its numeric value
-      setFormData({ ...formData, [name]: intervalMapping[value] });
-    } else {
-      // Otherwise, just update the form data normally
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleDateChange = (date) => {
@@ -60,16 +45,37 @@ const MeetingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Map interval string to numeric value
+    const intervalMapping = {
+      "10 min": 10,
+      "15 min": 15,
+      "20 min": 20,
+      "30 min": 30,
+      "1 hour": 60,
+    };
+  
+    const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
+    const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
+  
+    const formattedData = {
+      ...formData,
+      startTime: startDateTime, 
+      endTime: endDateTime,
+      interval: intervalMapping[formData.interval], // Map to numeric value
+    };
+  
     try {
-      const response = await createMeeting(formData);
-      if (!response || !response.data || !response.data.id) {
-        toast.error("Failed to create the meeting.");
+      const response = await createMeeting(formattedData);
+
+      if (!response || !response.data || !response.data.msgToken) {
+        //console.log(response);
+        
+        toast.error("YEYEYEYEYE.");
         return;
       }
-
-      // Display the popup with the token
-      setTokenPopup({ show: true, token });
-
+  
+      setTokenPopup({ show: true, token: response.data.msgToken });
       toast.success("Meeting created successfully");
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Meeting creation failed";

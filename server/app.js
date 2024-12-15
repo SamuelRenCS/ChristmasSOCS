@@ -208,7 +208,7 @@ app.post("/api/meetings/new", async (req, res) => {
   }
 
   // If repeat is selected, check for an endDate
-  if (repeat !== "none" && !endDate) {
+  if (repeat !== "None" && !endDate) {
     return res
       .status(400)
       .json({ message: "End date is required for repeating meetings" });
@@ -228,22 +228,23 @@ app.post("/api/meetings/new", async (req, res) => {
       seatsPerSlot,
       repeat,
       endDate,
+      token: "UNSET",
     });
 
     await newMeeting.save();
 
-    //create token with meeting id
+    const payload = { meetingID: newMeeting._id };
 
-    const token = jwt.sign(newMeeting._id, SECRET_KEY);
+    const newToken = jwt.sign(payload, SECRET_KEY);
     // Append the token to the meeting object
-    newMeeting.token = token;
+    newMeeting.token = newToken;
 
     // Save the meeting
     await newMeeting.save();
 
     res.status(201).json({
       message: "Meeting created successfully",
-      token: newMeeting.token
+      msgToken: newMeeting.token
     });
   } catch (error) {
     console.error("Meeting creation error:", error);

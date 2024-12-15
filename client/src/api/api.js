@@ -34,7 +34,9 @@ export const register = async (formData) => {
 export const createMeeting = async (meetingData) => {
   try {
     const response = await api.post("/meetings/new", meetingData);
-    return response.data;
+    console.log(response);
+    console.log(response.data);
+    return response;
   } catch (error) {
     // this will throw an error that can be caught in the component
     throw error;
