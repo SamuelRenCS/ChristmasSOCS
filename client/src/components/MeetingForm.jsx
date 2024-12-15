@@ -45,7 +45,7 @@ const MeetingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Map interval string to numeric value
     const intervalMapping = {
       "10 min": 10,
@@ -54,31 +54,34 @@ const MeetingForm = () => {
       "30 min": 30,
       "1 hour": 60,
     };
-  
+
     const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
     const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
-  
+
     const formattedData = {
       ...formData,
-      startTime: startDateTime, 
+      startTime: startDateTime,
       endTime: endDateTime,
       interval: intervalMapping[formData.interval], // Map to numeric value
     };
-  
+
     try {
       const response = await createMeeting(formattedData);
 
-      if (!response || !response.data || !response.data.msgToken) {
+      if (!response) {
         //console.log(response);
-        
+
         toast.error("YEYEYEYEYE.");
         return;
       }
-  
-      setTokenPopup({ show: true, token: response.data.msgToken });
+
+      setTokenPopup({ show: true, token: response.msgToken });
       toast.success("Meeting created successfully");
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || "Meeting creation failed";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Meeting creation failed";
       toast.error(errorMessage);
     }
   };
