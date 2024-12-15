@@ -1,16 +1,14 @@
 import { useState } from "react";
-import Header from "../partials/Header";
-import Footer from "../partials/Footer";
-import "../styles/CreateMeeting.css";
+import styles from "../styles/CreateMeeting.module.css";
 import MeetingForm from "../components/MeetingForm";
 const CreateMeeting = () => {
   return (
-    <div className="create-meeting">
-      <div className="form-container">
+    <div className={styles["create-meeting"]}>
+      <div className={styles["form-container"]}>
         <h2>Create a New Meeting</h2>
         <MeetingForm />
       </div>
-      <div className="img-container">
+      <div className={styles["img-container"]}>
         <img src="/Mcgill.jpg" alt="Meeting" />
       </div>
     </div>

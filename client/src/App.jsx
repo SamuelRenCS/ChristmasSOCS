@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Registration from "./pages/Registration";
-import "./App.css";
+import styles from "./App.module.css";
 import { ToastContainer, toast } from "react-toastify";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
@@ -53,7 +53,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Header hidden={isHeaderHidden} isAppearable={isAppearable} />
-        <div className="main-section">
+        <div className={styles["main-section"]}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Landing />} />

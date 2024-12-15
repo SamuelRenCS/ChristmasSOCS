@@ -1,0 +1,11 @@
+.main-section {
+  flex-grow: 1;
+  margin-top: 15vh;
+  background-color: white;
+  min-height: calc(100vh - 15vh);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0; /* Ensure no extra margin at the bottom */
+  padding-bottom: 0; /* Ensure no extra padding at the bottom */
+}

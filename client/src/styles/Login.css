@@ -1,88 +1,81 @@
 .login-container {
-    background-color: white;
-    border-radius: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    max-width: 900px;
-    width: 90%;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    overflow: hidden;
-    margin: 40px auto; 
-    height: 450px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  max-width: 900px;
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  overflow: hidden;
+  height: 450px;
 }
 
 .login-container h1 {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .login-box {
-    flex: 1;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    margin: 30;
-    padding: 30px;
-    padding-left: 50px;
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  margin: 30;
+  padding: 30px;
+  padding-left: 50px;
 }
 
 .image-box {
-    flex: 1.2; 
-    display: flex;
-    justify-content: flex-end; /* Aligns the image to the right */
-    overflow: hidden;
-    height: 100%;
-    position: relative;
+  flex: 1.2;
+  display: flex;
+  justify-content: flex-end; /* Aligns the image to the right */
+  overflow: hidden;
+  height: 100%;
+  position: relative;
 }
 
 img {
-    width: 100%;
-    height: auto; 
-    object-fit: cover; /* Ensures the image covers the area */
-    transform-origin: top right; /* Ensures the image slides from the top-right corner */
-    transition: all 0.4s ease-in-out; /* Smooth shrinking effect */
+  width: 100%;
+  height: auto;
+  object-fit: cover; /* Ensures the image covers the area */
+  transform-origin: top right; /* Ensures the image slides from the top-right corner */
+  transition: all 0.4s ease-in-out; /* Smooth shrinking effect */
 }
 
 /* Responsive Design for Smaller Screens */
 @media (max-width: 768px) {
-    .login-container {
-        flex-direction: column; 
-        height: auto; 
-    }
+  .login-container {
+    flex-direction: column;
+    height: auto;
+  }
 
-    .image-box {
-        width: 100%; 
-        height: 200px; 
-    }
+  .image-box {
+    width: 100%;
+    height: 200px;
+  }
 
-    img {
-        width: 100%;
-        height: 100%; /* Ensure the image still fills its container */
-        object-fit: cover; /* Maintain aspect ratio without white space */
-    }
+  img {
+    width: 100%;
+    height: 100%; /* Ensure the image still fills its container */
+    object-fit: cover; /* Maintain aspect ratio without white space */
+  }
 
-    .login-box {
-        width: 100%;
-        padding: 20px;
-    }
+  .login-box {
+    width: 100%;
+    padding: 20px;
+  }
 }
 
 @media (max-width: 480px) {
-    .login-container {
-        width: 100%; /* Full width on smaller devices */
-    }
+  .login-container {
+    width: 100%; /* Full width on smaller devices */
+  }
 
-    .image-box {
-        height: 150px; /* Further reduce image height */
-    }
+  .image-box {
+    height: 150px; /* Further reduce image height */
+  }
 
-    .form-row {
-        flex-direction: column; /* Stack form elements vertically */
-    }
-
+  .form-row {
+    flex-direction: column; /* Stack form elements vertically */
+  }
 }
-
-
-
-
-
