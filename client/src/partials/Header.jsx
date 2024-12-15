@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 
 const Header = ({ hidden = false, isAppearable = false }) => {
   const { isAuthenticated, logout } = useAuth(); // Get directly from context
-  const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -45,7 +44,7 @@ const Header = ({ hidden = false, isAppearable = false }) => {
           {/* for mobile view */}
           <button
             className={styles.mobileMenuToggle}
-            onClick={() => setIsMobileMenuOpen(true)}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             ☰
           </button>

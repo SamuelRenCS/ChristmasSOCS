@@ -26,19 +26,27 @@
 
 .mobileMenuToggle {
   display: none;
-  background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 4rem;
+  margin: 0;
+  background: none;
+  padding: 10px 15px;
   cursor: pointer;
+  color: black;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1184px) {
   .desktopNavigation {
     display: none;
   }
 
   .mobileMenuToggle {
     display: block;
+  }
+
+  .mobileMenuToggle:hover {
+    color: var(--mcgill-red);
+    background: none;
   }
 }
 
