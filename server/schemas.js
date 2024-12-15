@@ -30,6 +30,6 @@ module.exports.userSchema = Joi.object({
   firstName: Joi.string().min(2).max(30).required().escapeHTML(),
   lastName: Joi.string().min(2).max(30).required().escapeHTML(),
   email: Joi.string().email().required().escapeHTML(),
-  password: Joi.string().min(6).max(30).required(),
+  password: Joi.string().required(),
   confirmPassword: Joi.ref("password"),
 });

@@ -1,4 +1,5 @@
 import axios from "axios";
+import sha256 from "crypto-js/sha256";
 
 // create an axios instance with default configuration
 const api = axios.create({
@@ -11,7 +12,13 @@ const api = axios.create({
 // login function to send a POST request to /login
 export const login = async (credentials) => {
   try {
-    const response = await api.post("/login", credentials);
+    // Hash the password before sending it to the server
+    const secureCredentials = {
+      ...credentials,
+      password: sha256(credentials.password).toString(),
+    };
+
+    const response = await api.post("/login", secureCredentials);
     return response;
   } catch (error) {
     // this will throw an error that can be caught in the component
@@ -22,7 +29,14 @@ export const login = async (credentials) => {
 // register function to send a POST request to /register
 export const register = async (formData) => {
   try {
-    const response = await api.post("/register", formData);
+    // Hash the password before sending it to the server
+    const secureFormData = {
+      ...formData,
+      password: sha256(formData.password).toString(),
+      confirmPassword: sha256(formData.confirmPassword).toString(),
+    };
+
+    const response = await api.post("/register", secureFormData);
     return response.data;
   } catch (error) {
     // this will throw an error that can be caught in the component
