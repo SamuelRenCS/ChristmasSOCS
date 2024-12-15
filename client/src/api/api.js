@@ -41,4 +41,38 @@ export const createMeeting = async (meetingData) => {
   }
 };
 
+// fetchMeetings function to send a GET request to /meetings with id
+//TODO CHECK THIS
+export const fetchMeeting = async (id) => {
+  try {
+    const response = await api.get(`/api/meetings/${id}`); // Pass `id` as part of the route
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching meeting:", error);
+    throw error; // Throw error to handle it in the calling component
+  }
+};
+
+// fetchMeetingSlots function to send a GET request to /meetings/
+// TODO ADD PARAMS
+export const fetchMeetingSlots = async (id, date) => {
+  try {
+    const response = await api.get(`/meetings/${id}/${date}`);
+    return response.data;
+  } catch (error) {
+    // this will throw an error that can be caught in the component
+    throw error;
+  }
+};
+
+export const createBooking = async (bookingData) => {
+  try {
+    const response = await api.post("/bookings/new", bookingData);
+    return response.data;
+  } catch (error) {
+    // this will throw an error that can be caught in the component
+    throw error;
+  }
+};
+
 export default api;

@@ -40,12 +40,18 @@ const MeetingSchema = new Schema({
   },
   repeat: {
     type: String,
-    enum: ["none", "daily", "weekly"],
-    default: "none",
+    enum: ["None", "Daily", "Weekly"],
+    default: "None",
   },
   endDate: {
     type: Date, // When the repeating meetings end
   },
+
+  token: {
+    type: String,
+    required: true,
+  },
+
   /*
   daysOfWeek: {
     type: [String], // Days of the week for repeating meetings

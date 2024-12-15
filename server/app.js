@@ -11,6 +11,7 @@ const { validateUser } = require("./middleware");
 // models
 const User = require("./models/user");
 const Meeting = require("./models/meeting");
+const e = require("express");
 
 // PUT IN ENV FILE LATER
 const SECRET_KEY = "ChristmasSOCS";
@@ -179,27 +180,27 @@ app.post("/api/register", validateUser, async (req, res) => {
 app.post("/api/meetings/new", async (req, res) => {
   console.log(req.body);
   const {
-    host,
     title,
-    meetingDate,
-    repeatEndDate,
+    host,
+    date,
     startTime,
     endTime,
-    repeat,
-    interval,
-    seats,
-    location,
+    location, 
     description,
+    interval,
+    seatsPerSlot,
+    repeat,
+    endDate,
   } = req.body;
 
   // server-side validation
   if (
     !title ||
-    !meetingDate ||
+    !date ||
     !startTime ||
     !endTime ||
     !location ||
-    !seats ||
+    !seatsPerSlot ||
     !interval ||
     !host
   ) {
@@ -207,7 +208,7 @@ app.post("/api/meetings/new", async (req, res) => {
   }
 
   // If repeat is selected, check for an endDate
-  if (repeat !== "none" && !repeatEndDate) {
+  if (repeat !== "none" && !endDate) {
     return res
       .status(400)
       .json({ message: "End date is required for repeating meetings" });
@@ -217,25 +218,36 @@ app.post("/api/meetings/new", async (req, res) => {
     // Create new meeting
     const newMeeting = new Meeting({
       title,
-      meetingDate,
       host,
+      date,
       startTime,
       endTime,
-      location,
+      location, 
       description,
       interval,
-      seatsPerSlot: seats,
+      seatsPerSlot,
       repeat,
-      endDate: repeatEndDate,
+      endDate,
     });
 
     await newMeeting.save();
 
-    res.status(201).json({ message: "Meeting created successfully" });
+    //create token with meeting id
+
+    const token = jwt.sign(newMeeting._id, SECRET_KEY);
+    // Append the token to the meeting object
+    newMeeting.token = token;
+
+    // Save the meeting
+    await newMeeting.save();
+
+    res.status(201).json({
+      message: "Meeting created successfully",
+      token: newMeeting.token
+    });
   } catch (error) {
     console.error("Meeting creation error:", error);
 
-    // handle specific mongoose validation errors
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -244,12 +256,66 @@ app.post("/api/meetings/new", async (req, res) => {
       });
     }
 
-    // generic server error
     res
       .status(500)
       .json({ message: "Meeting creation failed", error: error.message });
   }
 });
+
+// Serve the meetings fetch api route.
+// Query the meetings by MongoDB ID for the specific Meeting
+//TODO CHECK THIS
+app.get("/api/meetings/:id", async (req, res) => {
+  const { id } = req.params; // Extract `id` from route parameters
+
+  try {
+    // Validate if `id` is provided
+    if (!id) {
+      return res.status(400).json({ message: "Meeting ID is required" });
+    }
+
+    // Fetch meeting by ID and populate the host details
+    const meeting = await Meeting.findById(id).populate("host", "firstName lastName");
+
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    // Return the meeting data
+    res.status(200).json({ data: meeting });
+  } catch (error) {
+    console.error("Meeting fetch error:", error);
+    res.status(500).json({ message: "Meeting fetch failed", error: error.message });
+  }
+});
+
+// Serve the meeting slots fetch api route
+// Meeting contains a list of slots called meetingSlots
+app.get("/api/meetings/:id/:date", async (req, res) => {
+  const { id, date } = req.params;
+
+  try {
+    const meeting = await Meeting.findById(id).populate("meetingSlots");
+
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    // Filter slots by date
+    const slots = meeting.meetingSlots.filter((slot) => {
+      return slot.date.toDateString() === new Date(date).toDateString();
+    });
+
+    res.status(200).json({ data: slots });
+  }
+  catch (error) {
+    console.error("Meeting slots fetch error:", error);
+    res.status(500).json({ message: "Meeting slots fetch failed", error: error.message });
+  }
+});
+
+// Serve the booking creation api route
+
 
 // For all other routes, send back the index.html from the React app
 app.get("*", (req, res) => {

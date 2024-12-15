@@ -1,6 +1,6 @@
 import React from "react";
 
-const InputField = ({ label, name, type, value, onChange, required, min }) => {
+const InputField = ({ label, name, type, value, onChange, required, min, max }) => {
   return (
     <label>
       {label}
@@ -11,6 +11,7 @@ const InputField = ({ label, name, type, value, onChange, required, min }) => {
         onChange={onChange}
         required={required}
         min={min}
+        max={max}
       />
     </label>
   );
