@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import Header from '../partials/Header';
-import Footer from '../partials/Footer';
-import '../styles/CreateMeeting.css';
-import MeetingForm from '../components/MeetingForm';
+import { useState } from "react";
+import Header from "../partials/Header";
+import Footer from "../partials/Footer";
+import "../styles/CreateMeeting.css";
+import MeetingForm from "../components/MeetingForm";
 const CreateMeeting = () => {
-  
-
   return (
     <div className="create-meeting">
       <Header />
@@ -22,4 +20,3 @@ const CreateMeeting = () => {
 };
 
 export default CreateMeeting;
-

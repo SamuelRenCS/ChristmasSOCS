@@ -77,6 +77,9 @@ export const AuthProvider = ({ children }) => {
       const decoded = jwtDecode(token);
       setUser(decoded);
       setIsAuthenticated(true);
+
+      // store the token in localStorage
+      localStorage.setItem("token", token);
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
@@ -85,7 +88,6 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function to remove the user and token from localStorage
   const logout = () => {
-    console.log("Logout method called");
     localStorage.removeItem("token");
 
     // Use functional update to ensure state change

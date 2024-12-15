@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
-import logoSrc from '../../assets/logo.svg';
-import styles from './NavbarLogo.module.css';
+import React, { useState } from "react";
+import logoSrc from "../../assets/logo.svg";
+import styles from "./NavbarLogo.module.css";
+import { Link } from "react-router-dom";
 
 const NavbarLogo = () => {
-
-    return (
+  return (
     <div className={styles.logoContainer}>
-        
-        <a href="/">
+      <Link to="/">
         <img src={logoSrc} alt="Logo" className={styles.logoImage} />
-        </a>
+      </Link>
     </div>
-    )
-    
-}
-
+  );
+};
 
 export default NavbarLogo;
