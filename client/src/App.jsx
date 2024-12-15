@@ -12,6 +12,7 @@ import { AuthProvider } from "./context/AuthContext";
 import CreateMeeting from "./pages/CreateMeeting";
 import Header from "./partials/Header";
 import Footer from "./partials/Footer";
+import ViewMeeting from "./pages/ViewMeeting";
 
 function App() {
   const [isHeaderHidden, setHeaderHidden] = useState(false);
@@ -58,6 +59,7 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
+            <Route path="/test" element={<ViewMeeting />} />
 
             {/* Private Routes */}
             <Route element={<PrivateRoute />}>

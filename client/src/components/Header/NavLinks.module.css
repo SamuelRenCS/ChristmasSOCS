@@ -10,8 +10,24 @@
   font-weight: bold;
 }
 
+.mobileNavLinks {
+  font-family: "Inter", "Roboto", sans-serif;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
 .navLinkItem {
   margin: 0 20px;
+}
+
+.mobileNavLinks .navLinkItem {
+  margin: 10px 0;
+  text-align: center;
+  width: 100%;
 }
 
 .desktopLinkItem {
@@ -22,8 +38,23 @@
   transition: color 0.3s ease;
 }
 
+.mobileLinkItem {
+  text-decoration: none;
+  color: var(--primary);
+  display: block;
+  padding: 10px;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 .desktopLinkItem:hover {
   cursor: pointer;
+  color: var(--mcgill-red);
+}
+
+.mobileLinkItem:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
   color: var(--mcgill-red);
 }
 

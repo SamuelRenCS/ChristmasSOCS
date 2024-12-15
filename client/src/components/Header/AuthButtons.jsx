@@ -1,8 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./AuthButtons.module.css";
 
-const AuthButtons = ({ isAuthenticated, onLogout }) => {
+const AuthButtons = ({ isAuthenticated, onLogout, onClose }) => {
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate("/login");
+    if (onClose) onClose();
+  };
+
+  const handleRegisterClick = () => {
+    navigate("/register");
+    if (onClose) onClose();
+  };
+
   if (isAuthenticated) {
     return (
       <button className={styles.logoutButton} onClick={onLogout}>
@@ -13,12 +25,12 @@ const AuthButtons = ({ isAuthenticated, onLogout }) => {
 
   return (
     <div className={styles.authButtonContainer}>
-      <Link to="/login" className={styles.loginButton}>
+      <button className={styles.loginButton} onClick={handleLoginClick}>
         Login
-      </Link>
-      <Link to="/register" className={styles.registerButton}>
+      </button>
+      <button className={styles.registerButton} onClick={handleRegisterClick}>
         Register
-      </Link>
+      </button>
     </div>
   );
 };
