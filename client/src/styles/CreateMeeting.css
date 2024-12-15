@@ -7,11 +7,10 @@
   .create-meeting {
     display: grid;
     grid-template-areas:
-      "navbar navbar"
-      "form-container image-container"
-      "footer footer";
+      "form-container image-container";
+
     grid-template-columns: 60% 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr 500px;
     height: 100vh; 
     background-color: #293773;
   }
