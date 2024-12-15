@@ -6,6 +6,4 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 0; /* Ensure no extra margin at the bottom */
-  padding-bottom: 0; /* Ensure no extra padding at the bottom */
 }

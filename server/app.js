@@ -185,7 +185,7 @@ app.post("/api/meetings/new", async (req, res) => {
     date,
     startTime,
     endTime,
-    location, 
+    location,
     description,
     interval,
     seatsPerSlot,
@@ -222,7 +222,7 @@ app.post("/api/meetings/new", async (req, res) => {
       date,
       startTime,
       endTime,
-      location, 
+      location,
       description,
       interval,
       seatsPerSlot,
@@ -244,7 +244,7 @@ app.post("/api/meetings/new", async (req, res) => {
 
     res.status(201).json({
       message: "Meeting created successfully",
-      msgToken: newMeeting.token
+      msgToken: newMeeting.token,
     });
   } catch (error) {
     console.error("Meeting creation error:", error);
@@ -276,7 +276,10 @@ app.get("/api/meetings/:id", async (req, res) => {
     }
 
     // Fetch meeting by ID and populate the host details
-    const meeting = await Meeting.findById(id).populate("host", "firstName lastName");
+    const meeting = await Meeting.findById(id).populate(
+      "host",
+      "firstName lastName"
+    );
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
@@ -286,7 +289,9 @@ app.get("/api/meetings/:id", async (req, res) => {
     res.status(200).json({ data: meeting });
   } catch (error) {
     console.error("Meeting fetch error:", error);
-    res.status(500).json({ message: "Meeting fetch failed", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Meeting fetch failed", error: error.message });
   }
 });
 
@@ -308,15 +313,15 @@ app.get("/api/meetings/:id/:date", async (req, res) => {
     });
 
     res.status(200).json({ data: slots });
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Meeting slots fetch error:", error);
-    res.status(500).json({ message: "Meeting slots fetch failed", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Meeting slots fetch failed", error: error.message });
   }
 });
 
 // Serve the booking creation api route
-
 
 // For all other routes, send back the index.html from the React app
 app.get("*", (req, res) => {

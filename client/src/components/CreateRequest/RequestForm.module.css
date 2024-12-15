@@ -1,0 +1,19 @@
+.form {
+  max-width: 500px;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tertiary);
+}
+
+.calendarContainer {
+  margin-bottom: 20px;
+  align-self: center;
+}
+
+.timeInputContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}

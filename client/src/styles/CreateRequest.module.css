@@ -1,0 +1,13 @@
+.requestForm {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  width: 100%;
+  background-color: var(--secondary);
+}
+
+.title {
+  text-align: left;
+  margin-left: 20px;
+}

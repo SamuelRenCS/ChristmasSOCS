@@ -71,7 +71,7 @@ const MeetingForm = () => {
       if (!response) {
         //console.log(response);
 
-        toast.error("YEYEYEYEYE.");
+        toast.error("Error creating meeting");
         return;
       }
 
