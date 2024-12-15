@@ -1,3 +1,4 @@
+import React from 'react';
 export default function Button({ type, text, onClick }) {
     const styles = {
         button: {
@@ -9,6 +10,7 @@ export default function Button({ type, text, onClick }) {
             cursor: 'pointer',
             fontSize: '1rem',
             marginTop: '20px',
+            fontWeight: 'bold',
         }
     }
     return (
