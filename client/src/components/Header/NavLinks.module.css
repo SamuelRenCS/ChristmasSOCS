@@ -1,36 +1,43 @@
 .desktopNavLinks {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    align-items: center;
+  font-family: "Inter", "Roboto", sans-serif;
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
-  
-.mobileNavLinks {
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-  
+
 .navLinkItem {
-    margin: 0 10px;
+  margin: 0 20px;
 }
-  
+
 .desktopLinkItem {
-    text-decoration: none;
-    color: #333;
-    transition: color 0.3s ease;
+  text-decoration: none;
+  color: var(--primary);
+  position: relative;
+  padding-bottom: 5px;
+  transition: color 0.3s ease;
 }
-  
+
 .desktopLinkItem:hover {
-    color: #8c0d0d; /* McGill red */
+  cursor: pointer;
+  color: var(--mcgill-red);
 }
-  
-.mobileLinkItem {
-    text-decoration: none;
-    color: #333;
-    display: block;
-    padding: 10px 0;
+
+.desktopLinkItem::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--mcgill-red);
+  transition: width 0.3s ease;
+}
+
+.desktopLinkItem:hover::after {
+  width: 100%; /* Full width on hover */
 }

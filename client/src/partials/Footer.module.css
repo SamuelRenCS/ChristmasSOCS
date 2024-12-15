@@ -1,8 +1,38 @@
 .footer {
-    height: 500px;
-    padding: 0 20px;
-    background-color: #333;
-    color: white;
-    display: flex;
-    justify-content: space-between;
+  font-family: "Inter", "Roboto", sans-serif;
+  height: auto;
+  padding: 0 40px;
+  background-color: #333;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+}
+
+.linksBlock {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footerSection {
+  margin-right: 80px;
+  text-align: left;
+}
+
+.footerList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.footerList li {
+  margin-bottom: 5px;
+}
+
+.footerLink {
+  text-decoration: none;
+  color: white;
+}
+
+.footerCredits {
+  display: flex;
+  align-items: flex-end;
 }

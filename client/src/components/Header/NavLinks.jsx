@@ -1,19 +1,17 @@
-import React from 'react';
-import styles from './NavLinks.module.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import styles from "./NavLinks.module.css";
 
-const NavLinks = ({ links, isMobile = false }) => {
-  const linkClassName = isMobile ? styles.mobileLinkItem : styles.desktopLinkItem;
+const NavLinks = ({ links }) => {
+  const linkClassName = styles.desktopLinkItem;
 
   return (
-    <ul className={isMobile ? styles.mobileNavLinks : styles.desktopNavLinks}>
+    <ul className={styles.desktopNavLinks}>
       {links.map((link) => (
         <li key={link.name} className={styles.navLinkItem}>
-          <a 
-            href={link.href} 
-            className={linkClassName}
-          >
+          <Link to={link.path} className={linkClassName}>
             {link.name}
-          </a>
+          </Link>
         </li>
       ))}
     </ul>
