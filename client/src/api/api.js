@@ -89,4 +89,9 @@ export const createBooking = async (bookingData) => {
   }
 };
 
+// TODO
+export const getMeetingsSlots = async () => {
+  return;
+};
+
 export default api;
