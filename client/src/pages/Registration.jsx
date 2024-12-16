@@ -17,6 +17,45 @@ function Registration() {
     confirmPassword: "",
   });
 
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const validationErrors = {};
+
+    // First Name validation
+    if (!formData.firstName.trim()) {
+      validationErrors.firstName = "First Name is required.";
+    }
+
+    // Last Name validation
+    if (!formData.lastName.trim()) {
+      validationErrors.lastName = "Last Name is required.";
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      validationErrors.email = "Email is invalid.";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      validationErrors.password = "Password is required.";
+    } else if (formData.password.length < 8) {
+      validationErrors.password = "Password must be at least 8 characters.";
+    } else if (!/[!@#$%^&*]/.test(formData.password)) {
+      validationErrors.password = "Password must include at least one special character.";
+    }
+
+    // Confirm Password validation
+    if (formData.password !== formData.confirmPassword) {
+      validationErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    return validationErrors;
+};
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -27,6 +66,16 @@ function Registration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix validation errors.");
+      return;
+    }
+
+    setErrors({}); // Clear errors if validation passes
+
 
     // basic client-side validation
     if (formData.password !== formData.confirmPassword) {
@@ -66,6 +115,9 @@ function Registration() {
               formType="register"
               onChange={handleChange}
             />
+            {errors.firstName && (
+                <p className="error-text">{errors.firstName}</p>
+            )}
             <Input
               label="Last Name"
               type="text"
@@ -74,6 +126,9 @@ function Registration() {
               formType="register"
               onChange={handleChange}
             />
+            {errors.lastName && (
+                <p className="error-text">{errors.lastName}</p>
+            )}
           </div>
           <Input
             label="Email"
@@ -83,6 +138,7 @@ function Registration() {
             formType="register"
             onChange={handleChange}
           />
+          {errors.email && <p className="error-text">{errors.email}</p>}
           <Input
             label="Password"
             type="password"
@@ -91,6 +147,7 @@ function Registration() {
             formType="register"
             onChange={handleChange}
           />
+          {errors.password && <p className="error-text">{errors.password}</p>}
           <Input
             label="Confirm Password"
             type="password"
@@ -99,6 +156,9 @@ function Registration() {
             formType="register"
             onChange={handleChange}
           />
+          {errors.confirmPassword && (
+            <p className="error-text">{errors.confirmPassword}</p>
+          )}
           <Button type="submit" text="Register" />
         </form>
       </div>

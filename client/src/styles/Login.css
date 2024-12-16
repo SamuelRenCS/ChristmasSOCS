@@ -8,8 +8,18 @@
   justify-content: space-between;
   align-items: flex-start;
   overflow: hidden;
-  height: 450px;
+  height: auto;
+  min-height: 450px;
 }
+
+.error-text {
+    font-size: 0.8rem;
+    color: red;
+    position: absolute;
+    bottom: -20px; /* Adjust this to control spacing */
+    left: 0;
+    white-space: nowrap; /* Prevent the message from wrapping */
+  }
 
 .login-container h1 {
   margin-bottom: 20px;
