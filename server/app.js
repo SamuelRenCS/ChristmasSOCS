@@ -266,26 +266,32 @@ app.post("/api/meetings/new", async (req, res) => {
 // Serve the meetings fetch api route.
 // Query the meetings by MongoDB ID for the specific Meeting
 //TODO CHECK THIS
-app.get("/api/meetings/:id", async (req, res) => {
-  const { id } = req.params; // Extract `id` from route parameters
 
+app.get("/api/meetings/:token", async (req, res) => {
+
+  const { iToken } = req.params;
+
+  // Extract the meeting ID from the token and validate the token that is stored in the meeting object
   try {
-    // Validate if `id` is provided
-    if (!id) {
-      return res.status(400).json({ message: "Meeting ID is required" });
+
+    if (!iToken) {
+      return res.status(400).json({ message: "Token is required" });
     }
 
-    // Fetch meeting by ID and populate the host details
-    const meeting = await Meeting.findById(id).populate(
-      "host",
-      "firstName lastName"
-    );
+    const decoded = jwt.verify(iToken, SECRET_KEY);
+    const meetingID = decoded.meetingID;
+
+    const meeting = await Meeting.findById(meetingID).populate("host", "firstName lastName");
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
+    } 
+
+    // Compare the token in the meeting object with the token in the request
+    if (meeting.token !== iToken) {
+      return res.status(401).json({ message: "Unauthorized access" });
     }
 
-    // Return the meeting data
     res.status(200).json({ data: meeting });
   } catch (error) {
     console.error("Meeting fetch error:", error);
@@ -294,6 +300,7 @@ app.get("/api/meetings/:id", async (req, res) => {
       .json({ message: "Meeting fetch failed", error: error.message });
   }
 });
+
 
 // Serve the meeting slots fetch api route
 // Meeting contains a list of slots called meetingSlots
