@@ -1,19 +1,20 @@
-import { useState } from 'react';
-import Header from '../partials/Header';
-import Footer from '../partials/Footer';
-import '../styles/CreateBooking.css';
-import BookingForm from '../components/BookingForm';
-const CreateMeeting = () => {
-  
+import { useState } from "react";
+import Header from "../partials/Header";
+import Footer from "../partials/Footer";
+import { useParams } from "react-router-dom";
+import styles from "../styles/CreateBooking.module.css";
+import BookingForm from "../components/BookingForm";
+const CreateBooking = () => {
+  const { token } = useParams();
 
   return (
-    <div className="create-meeting">
+    <div className={styles["create-meeting"]}>
       <Header />
-      <div className="form-container">
+      <div className={styles["form-container"]}>
         <h2>Book a meeting</h2>
-        <BookingForm />
+        <BookingForm token={token} />
       </div>
-      <div className="img-container">
+      <div className={styles["img-container"]}>
         <img src="/Mcgill.jpg" alt="Meeting" />
       </div>
       <Footer />
@@ -21,5 +22,4 @@ const CreateMeeting = () => {
   );
 };
 
-export default CreateMeeting;
-
+export default CreateBooking;

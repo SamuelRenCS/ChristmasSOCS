@@ -9,13 +9,13 @@ import { getMeetingsSlots } from "../api/api";
 import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
-import './BookingForm.css';
+import "./BookingForm.css";
 
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const BookingForm = ({meetingID}) => {
+const BookingForm = (token) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -32,7 +32,11 @@ const BookingForm = ({meetingID}) => {
         const { startDate, endDate, timeSlot, seats, interval } = response.data;
 
         // Calculate highlighted dates based on the interval
-        const dates = calculateDates(new Date(startDate), new Date(endDate), interval);
+        const dates = calculateDates(
+          new Date(startDate),
+          new Date(endDate),
+          interval
+        );
 
         setHighlightedDates(dates);
 
@@ -56,7 +60,9 @@ const BookingForm = ({meetingID}) => {
 
     while (currentDate <= endDate) {
       dates.push(new Date(currentDate)); // Push the date
-      currentDate.setDate(currentDate.getDate() + (interval === "daily" ? 1 : 7)); // Increment based on interval
+      currentDate.setDate(
+        currentDate.getDate() + (interval === "daily" ? 1 : 7)
+      ); // Increment based on interval
     }
 
     return dates;
@@ -66,9 +72,9 @@ const BookingForm = ({meetingID}) => {
     const slots = [];
     const start = new Date(`1970-01-01T${startTime}:00`); // Base date for time calculation
     const end = new Date(`1970-01-01T${endTime}:00`);
-  
+
     let current = new Date(start);
-  
+
     while (current < end) {
       slots.push(
         current.toLocaleTimeString("en-US", {
@@ -78,7 +84,7 @@ const BookingForm = ({meetingID}) => {
       );
       current.setMinutes(current.getMinutes() + interval); // Increment by interval
     }
-  
+
     return slots;
   };
 
@@ -123,14 +129,16 @@ const BookingForm = ({meetingID}) => {
         return;
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || "Booking creation failed";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Booking creation failed";
       toast.error(errorMessage);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="booking-form">
-
       <div className="form-date">
         <CalendarDateInput
           label="Date:"
@@ -166,8 +174,6 @@ const BookingForm = ({meetingID}) => {
       <div className="form-submit">
         <button type="submit">Book Meeting</button>
       </div>
-
-      
     </form>
   );
 };
