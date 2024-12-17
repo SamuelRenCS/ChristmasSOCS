@@ -9,7 +9,7 @@ const MeetingSlotSchema = new Schema({
   occurrenceDate: { type: Date, required: true }, // The specific date of this occurrence
   startTime: Date,
   endTime: Date,
-  location: String,
+  //location: String,
   users: [
     {
       type: Schema.Types.ObjectId,

@@ -4,7 +4,9 @@ import { useEffect } from "react";
 //TODO
 import { createBooking } from "../api/api";
 import { fetchMeeting } from "../api/api"; // onload to get the general meeting details
-import { getMeetingsSlots } from "../api/api";
+import { fetchMeetingSlot } from "../api/api";
+
+import { fetchSeats } from "../api/api";
 
 import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
@@ -15,11 +17,11 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const BookingForm = (token) => {
+const BookingForm = ({token}) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [allSlots, setAllSlots] = useState([]);
+  //const [allSlots, setAllSlots] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [maxSeats, setMaxSeats] = useState(0);
   const [highlightedDates, setHighlightedDates] = useState([]);
@@ -28,65 +30,30 @@ const BookingForm = (token) => {
     // Fetch the meeting data on load
     const fetchMeetingDetails = async () => {
       try {
-        const response = await fetchMeeting(meetingID);
-        const { startDate, endDate, timeSlot, seats, interval } = response.data;
+        // pass token as a string
+        const response = await fetchMeeting(token);
+        // res.status(200).json({ data: { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, dates } });
+        const { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, formattedDates } = response.data;
 
-        // Calculate highlighted dates based on the interval
-        const dates = calculateDates(
-          new Date(startDate),
-          new Date(endDate),
-          interval
-        );
+        console.log("Meeting details:", response.data);
+        console.log("Formatted dates:", formattedDates);
+        setHighlightedDates(formattedDates);
 
-        setHighlightedDates(dates);
+        //keep the date part of the datetime
+        const dateObj = new Date(date);
 
         // Prepopulate form fields
         setFormData({
-          meetingDate: startDate,
-          timeSlot: timeSlot || "",
-          seats: seats || "",
+          meetingDate: dateObj.toISOString().split("T")[0],
         });
+
       } catch (error) {
         console.error("Error fetching meeting data:", error);
       }
     };
 
     fetchMeetingDetails();
-  }, [meetingID]);
-
-  const calculateDates = (startDate, endDate, interval) => {
-    const dates = [];
-    let currentDate = new Date(startDate);
-
-    while (currentDate <= endDate) {
-      dates.push(new Date(currentDate)); // Push the date
-      currentDate.setDate(
-        currentDate.getDate() + (interval === "daily" ? 1 : 7)
-      ); // Increment based on interval
-    }
-
-    return dates;
-  };
-
-  const generateSlots = (startTime, endTime, interval) => {
-    const slots = [];
-    const start = new Date(`1970-01-01T${startTime}:00`); // Base date for time calculation
-    const end = new Date(`1970-01-01T${endTime}:00`);
-
-    let current = new Date(start);
-
-    while (current < end) {
-      slots.push(
-        current.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
-      current.setMinutes(current.getMinutes() + interval); // Increment by interval
-    }
-
-    return slots;
-  };
+  }, [token]);
 
   const [formData, setFormData] = useState({
     attendee: user ? user.id : "",
@@ -96,29 +63,42 @@ const BookingForm = (token) => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value || "" });
   };
 
   const handleDateChange = async (date) => {
     setFormData({
       ...formData,
-      meetingDate: date,
+      meetingDate: date || "",
     });
 
     try {
-      const response = await getMeetingsSlots(meetingID, date);
-      const { bookedSlots } = await response.json();
-
-      const remainingSlots = allSlots.filter(
-        (slot) => !bookedSlots.some((booked) => booked.timeSlot === slot)
-      );
-
+      const response = await fetchMeetingSlot(token, date);
+      const  remainingSlots = response.data;
       setAvailableSlots(remainingSlots);
     } catch (error) {
       console.error("Error fetching slots for the date:", error);
       toast.error("Error fetching available slots.");
     }
   };
+
+  // When is a slot selected, we need to update the max of seats available
+  const handleSlotChange = async (e) => {
+    const selectedSlot = e.target.value;
+    setFormData({
+      ...formData,
+      timeSlot: selectedSlot || "",
+    });
+
+    try {
+      const response = await fetchSeats(token, formData.meetingDate, selectedSlot);
+      const { remainingSeats } = response.data;
+      setMaxSeats(remainingSeats);
+    } catch (error) {
+      console.error("Error fetching remaining seats for the slot:", error);
+      toast.error("Error fetching remaining seats.");
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -153,7 +133,7 @@ const BookingForm = (token) => {
           label="Time slot:"
           name="timeSlot"
           value={formData.timeSlot}
-          onChange={handleChange}
+          onChange={handleSlotChange}
           options={availableSlots}
         />
       </div>
@@ -165,7 +145,7 @@ const BookingForm = (token) => {
           type="number"
           min="1"
           max={maxSeats}
-          value={formData.seats}
+          value={formData.seats || ""}
           onChange={handleChange}
           placeholder="Enter the number of seats"
         />

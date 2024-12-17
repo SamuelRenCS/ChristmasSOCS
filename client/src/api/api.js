@@ -57,9 +57,9 @@ export const createMeeting = async (meetingData) => {
 
 // fetchMeetings function to send a GET request to /meetings with id
 //TODO CHECK THIS
-export const fetchMeeting = async (id) => {
+export const fetchMeeting = async (token) => {
   try {
-    const response = await api.get(`/api/meetings/${id}`); // Pass `id` as part of the route
+    const response = await api.get(`/meetings/${token}`); // Pass `id` as part of the route
     return response.data;
   } catch (error) {
     console.error("Error fetching meeting:", error);
@@ -69,12 +69,12 @@ export const fetchMeeting = async (id) => {
 
 // fetchMeetingSlots function to send a GET request to /meetings/
 // TODO ADD PARAMS
-export const fetchMeetingSlots = async (id, date) => {
+export const fetchMeetingSlot = async (meetingID, date) => {
   try {
-    const response = await api.get(`/meetings/${id}/${date}`);
+    const response = await api.get(`/meetings/${meetingID}/${date}`);
     return response.data;
   } catch (error) {
-    // this will throw an error that can be caught in the component
+    console.error("Error fetching meeting details:", error);
     throw error;
   }
 };
@@ -89,9 +89,14 @@ export const createBooking = async (bookingData) => {
   }
 };
 
-// TODO
-export const getMeetingsSlots = async () => {
-  return;
+export const fetchSeats = async (meetingID, date, slot) => {
+  try {
+    const response = await api.get(`/bookings/${meetingID}/${date}/${slot}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    throw error;
+  }
 };
 
 export default api;

@@ -263,13 +263,23 @@ app.post("/api/meetings/new", async (req, res) => {
   }
 });
 
-// Serve the meetings fetch api route.
-// Query the meetings by MongoDB ID for the specific Meeting
-//TODO CHECK THIS
+const calculateDates = (startDate, endDate, repeat) => {
+  const dates = [];
+  let currentDate = new Date(startDate);
+
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate)); // Push the date
+    currentDate.setDate(
+      currentDate.getDate() + (repeat === "Daily" ? 1 : 7)
+    ); // Increment based on interval
+  }
+
+  return dates;
+};
 
 app.get("/api/meetings/:token", async (req, res) => {
 
-  const { iToken } = req.params;
+  const iToken = req.params.token;
 
   // Extract the meeting ID from the token and validate the token that is stored in the meeting object
   try {
@@ -292,7 +302,14 @@ app.get("/api/meetings/:token", async (req, res) => {
       return res.status(401).json({ message: "Unauthorized access" });
     }
 
-    res.status(200).json({ data: meeting });
+    const { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate } = meeting;
+
+    const dates = calculateDates(date, endDate, repeat);
+
+    const formattedDates = dates.map(date => date.toISOString().split('T')[0]);
+
+    res.status(200).json({ data: { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, formattedDates, meetingID } });
+
   } catch (error) {
     console.error("Meeting fetch error:", error);
     res
@@ -304,22 +321,59 @@ app.get("/api/meetings/:token", async (req, res) => {
 
 // Serve the meeting slots fetch api route
 // Meeting contains a list of slots called meetingSlots
-app.get("/api/meetings/:id/:date", async (req, res) => {
-  const { id, date } = req.params;
+app.get("/api/meetings/:meetingID/:date", async (req, res) => {
+  const { meetingID, date } = req.params;
 
   try {
-    const meeting = await Meeting.findById(id).populate("meetingSlots");
+    if (!meetingID || !date) {
+      return res.status(400).json({ message: "Meeting ID and date are required" });
+    }
+
+    const meeting = await Meeting.findById(meetingID);
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-    // Filter slots by date
-    const slots = meeting.meetingSlots.filter((slot) => {
-      return slot.date.toDateString() === new Date(date).toDateString();
-    });
+    // Compare the token in the meeting object with the token in the request
+    if (meeting.token !== meetingID) {
+      return res.status(401).json({ message: "Unauthorized access" });
+    }
 
-    res.status(200).json({ data: slots });
+    const meetingSlots = meeting.populate("meetingSlots");
+    const bookedSlots = meetingSlots.filter((slot) => slot.date === date).map((slot) => slot.startTime);
+
+    // remove the slots that have 0 seats available
+    
+    const slotsWithSeats = meetingSlots.filter((slot) => slot.seatsAvailable > 0);
+
+
+    const allSlots = generateSlots(startTime, endTime, interval);
+
+    const generateSlots = (startTime, endTime, interval) => {
+      const slots = [];
+      const start = startTime; // Base date for time calculation
+      const end = endTime;
+
+      let current = new Date(start);
+
+      while (current < end) {
+        slots.push(
+          current.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        );
+        current.setMinutes(current.getMinutes() + interval); // Increment by interval
+      }
+
+      return slots;
+    };
+
+    const availableSlots = allSlots.filter((slot) => !bookedSlots.includes(slot));
+
+    res.status(200).json({ data: {availableSlots } });
+
   } catch (error) {
     console.error("Meeting slots fetch error:", error);
     res
@@ -328,7 +382,38 @@ app.get("/api/meetings/:id/:date", async (req, res) => {
   }
 });
 
-// Serve the booking creation api route
+app.get("/api/bookings/:meetingID/:date/:slot", async (req, res) => {
+  const { meetingID, date, slot } = req.params;
+
+  try {
+    if (!meetingID || !date || !slot) {
+      return res.status(400).json({ message: "Meeting ID, date, and slot are required" });
+    }
+
+    const meeting = await Meeting.findById(meetingID);
+
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    //check is a meeintg slot exists for the given date and slot
+    const meetingSlot = meeting.meetingSlots.find((slot) => slot.date === date && slot.startTime === slot);
+
+    // if no meeting slot is found, return the max seats for the meeting
+    if (!meetingSlot) {
+      return res.status(200).json({ data: { maxSeats: meeting.seatsPerSlot } });
+    } else {
+      const seats = meetingSlot.seatsAvailable;
+      res.status(200).json({ data: { seats } });
+    }
+
+  } catch (error) {
+    console.error("Meeting slots fetch error:", error);
+    res
+      .status(500)
+      .json({ message: "Meeting slots fetch failed", error: error.message });
+  }
+});
 
 // For all other routes, send back the index.html from the React app
 app.get("*", (req, res) => {
