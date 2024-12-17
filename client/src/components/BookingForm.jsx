@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 const BookingForm = ({token}) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [meetingID, setMeetingID] = useState("");
 
   //const [allSlots, setAllSlots] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -33,8 +34,9 @@ const BookingForm = ({token}) => {
         // pass token as a string
         const response = await fetchMeeting(token);
         // res.status(200).json({ data: { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, dates } });
-        const { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, formattedDates } = response.data;
+        const { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, formattedDates, meetingID } = response.data;
 
+        setMeetingID(meetingID);
         console.log("Meeting details:", response.data);
         console.log("Formatted dates:", formattedDates);
         setHighlightedDates(formattedDates);
@@ -44,6 +46,7 @@ const BookingForm = ({token}) => {
 
         // Prepopulate form fields
         setFormData({
+          attendee: user ? `${user.firstName} ${user.lastName}` : "",
           meetingDate: dateObj.toISOString().split("T")[0],
         });
 
@@ -56,7 +59,8 @@ const BookingForm = ({token}) => {
   }, [token]);
 
   const [formData, setFormData] = useState({
-    attendee: user ? user.id : "",
+    // Retrieve the first and last name from the user context
+    attendee: user ? `${user.firstName} ${user.lastName}` : "",
     meetingDate: "",
     timeSlot: "",
     seats: "",
@@ -73,9 +77,27 @@ const BookingForm = ({token}) => {
     });
 
     try {
-      const response = await fetchMeetingSlot(token, date);
-      const  remainingSlots = response.data;
+      const response = await fetchMeetingSlot(meetingID, date);
+      const  remainingSlots = response.data.finalSlots;
+      console.log("Available slots:", remainingSlots);
       setAvailableSlots(remainingSlots);
+      // select the first slot
+      setFormData({
+        ...formData,
+        timeSlot: remainingSlots[0] || "",
+      });
+      // get the max seats for the first slot
+      const firstSlot = remainingSlots[0];
+      try {
+        //console.log("Meeting ID:", meetingID);
+        const response = await fetchSeats(meetingID, formData.meetingDate, firstSlot);
+        const remainingSeats = response.data.seats;
+        console.log("Remaining seats:", remainingSeats);
+        setMaxSeats(remainingSeats);
+      } catch (error) {
+        console.error("Error fetching remaining seats for the slot:", error);
+        toast.error("Error fetching remaining seats.");
+      }
     } catch (error) {
       console.error("Error fetching slots for the date:", error);
       toast.error("Error fetching available slots.");
@@ -91,8 +113,10 @@ const BookingForm = ({token}) => {
     });
 
     try {
-      const response = await fetchSeats(token, formData.meetingDate, selectedSlot);
-      const { remainingSeats } = response.data;
+      //console.log("Meeting ID:", meetingID);
+      const response = await fetchSeats(meetingID, formData.meetingDate, selectedSlot);
+      const remainingSeats = response.data.seats;
+      console.log("Remaining seats:", remainingSeats);
       setMaxSeats(remainingSeats);
     } catch (error) {
       console.error("Error fetching remaining seats for the slot:", error);
@@ -150,6 +174,20 @@ const BookingForm = ({token}) => {
           placeholder="Enter the number of seats"
         />
       </div>
+
+      {/* show a field to input name of the attendee (autocomplete if token is provided)  */}
+      <div className="form-attendee">
+        <InputField
+          label="Name:"
+          name="attendee"
+          type="text"
+          value={formData.attendee}
+          onChange={handleChange}
+          required={true}
+        />
+      </div>
+
+
 
       <div className="form-submit">
         <button type="submit">Book Meeting</button>

@@ -12,6 +12,8 @@ const { validateUser } = require("./middleware");
 const User = require("./models/user");
 const Meeting = require("./models/meeting");
 const e = require("express");
+const MeetingSlot = require("./models/meetingSlot");
+
 
 // PUT IN ENV FILE LATER
 const SECRET_KEY = "ChristmasSOCS";
@@ -318,6 +320,25 @@ app.get("/api/meetings/:token", async (req, res) => {
   }
 });
 
+const generateSlots = (startTime, endTime, interval) => {
+  const slots = [];
+  const start = startTime; // Base date for time calculation
+  const end = endTime;
+
+  let current = new Date(start);
+
+  while (current < end) {
+    slots.push(
+      current.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+    current.setMinutes(current.getMinutes() + interval); // Increment by interval
+  }
+
+  return slots;
+};
 
 // Serve the meeting slots fetch api route
 // Meeting contains a list of slots called meetingSlots
@@ -331,48 +352,35 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
 
     const meeting = await Meeting.findById(meetingID);
 
+    const { startTime, endTime, interval } = meeting;
+
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-    // Compare the token in the meeting object with the token in the request
-    if (meeting.token !== meetingID) {
-      return res.status(401).json({ message: "Unauthorized access" });
-    }
+    //retrieve only the meeting slots for the given date
+    const meetingSlots = meeting.meetingSlots.filter((slot) => slot.date === date);
 
-    const meetingSlots = meeting.populate("meetingSlots");
+    console.log("meetingSlots", meetingSlots);
+
     const bookedSlots = meetingSlots.filter((slot) => slot.date === date).map((slot) => slot.startTime);
 
-    // remove the slots that have 0 seats available
-    
-    const slotsWithSeats = meetingSlots.filter((slot) => slot.seatsAvailable > 0);
+    console.log("bookedSlots", bookedSlots);
 
+    // find slots that have 0 seats available
+    const slotsWithSeats = meetingSlots.filter((slot) => slot.seatsAvailable > 0).map((slot) => slot.startTime);
+
+    console.log("slotsWithSeats", slotsWithSeats);
 
     const allSlots = generateSlots(startTime, endTime, interval);
 
-    const generateSlots = (startTime, endTime, interval) => {
-      const slots = [];
-      const start = startTime; // Base date for time calculation
-      const end = endTime;
+    console.log("allSlots", allSlots);
 
-      let current = new Date(start);
+    // remove slots that are booked and have no seats available
+    const finalSlots = allSlots.filter((slot) => !bookedSlots.includes(slot) && !slotsWithSeats.includes(slot));
+    console.log("finalSlots", finalSlots);
 
-      while (current < end) {
-        slots.push(
-          current.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        );
-        current.setMinutes(current.getMinutes() + interval); // Increment by interval
-      }
-
-      return slots;
-    };
-
-    const availableSlots = allSlots.filter((slot) => !bookedSlots.includes(slot));
-
-    res.status(200).json({ data: {availableSlots } });
+    res.status(200).json({ data: {finalSlots } });
 
   } catch (error) {
     console.error("Meeting slots fetch error:", error);
@@ -401,10 +409,10 @@ app.get("/api/bookings/:meetingID/:date/:slot", async (req, res) => {
 
     // if no meeting slot is found, return the max seats for the meeting
     if (!meetingSlot) {
-      return res.status(200).json({ data: { maxSeats: meeting.seatsPerSlot } });
+      return res.status(200).json({ data: { seats: meeting.seatsPerSlot } });
     } else {
-      const seats = meetingSlot.seatsAvailable;
-      res.status(200).json({ data: { seats } });
+      const seatsLeft = meetingSlot.seatsAvailable;
+      res.status(200).json({ data: { seats : seatsLeft } });
     }
 
   } catch (error) {

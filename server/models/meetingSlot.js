@@ -10,13 +10,13 @@ const MeetingSlotSchema = new Schema({
   startTime: Date,
   endTime: Date,
   //location: String,
-  users: [
+  // Names of attendees
+  attendees: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
     },
   ],
   seatsAvailable: Number,
 });
 
-modules.exports = mongoose.model("MeetingSlot", MeetingSlotSchema);
+module.exports = mongoose.model("MeetingSlot", MeetingSlotSchema);
