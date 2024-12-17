@@ -15,6 +15,7 @@ import Footer from "./partials/Footer";
 import ViewMeeting from "./pages/ViewMeeting";
 import CreateRequest from "./pages/CreateRequest";
 import CreateBooking from "./pages/CreateBooking";
+//import MeetingPage from "./pages/MeetingPage";
 
 function App() {
   const [isHeaderHidden, setHeaderHidden] = useState(false);
@@ -63,7 +64,7 @@ function App() {
             <Route path="/register" element={<Registration />} />
             <Route path="/test" element={<ViewMeeting />} />
             <Route path="/requests" element={<CreateRequest />} />
-            {/* <Route path="/meetings/:token" element={<CreateBooking />} /> */}
+            <Route path="/meetings/:token" element={<CreateBooking />} />
 
             <Route path="/meetings/new" element={<CreateMeeting />} />
 
