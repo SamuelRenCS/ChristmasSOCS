@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "../styles/CreateMeeting.module.css";
-import MeetingForm from "../components/MeetingForm";
+import MeetingForm from "../components/MeetingForm/MeetingForm";
 const CreateMeeting = () => {
   return (
     <div className={styles["create-meeting"]}>

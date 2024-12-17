@@ -1,17 +1,23 @@
 import React from "react";
+import styles from "./SelectField.module.css";
 
 const SelectField = ({ label, name, value, onChange, options }) => {
   return (
-    <label>
-      {label}
-      <select name={name} value={value} onChange={onChange}>
+    <div className={styles.selectWrapper}>
+      <label className={styles.label}>{label}</label>
+      <select
+        className={styles.select}
+        name={name}
+        value={value}
+        onChange={onChange}
+      >
         {options.map((option, index) => (
           <option key={index} value={option}>
             {option}
           </option>
         ))}
       </select>
-    </label>
+    </div>
   );
 };
 

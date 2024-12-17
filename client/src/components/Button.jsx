@@ -10,6 +10,7 @@ export default function Button({ type, text, onClick }) {
       cursor: "pointer",
       fontSize: "1rem",
       marginTop: "20px",
+      maxWidth: "300px",
     },
   };
   return (

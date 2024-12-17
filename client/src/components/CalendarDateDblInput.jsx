@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import styles from "./CalendarDateDblInput.module.css";
+import InputField from "./InputField";
 
-const CalendarDateDblInput = ({ label, value, onChange, showEndDate, endDate, onEndDateChange }) => {
+const CalendarDateDblInput = ({
+  label,
+  value,
+  onChange,
+  showEndDate,
+  endDate,
+  onEndDateChange,
+}) => {
   const [showCalendarFor, setShowCalendarFor] = useState(null); // 'start' or 'end'
 
   // Handle date change based on active calendar
@@ -17,31 +26,29 @@ const CalendarDateDblInput = ({ label, value, onChange, showEndDate, endDate, on
   };
 
   return (
-    <div className="calendar-date-input">
-      <label>
-        {label}
-        <input
-          type="text"
-          value={value}
-          onClick={() => setShowCalendarFor("start")} // Open calendar for start date
-          readOnly
-          placeholder="Select a date"
-        />
-      </label>
+    <div className={styles["calendar-date-input"]}>
+      <InputField
+        label={label}
+        value={value}
+        name={"start-date"}
+        type={"text"}
+        onClick={() => setShowCalendarFor("start")}
+        readOnly
+        placeholder="Select a date"
+        isDate={true}
+      />
       {showEndDate && (
-        <label>
-          End Date:
-          <input
-            type="text"
-            value={endDate}
-            onClick={() => setShowCalendarFor("end")} // Open calendar for end date
-            readOnly
-            placeholder="Select an end date"
-          />
-        </label>
+        <InputField
+          label={"End Date"}
+          type={"text"}
+          value={endDate}
+          onClick={() => setShowCalendarFor("end")}
+          readOnly
+          placeholder={"Select an end date"}
+        />
       )}
       {showCalendarFor && (
-        <div className="calendar-container">
+        <div className={styles["calendar-container"]}>
           <Calendar
             onChange={handleDateChange}
             value={

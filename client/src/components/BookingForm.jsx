@@ -9,7 +9,7 @@ import { getMeetingsSlots } from "../api/api";
 import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
-import "./BookingForm.css";
+import styles from "./BookingForm.module.css";
 
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";

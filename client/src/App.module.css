@@ -1,8 +1,9 @@
 .main-section {
   flex-grow: 1;
-  margin-top: 15vh;
+  min-height: 85vh;
+  position: relative;
+  margin-top: 125px;
   background-color: white;
-  min-height: calc(100vh - 15vh);
   display: flex;
   justify-content: center;
   align-items: center;

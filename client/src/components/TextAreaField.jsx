@@ -1,11 +1,18 @@
 import React from "react";
+import styles from "./TextAreaField.module.css";
 
-const TextAreaField = ({ label, name, value, onChange }) => {
+const TextAreaField = ({ label, name, value, onChange, placeholder }) => {
   return (
-    <label>
-      {label}
-      <textarea name={name} value={value} onChange={onChange}></textarea>
-    </label>
+    <div className={styles.textAreaWrapper}>
+      <label className={styles.label}>{label}</label>
+      <textarea
+        className={styles.textArea}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+      ></textarea>
+    </div>
   );
 };
 
