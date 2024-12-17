@@ -18,43 +18,68 @@ function Registration() {
   });
 
   const [errors, setErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState("");
+  const [showStrengthBar, setShowStrengthBar] = useState(false);
+
 
   const validate = () => {
     const validationErrors = {};
-
-    // First Name validation
+  
+    // First Name validation (only letters, no numbers/symbols)
     if (!formData.firstName.trim()) {
       validationErrors.firstName = "First Name is required.";
+    } else if (!/^[A-Za-z]+$/.test(formData.firstName.trim())) {
+      validationErrors.firstName = "First Name must only contain letters.";
     }
-
-    // Last Name validation
+  
+    // Last Name validation (only letters, no numbers/symbols)
     if (!formData.lastName.trim()) {
       validationErrors.lastName = "Last Name is required.";
+    } else if (!/^[A-Za-z]+$/.test(formData.lastName.trim())) {
+      validationErrors.lastName = "Last Name must only contain letters.";
     }
-
-    // Email validation
+  
+    // Email validation (valid email structure)
     if (!formData.email.trim()) {
-      validationErrors.email = "Email is required.";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      validationErrors.email = "Email is invalid.";
-    }
-
-    // Password validation
+        validationErrors.email = "Email is required.";
+      } else if (!/^[\w\.-]+@(mail\.mcgill\.ca|mcgill\.ca)$/.test(formData.email)) {
+        validationErrors.email = "Email must be a valid McGill email (e.g., @mail.mcgill.ca or @mcgill.ca).";
+      }
+  
+    // Password validation (strong rules)
     if (!formData.password) {
       validationErrors.password = "Password is required.";
-    } else if (formData.password.length < 8) {
-      validationErrors.password = "Password must be at least 8 characters.";
-    } else if (!/[!@#$%^&*]/.test(formData.password)) {
-      validationErrors.password = "Password must include at least one special character.";
+    } else {
+      const passwordRules = [];
+      if (formData.password.length < 8) {
+        passwordRules.push("at least 8 characters");
+      }
+      if (!/[A-Z]/.test(formData.password)) {
+        passwordRules.push("one uppercase letter");
+      }
+      if (!/[a-z]/.test(formData.password)) {
+        passwordRules.push("one lowercase letter");
+      }
+      if (!/[0-9]/.test(formData.password)) {
+        passwordRules.push("one number");
+      }
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
+        passwordRules.push("one special character");
+      }
+  
+      if (passwordRules.length > 0) {
+        validationErrors.password = `Password must include ${passwordRules.join(", ")}.`;
+      }
     }
-
+  
     // Confirm Password validation
     if (formData.password !== formData.confirmPassword) {
       validationErrors.confirmPassword = "Passwords do not match.";
     }
-
+  
     return validationErrors;
-};
+  };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,12 +87,24 @@ function Registration() {
       ...prev,
       [name]: value,
     }));
+    if (name === "password") {
+        let score = 0;
+        setShowStrengthBar(true);
+    
+        if (value.length >= 8) score += 25; 
+        if (/[A-Z]/.test(value)) score += 25; 
+        if (/[0-9]/.test(value)) score += 25; 
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(value)) score += 25; 
+    
+        setPasswordStrength(score);
+      }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = validate();
+    console.log(validationErrors);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       toast.error("Please fix validation errors.");
@@ -104,7 +141,7 @@ function Registration() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2 style={{ margin: "0px", padding: "0px" }}>Create an Account</h2>
+        <h2 >Create an Account</h2>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-row" style={{ display: "flex", gap: "10px" }}>
             <Input
@@ -115,9 +152,7 @@ function Registration() {
               formType="register"
               onChange={handleChange}
             />
-            {errors.firstName && (
-                <p className="error-text">{errors.firstName}</p>
-            )}
+            
             <Input
               label="Last Name"
               type="text"
@@ -126,10 +161,14 @@ function Registration() {
               formType="register"
               onChange={handleChange}
             />
+            
+          </div>
+          {errors.firstName && (
+                <p className="error-text">{errors.firstName}</p>
+            )}
             {errors.lastName && (
                 <p className="error-text">{errors.lastName}</p>
             )}
-          </div>
           <Input
             label="Email"
             type="email"
@@ -148,6 +187,22 @@ function Registration() {
             onChange={handleChange}
           />
           {errors.password && <p className="error-text">{errors.password}</p>}
+          {showStrengthBar && (
+          <div className="password-strength-bar">
+            <div
+                className="progress"
+                style={{
+                width: `${passwordStrength}%`,
+                backgroundColor:
+                    passwordStrength < 50
+                    ? "red"
+                    : passwordStrength < 75
+                    ? "orange"
+                    : "green",
+                }}
+            ></div>
+          </div>
+            )}
           <Input
             label="Confirm Password"
             type="password"
