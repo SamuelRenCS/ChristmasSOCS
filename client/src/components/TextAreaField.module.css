@@ -13,6 +13,7 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  margin: 10px 0;
 }
 
 .textArea {
@@ -24,6 +25,7 @@
   font-size: 0.75rem;
   transition: all 0.3s ease;
   outline: none;
+  resize: none;
 }
 
 .textArea:disabled {

@@ -5,6 +5,7 @@
   gap: 0.5rem;
   max-width: 300px;
   width: 100%;
+  margin: 10px 0;
 }
 
 .label {
@@ -46,7 +47,7 @@
   padding: 0.5rem;
   border: 2px solid var(--light-grey);
   border-radius: 0.75rem;
-  max-width: 125px;
+  max-width: 150px;
   font-size: 1rem;
   transition: all 0.3s ease;
   outline: none;
@@ -73,6 +74,11 @@
   outline: none;
 }
 
+.number:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .date {
   text-align: center;
   padding: 0.75rem;
@@ -82,4 +88,25 @@
   width: 50%;
   transition: all 0.3s ease;
   outline: none;
+}
+
+.dateInput {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border: 2px solid var(--light-grey);
+  border-radius: 0.75rem;
+  max-width: 150px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.dateInput:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.hidden {
+  visibility: hidden;
 }

@@ -3,7 +3,12 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 //import "./CalendarDateInput.css"; // For custom styles
 
-const CalendarDateInput = ({ label, value, onChange, highlightedDates = [] }) => {
+const CalendarDateInput = ({
+  label,
+  value,
+  onChange,
+  highlightedDates = [],
+}) => {
   // Handle date change from calendar
   const handleDateChange = (date) => {
     const formattedDate = date.toISOString().split("T")[0]; // Format the date as "YYYY-MM-DD"

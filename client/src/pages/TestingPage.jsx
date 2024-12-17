@@ -14,6 +14,8 @@ export default function TestingPage() {
         placeholder="placeholder"
       />
       <Button text="Test Button" />
+      <CalendarInput label="Test Calendar Input" />
+      <InputField label="Test Date Input" type="date" />
     </div>
   );
 }

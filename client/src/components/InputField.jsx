@@ -24,6 +24,8 @@ const InputField = ({
         return styles.time;
       case "number":
         return styles.number;
+      case "date":
+        return styles.dateInput;
       default:
         return styles.input;
     }
@@ -31,7 +33,10 @@ const InputField = ({
 
   return (
     <div className={styles.inputWrapper}>
-      <label htmlFor={name} className={styles.label}>
+      <label
+        htmlFor={name}
+        className={`${styles.label} ${label === "hidden" ? styles.hidden : ""}`}
+      >
         {label}
       </label>
       <input
