@@ -10,6 +10,12 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+import ProfilePage from "./DashboardContent/ProfilePage";
+import HomePage from "./DashboardContent/HomePage";
+import MeetingsPage from "./DashboardContent/MeetingsPage";
+import RequestsPage from "./DashboardContent/RequestsPage";
+import NotificationsPage from "./DashboardContent/NotificationsPage";
+import SettingsPage from "./DashboardContent/SettingsPage";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -20,37 +26,48 @@ const Dashboard = () => {
       name: "home",
       icon: Home,
       label: "Home",
+      component: HomePage,
     },
     {
       name: "meetings",
       icon: Calendar,
       label: "Meetings",
+      component: MeetingsPage,
     },
     {
       name: "requests",
       icon: Archive,
       label: "Requests",
+      component: RequestsPage,
     },
     {
       name: "notifications",
       icon: Bell,
       label: "Notifications",
+      component: NotificationsPage,
     },
     {
       name: "profile",
       icon: User,
       label: "Profile",
+      component: ProfilePage,
     },
     {
       name: "settings",
       icon: Settings,
       label: "Settings",
+      component: SettingsPage,
     },
   ];
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
+
+  // Find the component for the active section
+  const ActiveComponent =
+    menuItems.find((item) => item.name === activeSection)?.component ||
+    HomePage;
 
   return (
     <div className={styles.dashboardContainer}>
@@ -76,6 +93,11 @@ const Dashboard = () => {
             <span className={styles.label}>{item.label}</span>
           </button>
         ))}
+
+        {/* Sidebar Toggle Button */}
+        <button onClick={toggleSidebar} className={styles.sidebarToggle}>
+          {isSidebarCollapsed ? <ChevronRight /> : <ChevronLeft />}
+        </button>
       </div>
 
       {/* Main Content Area */}
@@ -85,7 +107,7 @@ const Dashboard = () => {
           ${isSidebarCollapsed ? styles.expanded : ""}
         `}
       >
-        PAGE CONTENT HERE
+        <ActiveComponent />
       </div>
     </div>
   );

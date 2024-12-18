@@ -17,10 +17,6 @@ const UserSchema = new Schema({
     unique: true,
     index: { unique: true },
   },
-  isMcGillMember: {
-    type: Boolean,
-    required: true,
-  },
   passwordHash: {
     type: String,
     required: true,

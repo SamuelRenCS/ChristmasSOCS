@@ -7,6 +7,7 @@
 
 .sidebar {
   width: 200px;
+  height: 400px;
   background-color: #f0f0f0;
   display: flex;
   flex-direction: column;
@@ -15,6 +16,37 @@
   position: relative;
   margin: 10px 0 10px 10px;
   border-radius: 10px;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+  margin-right: 10px;
+}
+
+.sidebar.collapsed .label {
+  display: none;
+}
+
+.sidebar.collapsed .sidebarItem {
+  justify-content: center;
+  padding: 10px;
+}
+
+.sidebarToggle {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.sidebarToggle:hover {
+  background-color: #e0e0e0;
 }
 
 .sidebarItem {
@@ -40,13 +72,13 @@
 }
 
 .icon {
-  margin-right: 10px;
   width: 20px;
   height: 20px;
   flex-shrink: 0;
 }
 
 .label {
+  margin-left: 10px;
   font-size: 16px;
   overflow: hidden;
 }
@@ -59,4 +91,8 @@
   border-radius: 10px;
   background-color: var(--beige);
   transition: width 0.3s ease, margin-left 0.3s ease;
+}
+
+.mainContent.expanded {
+  margin-left: 0;
 }

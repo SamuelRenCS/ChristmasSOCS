@@ -100,4 +100,26 @@ export const fetchSeats = async (meetingID, date, slot) => {
   }
 };
 
+// TODO
+export const updatePassword = async (passwordData) => {
+  // Hash the password and new password before sending it to the server
+  const securePasswordData = {
+    ...passwordData,
+    currentPassword: sha256(passwordData.currentPassword).toString(),
+    newPassword: sha256(passwordData.newPassword).toString(),
+  };
+
+  try {
+    const response = await api.put("/password", securePasswordData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// fetchUserProfile function to send a GET request to /profile
+export const fetchUserProfile = async () => {
+  return;
+};
+
 export default api;

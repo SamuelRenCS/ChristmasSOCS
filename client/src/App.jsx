@@ -5,7 +5,6 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import styles from "./App.module.css";
 import { ToastContainer, toast } from "react-toastify";
-import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import TestingPage from "./pages/TestingPage";
 import { AuthProvider } from "./context/AuthContext";
@@ -17,6 +16,7 @@ import CreateRequest from "./pages/CreateRequest";
 import CreateBooking from "./pages/CreateBooking";
 import RequestList from "./components/RequestList";
 //import MeetingPage from "./pages/MeetingPage";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const [isHeaderHidden, setHeaderHidden] = useState(false);
@@ -64,18 +64,18 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
             <Route path="/test" element={<ViewMeeting />} />
-            <Route path="/requests/new" element={<CreateRequest />} />
             <Route path="/test2" element={<RequestList />} />
+            <Route path="/requests/new/:hostID" element={<CreateRequest />} />
             <Route path="/meetings/:token" element={<CreateBooking />} />
 
             <Route path="/meetings/new" element={<CreateMeeting />} />
 
             <Route path="/testing" element={<TestingPage />} />
 
-            <Route path="/dashboard" element={<Dashboard />} />
-
             {/* Private Routes */}
-            <Route element={<PrivateRoute />}></Route>
+            <Route element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
           </Routes>
         </div>
         <ToastContainer />
