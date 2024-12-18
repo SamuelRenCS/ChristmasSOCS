@@ -7,10 +7,9 @@ const MeetingSlotSchema = new Schema({
     ref: "Meeting",
   },
   occurrenceDate: { type: Date, required: true }, // The specific date of this occurrence
-  startTime: Date,
-  endTime: Date,
-  //location: String,
-  // Names of attendees
+  startTime: { type: String, required: true },
+  endTime: { type: String, required: true },
+  
   attendees: [
     {
       type: String,

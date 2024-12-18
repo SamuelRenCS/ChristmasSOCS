@@ -27,6 +27,7 @@ const BookingForm = ({token}) => {
   const [formData, setFormData] = useState({
     // Retrieve the first and last name from the user context
     attendee: user ? `${user.firstName} ${user.lastName}` : "",
+    meetingID: "",
     userID: user ? user.id : "",
     meetingDate: "",
     timeSlot: "",
@@ -53,6 +54,7 @@ const BookingForm = ({token}) => {
         // Prepopulate form fields
         setFormData({
           attendee: user ? `${user.firstName} ${user.lastName}` : "",
+          meetingID: meetingID,
           meetingDate: dateObj.toISOString().split("T")[0],
         });
 
