@@ -15,6 +15,7 @@ import Footer from "./partials/Footer";
 import ViewMeeting from "./pages/ViewMeeting";
 import CreateRequest from "./pages/CreateRequest";
 import CreateBooking from "./pages/CreateBooking";
+import RequestList from "./components/RequestList";
 //import MeetingPage from "./pages/MeetingPage";
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
             <Route path="/register" element={<Registration />} />
             <Route path="/test" element={<ViewMeeting />} />
             <Route path="/requests/new" element={<CreateRequest />} />
+            <Route path="/test2" element={<RequestList />} />
             <Route path="/meetings/:token" element={<CreateBooking />} />
 
             <Route path="/meetings/new" element={<CreateMeeting />} />

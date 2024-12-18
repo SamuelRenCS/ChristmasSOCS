@@ -1,0 +1,13 @@
+.requestList {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    height: auto;
+    width: 100%;
+    height: auto;
+  }
+  
+  .requestList h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  

@@ -1,0 +1,71 @@
+.requestItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: white;
+  }
+  
+  .requestInfo {
+    flex: 3;
+    text-align: left;
+    padding: 20px;
+  }
+  
+  .requestInfo h3 {
+    margin: 0;
+  }
+  
+  .requestActions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .acceptButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+  
+  .acceptedButton {
+    background-color: white;
+    color: black;
+    border: 2px solid #007bff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+  
+  .acceptButton:hover {
+    background-color: #00274c;
+  }
+  
+  .rejectButton {
+    background-color: white;
+    color: black;
+    border: 2px solid #fd6e6b;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+  
+  .rejectButton:hover {
+    background-color: #d24341;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .requestItem {
+      flex-direction: column;
+    }
+  
+    .requestActions {
+      flex-direction: column;
+    }
+  }
+  
