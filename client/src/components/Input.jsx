@@ -7,6 +7,8 @@ const Input = ({
   name,
   value,
   onChange,
+  onFocus,
+  onBlur,
   placeholder,
   formType,
 }) => {
@@ -43,6 +45,8 @@ const Input = ({
         name={name}
         value={value}
         onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder}
         style={styles.input}
         required

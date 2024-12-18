@@ -19,8 +19,16 @@ function Registration() {
 
   const [errors, setErrors] = useState({});
   const [passwordStrength, setPasswordStrength] = useState("");
-  const [showStrengthBar, setShowStrengthBar] = useState(false);
+  const [passwordStrengthLabel, setPasswordStrengthLabel] = useState("Weak");
+  const [passwordRules, setPasswordRules] = useState({
+    hasLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
 
+  const [showPasswordValidation, setShowPasswordValidation] = useState(false);
 
   const validate = () => {
     const validationErrors = {};
@@ -30,21 +38,21 @@ function Registration() {
       validationErrors.firstName = "First Name is required.";
     } else if (!/^[A-Za-z]+$/.test(formData.firstName.trim())) {
       validationErrors.firstName = "First Name must only contain letters.";
-    }
+    } 
   
     // Last Name validation (only letters, no numbers/symbols)
     if (!formData.lastName.trim()) {
       validationErrors.lastName = "Last Name is required.";
     } else if (!/^[A-Za-z]+$/.test(formData.lastName.trim())) {
       validationErrors.lastName = "Last Name must only contain letters.";
-    }
+    } 
   
     // Email validation (valid email structure)
     if (!formData.email.trim()) {
         validationErrors.email = "Email is required.";
       } else if (!/^[\w\.-]+@(mail\.mcgill\.ca|mcgill\.ca)$/.test(formData.email)) {
         validationErrors.email = "Email must be a valid McGill email (e.g., @mail.mcgill.ca or @mcgill.ca).";
-      }
+      } 
   
     // Password validation (strong rules)
     if (!formData.password) {
@@ -57,9 +65,6 @@ function Registration() {
       if (!/[A-Z]/.test(formData.password)) {
         passwordRules.push("one uppercase letter");
       }
-      if (!/[a-z]/.test(formData.password)) {
-        passwordRules.push("one lowercase letter");
-      }
       if (!/[0-9]/.test(formData.password)) {
         passwordRules.push("one number");
       }
@@ -69,13 +74,13 @@ function Registration() {
   
       if (passwordRules.length > 0) {
         validationErrors.password = `Password must include ${passwordRules.join(", ")}.`;
-      }
-    }
+      } else delete validationErrors.password;
+    } 
   
     // Confirm Password validation
     if (formData.password !== formData.confirmPassword) {
       validationErrors.confirmPassword = "Passwords do not match.";
-    }
+    } 
   
     return validationErrors;
   };
@@ -87,17 +92,52 @@ function Registration() {
       ...prev,
       [name]: value,
     }));
+    // if (name === "password") {
+    //     let score = 0;
+    //     setShowStrengthBar(true);
+    
+    //     if (value.length >= 8) score += 25; 
+    //     if (/[A-Z]/.test(value)) score += 25; 
+    //     if (/[0-9]/.test(value)) score += 25; 
+    //     if (/[!@#$%^&*(),.?":{}|<>]/.test(value)) score += 25; 
+    
+    //     setPasswordStrength(score);
+    //   }
     if (name === "password") {
-        let score = 0;
-        setShowStrengthBar(true);
-    
-        if (value.length >= 8) score += 25; 
-        if (/[A-Z]/.test(value)) score += 25; 
-        if (/[0-9]/.test(value)) score += 25; 
-        if (/[!@#$%^&*(),.?":{}|<>]/.test(value)) score += 25; 
-    
-        setPasswordStrength(score);
+        const hasLength = value.length >= 8;
+        const hasUppercase = /[A-Z]/.test(value);
+        const hasNumber = /[0-9]/.test(value);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+  
+        const strengthScore =
+          (hasLength ? 25 : 0) +
+          (hasUppercase ? 25 : 0) +
+          (hasNumber ? 25 : 0) +
+          (hasSpecialChar ? 25 : 0);
+  
+        setPasswordStrength(strengthScore);
+        setPasswordRules({ hasLength, hasUppercase, hasNumber, hasSpecialChar });
+        if (strengthScore < 50) {
+            setPasswordStrengthLabel("Weak");
+          } else if (strengthScore < 100) {
+            setPasswordStrengthLabel("Good");
+          } else {
+            setPasswordStrengthLabel("Strong");
+          }
       }
+  };
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const validationErrors = validate();
+    setErrors((prevErrors) => {
+      // Remove error if the field is valid
+      if (validationErrors[name]) {
+        return { ...prevErrors, [name]: validationErrors[name] };
+      }
+      const newErrors = { ...prevErrors };
+      delete newErrors[name]; // Remove error if the input is valid
+      return newErrors;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -115,10 +155,10 @@ function Registration() {
 
 
     // basic client-side validation
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+    // if (formData.password !== formData.confirmPassword) {
+    //   toast.error("Passwords do not match");
+    //   return;
+    // }
 
     console.log("Form submitted:", formData);
 
@@ -151,6 +191,7 @@ function Registration() {
               placeholder="Enter first name"
               formType="register"
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             
             <Input
@@ -160,6 +201,7 @@ function Registration() {
               placeholder="Enter last name"
               formType="register"
               onChange={handleChange}
+              onBlur={handleBlur}
             />
             
           </div>
@@ -176,6 +218,7 @@ function Registration() {
             placeholder="Enter email"
             formType="register"
             onChange={handleChange}
+            onBlur={handleBlur}
           />
           {errors.email && <p className="error-text">{errors.email}</p>}
           <Input
@@ -185,23 +228,31 @@ function Registration() {
             placeholder="Enter password"
             formType="register"
             onChange={handleChange}
+            onFocus={() => {
+                setShowPasswordValidation(true);
+              }}
+            onBlur={handleBlur}
           />
-          {errors.password && <p className="error-text">{errors.password}</p>}
-          {showStrengthBar && (
-          <div className="password-strength-bar">
-            <div
-                className="progress"
-                style={{
-                width: `${passwordStrength}%`,
-                backgroundColor:
-                    passwordStrength < 50
-                    ? "red"
-                    : passwordStrength < 75
-                    ? "orange"
-                    : "green",
-                }}
-            ></div>
-          </div>
+            {errors.password && <p className="error-text">{errors.password}</p>}
+            
+            {showPasswordValidation && (
+            <ul className="password-rules">
+            <li style={{ color: passwordStrengthLabel === "Weak" ? "red" : "green" }}>
+                Password Strength: {passwordStrengthLabel}
+            </li>
+            <li style={{ color: passwordRules.hasLength ? "green" : "red" }}>
+              {passwordRules.hasLength ? "✔" : "✖"} At least 8 characters
+            </li>
+            <li style={{ color: passwordRules.hasUppercase ? "green" : "red" }}>
+              {passwordRules.hasUppercase ? "✔" : "✖"} One uppercase letter
+            </li>
+            <li style={{ color: passwordRules.hasNumber ? "green" : "red" }}>
+              {passwordRules.hasNumber ? "✔" : "✖"} One number
+            </li>
+            <li style={{ color: passwordRules.hasSpecialChar ? "green" : "red" }}>
+              {passwordRules.hasSpecialChar ? "✔" : "✖"} One special character
+            </li>
+          </ul>
             )}
           <Input
             label="Confirm Password"
@@ -210,6 +261,7 @@ function Registration() {
             placeholder="Re-enter password"
             formType="register"
             onChange={handleChange}
+            onBlur={handleBlur}
           />
           {errors.confirmPassword && (
             <p className="error-text">{errors.confirmPassword}</p>

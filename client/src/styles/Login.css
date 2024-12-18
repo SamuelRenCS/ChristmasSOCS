@@ -28,21 +28,8 @@
   
   .error-text {
     color: red;
-    font-size: 0.8rem;
+    font-size: 11px;
     margin-top: 5px;
-  }
-  .password-strength-bar {
-    height: 8px;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    overflow: hidden;
-    width: 80%;
-  }
-  
-  .progress {
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
   }    
 
 .login-container h1 {
@@ -75,6 +62,19 @@ img {
   transform-origin: top right; /* Ensures the image slides from the top-right corner */
   transition: all 0.4s ease-in-out; /* Smooth shrinking effect */
 }
+  
+  .password-rules {
+    font-size: 10px;
+    margin: 10px 0;
+    padding: 0;
+    list-style: none;
+    color: red;
+  }
+  
+  .password-rules li {
+    margin: 5px 0;
+  }
+  
 
 /* Responsive Design for Smaller Screens */
 @media (max-width: 768px) {

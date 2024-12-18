@@ -29,7 +29,7 @@ export default function Landing() {
             <img  src={mcgillImage} alt="McGill Campus" />
           </div> */}
           <div className="description-section">
-            <h1>Welcome to McGill Meeting Scheduler</h1>
+            <h1>Welcome to McGill Campus Connect</h1>
             <p>
               Welcome to McGill's Campus Connect! Our platform is designed exclusively for 
               McGill students and staff to simplify meeting management. Here’s what you can do:
