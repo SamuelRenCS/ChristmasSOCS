@@ -14,14 +14,16 @@ const RequestsPage = () => {
           title: "Team Sync-Up",
           requesterName: "John Doe",
           meetingTime: "2024-12-18T14:00:00Z",
-          purpose: "Discuss project updates",
+          description: "Discuss project updates",
+          location: "Conference Room A",
         },
         {
           id: "2",
           title: "Budget Review",
           requesterName: "Jane Smith",
           meetingTime: "2024-12-19T10:00:00Z",
-          purpose: "Finalize next quarter's budget",
+          description: "Finalize next quarter's budget",
+          location: "Conference Room B",
         },
       ];
       setRequests(mockRequests);

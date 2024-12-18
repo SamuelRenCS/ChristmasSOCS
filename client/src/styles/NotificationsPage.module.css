@@ -1,0 +1,61 @@
+.notificationsContainer {
+    padding: 20px;
+    background-color: #f9f9f9;
+    height: auto;
+  }
+  
+  .notificationsContainer h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .clearButton {
+    background-color: #fd6e6b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .clearButton:hover {
+    background-color: #d24341;
+  }
+  
+  .notificationItem {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .notificationItem p {
+    font-size: 16px;
+    margin: 0.5rem 0;
+  }
+
+  .deleteButton {
+    background-color: transparent;
+    border: none;
+    color: #fd6e6b;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .deleteButton:hover {
+    color: #d24341;
+  }
+  
+  
