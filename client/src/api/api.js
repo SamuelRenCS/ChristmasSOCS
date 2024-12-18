@@ -90,8 +90,9 @@ export const createBooking = async (bookingData) => {
 };
 
 export const fetchSeats = async (meetingID, date, slot) => {
+  console.log("fetching seats for:", meetingID, date, slot);
   try {
-    const response = await api.get(`/bookings/${meetingID}/${date}/${slot}`);
+    const response = await api.get(`/meetings/${meetingID}/${date}/${slot}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching bookings:", error);

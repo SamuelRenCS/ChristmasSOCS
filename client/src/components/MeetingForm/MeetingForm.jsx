@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { createMeeting } from "../../api/api";
-import CalendarDateDblInput from "../CalendarDateDblInput";
+//import CalendarDateDblInput from "../CalendarDateDblInput";
 import InputField from "../InputField";
 import SelectField from "../SelectField";
 import TextAreaField from "../TextAreaField";
@@ -203,6 +203,7 @@ const MeetingForm = () => {
         toast.error("Error creating meeting");
         return;
       }
+      console.log(response);
 
       // setTokenPopup({ show: true, token: response.msgToken });
       // toast.success("Meeting created successfully");

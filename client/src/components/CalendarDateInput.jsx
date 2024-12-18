@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-//import "./CalendarDateInput.css"; // For custom styles
 
 const CalendarDateInput = ({
   label,
@@ -9,7 +8,6 @@ const CalendarDateInput = ({
   onChange,
   highlightedDates = [],
 }) => {
-  // Handle date change from calendar
   const handleDateChange = (date) => {
     const formattedDate = date.toISOString().split("T")[0]; // Format the date as "YYYY-MM-DD"
     if (highlightedDates.includes(formattedDate)) {
@@ -17,11 +15,23 @@ const CalendarDateInput = ({
     }
   };
 
-  // Highlight specific dates
+  // Highlight specific dates and selected date
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
       const formattedDate = date.toISOString().split("T")[0];
-      return highlightedDates.includes(formattedDate) ? "highlight" : null;
+      const classes = [];
+      
+      // Highlight available dates
+      if (highlightedDates.includes(formattedDate)) {
+        classes.push("highlight");
+      }
+      
+      // Highlight selected date
+      if (value && date.toISOString().split("T")[0] === value) {
+        classes.push("selected");
+      }
+      
+      return classes.length > 0 ? classes.join(" ") : null;
     }
     return null;
   };

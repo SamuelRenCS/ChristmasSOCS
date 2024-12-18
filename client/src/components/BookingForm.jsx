@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 
-//TODO
 import { createBooking } from "../api/api";
 import { fetchMeeting } from "../api/api"; // onload to get the general meeting details
 import { fetchMeetingSlot } from "../api/api";
-
 import { fetchSeats } from "../api/api";
 
 import CalendarDateInput from "./CalendarDateInput";
@@ -22,10 +20,18 @@ const BookingForm = ({token}) => {
   const { user } = useAuth();
   const [meetingID, setMeetingID] = useState("");
 
-  //const [allSlots, setAllSlots] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [maxSeats, setMaxSeats] = useState(0);
   const [highlightedDates, setHighlightedDates] = useState([]);
+
+  const [formData, setFormData] = useState({
+    // Retrieve the first and last name from the user context
+    attendee: user ? `${user.firstName} ${user.lastName}` : "",
+    userID: user ? user.id : "",
+    meetingDate: "",
+    timeSlot: "",
+    seats: "",
+  });
 
   useEffect(() => {
     // Fetch the meeting data on load
@@ -34,7 +40,7 @@ const BookingForm = ({token}) => {
         // pass token as a string
         const response = await fetchMeeting(token);
         // res.status(200).json({ data: { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, dates } });
-        const { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, formattedDates, meetingID } = response.data;
+        const { title, host, startDate, endDate, location, description, interval, seatsPerSlot, repeat, endRepeatDate, formattedDates, meetingID } = response.data;
 
         setMeetingID(meetingID);
         console.log("Meeting details:", response.data);
@@ -42,7 +48,7 @@ const BookingForm = ({token}) => {
         setHighlightedDates(formattedDates);
 
         //keep the date part of the datetime
-        const dateObj = new Date(date);
+        const dateObj = new Date(startDate);
 
         // Prepopulate form fields
         setFormData({
@@ -58,45 +64,33 @@ const BookingForm = ({token}) => {
     fetchMeetingDetails();
   }, [token]);
 
-  const [formData, setFormData] = useState({
-    // Retrieve the first and last name from the user context
-    attendee: user ? `${user.firstName} ${user.lastName}` : "",
-    meetingDate: "",
-    timeSlot: "",
-    seats: "",
-  });
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value || "" });
   };
 
   const handleDateChange = async (date) => {
-    setFormData({
-      ...formData,
-      meetingDate: date || "",
-    });
-
     try {
       const response = await fetchMeetingSlot(meetingID, date);
-      const  remainingSlots = response.data.finalSlots;
+      const remainingSlots = response.data.finalSlots;
       console.log("Available slots:", remainingSlots);
       setAvailableSlots(remainingSlots);
-      // select the first slot
-      setFormData({
-        ...formData,
-        timeSlot: remainingSlots[0] || "",
-      });
-      // get the max seats for the first slot
+  
+      // Directly use the date passed to the function instead of relying on state
       const firstSlot = remainingSlots[0];
-      try {
-        //console.log("Meeting ID:", meetingID);
-        const response = await fetchSeats(meetingID, formData.meetingDate, firstSlot);
-        const remainingSeats = response.data.seats;
+      
+      // Update form data in one go
+      setFormData(prevData => ({
+        ...prevData,
+        meetingDate: date,
+        timeSlot: firstSlot || "",
+      }));
+  
+      // Fetch seats for the first slot
+      if (firstSlot) {
+        const seatsResponse = await fetchSeats(meetingID, date, firstSlot);
+        const remainingSeats = seatsResponse.data.seats;
         console.log("Remaining seats:", remainingSeats);
         setMaxSeats(remainingSeats);
-      } catch (error) {
-        console.error("Error fetching remaining seats for the slot:", error);
-        toast.error("Error fetching remaining seats.");
       }
     } catch (error) {
       console.error("Error fetching slots for the date:", error);
@@ -142,6 +136,7 @@ const BookingForm = ({token}) => {
   };
 
   return (
+    // display the name of the meeting, the host, the location
     <form onSubmit={handleSubmit} className="booking-form">
       <div className="form-date">
         <CalendarDateInput
