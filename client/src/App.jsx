@@ -63,7 +63,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
             <Route path="/test" element={<ViewMeeting />} />
-            <Route path="/requests" element={<CreateRequest />} />
+            <Route path="/requests/new" element={<CreateRequest />} />
             <Route path="/meetings/:token" element={<CreateBooking />} />
 
             <Route path="/meetings/new" element={<CreateMeeting />} />

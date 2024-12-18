@@ -1,10 +1,11 @@
 .form {
-  max-width: 500px;
-  margin: 0;
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  background-color: var(--tertiary);
+  gap: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  overflow-y: auto;
 }
 
 .calendarContainer {

@@ -4,9 +4,14 @@ import styles from "../styles/CreateRequest.module.css";
 
 const CreateRequest = () => {
   return (
-    <div className={styles.requestForm}>
-      <h1 className={styles.title}>Create Request</h1>
-      <RequestForm />
+    <div className={styles["create-request"]}>
+      <div className={styles["form-container"]}>
+        <h2>Create a New Request</h2>
+        <RequestForm />
+      </div>
+      <div className={styles["img-container"]}>
+        <img src="/Mcgill.jpg" alt="Meeting" />
+      </div>
     </div>
   );
 };

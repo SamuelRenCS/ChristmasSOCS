@@ -1,17 +1,27 @@
 import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import Input from "../Input";
+import InputField from "../InputField";
 import Button from "../Button";
 import styles from "./RequestForm.module.css";
 
 const RequestForm = () => {
+  // Helper function to format date and time
+  const formatDate = (date) => date.toISOString().split("T")[0];
+  const formatTime = (date) =>
+    date.toTimeString().split(":").slice(0, 2).join(":");
+
+  // Set initial values for date and time
+  const now = new Date();
+  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
   // State for form fields
   const [formData, setFormData] = useState({
     host: "Anonymous", // Default host
-    date: new Date(),
-    startTime: "",
-    endTime: "",
+    title: "",
+    date: formatDate(now),
+    startTime: formatTime(now),
+    endTime: formatTime(oneHourLater),
     numberOfSlots: 1,
     location: "",
   });
@@ -25,78 +35,94 @@ const RequestForm = () => {
     }));
   };
 
-  // Handle calendar date change
-  const handleDateChange = (date) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      date,
-    }));
-  };
-
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your form submission logic here
-    console.log("Form submitted:", formData);
+
+    const startDateTime = new Date(
+      `${formData.date}T${formData.startTime}`
+    ).toISOString();
+    const endDateTime = new Date(
+      `${formData.date}T${formData.endTime}`
+    ).toISOString();
+
+    const formattedData = {
+      requester: "",
+      host: formData.host,
+      title: formData.title,
+      location: formData.location,
+      startDate: startDateTime,
+      endDate: endDateTime,
+      numberOfSlots: formData.numberOfSlots,
+    };
+
+    console.log("Form submitted:", formattedData);
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <Input
+      <InputField
         label="Host"
         name="host"
         value={formData.host}
         onChange={handleInputChange}
-        formType="request"
+        readOnly
       />
 
-      <div className={styles.calendarContainer}>
-        <label style={{ display: "block", marginBottom: "10px" }}>
-          Select Date
-        </label>
-        <Calendar
-          onChange={handleDateChange}
-          value={formData.date}
-          minDate={new Date()} // Prevent selecting past dates
-        />
-      </div>
+      <InputField
+        label="Title"
+        name="title"
+        value={formData.title}
+        onChange={handleInputChange}
+        placeholder="Enter title"
+        required={true}
+      />
+
+      <InputField
+        label="Location"
+        name="location"
+        value={formData.location}
+        onChange={handleInputChange}
+        placeholder="Enter location"
+        required={true}
+      />
+
+      <InputField
+        label="Select Date"
+        type="date"
+        name="date"
+        value={formData.date}
+        onChange={handleInputChange}
+        required={true}
+      />
 
       <div className={styles.timeInputContainer}>
-        <Input
+        <InputField
           label="Start Time"
           type="time"
           name="startTime"
           value={formData.startTime}
           onChange={handleInputChange}
-          formType="request"
+          required={true}
         />
-        <Input
+        <InputField
           label="End Time"
           type="time"
           name="endTime"
           value={formData.endTime}
           onChange={handleInputChange}
-          formType="request"
+          required={true}
         />
       </div>
 
-      <Input
+      <InputField
         label="Number of Slots"
         type="number"
         name="numberOfSlots"
         value={formData.numberOfSlots}
         onChange={handleInputChange}
         min="1"
-        formType="request"
-      />
-
-      <Input
-        label="Location"
-        name="location"
-        value={formData.location}
-        onChange={handleInputChange}
-        formType="request"
-        placeholder="Enter location"
+        required={true}
       />
 
       <Button type="submit" text="Submit Request" onClick={handleSubmit} />
