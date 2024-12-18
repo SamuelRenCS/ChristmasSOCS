@@ -100,7 +100,7 @@ export const fetchSeats = async (meetingID, date, slot) => {
   }
 };
 
-// TODO
+// update password function to send a PUT request to /password
 export const updatePassword = async (passwordData) => {
   // Hash the password and new password before sending it to the server
   const securePasswordData = {
@@ -117,9 +117,34 @@ export const updatePassword = async (passwordData) => {
   }
 };
 
-// fetchUserProfile function to send a GET request to /profile
-export const fetchUserProfile = async () => {
-  return;
+// fetchUser function to send a GET request to /user
+export const fetchUser = async (userID) => {
+  try {
+    const response = await api.get(`/user/${userID}`);
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// createRequest function to send a POST request to /requests
+export const createRequest = async (requestData) => {
+  try {
+    const response = await api.post("/requests/new", requestData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// fetchRequests function to send a GET request to /requests
+export const fetchRequests = async (userID) => {
+  try {
+    const response = await api.get(`/requests/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export default api;

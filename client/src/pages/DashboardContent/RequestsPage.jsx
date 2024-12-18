@@ -1,41 +1,30 @@
 import React, { useState, useEffect } from "react";
 import RequestItem from "../../components/RequestItem";
 import styles from "../../styles/RequestPage.module.css";
+import { fetchRequests } from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
 
 const RequestsPage = () => {
+  const { user } = useAuth();
   const [requests, setRequests] = useState([]);
 
   // Mock API call to fetch requests
   useEffect(() => {
-    const fetchRequests = async () => {
-      const mockRequests = [
-        {
-          id: "1",
-          title: "Team Sync-Up",
-          requesterName: "John Doe",
-          meetingTime: "2024-12-18T14:00:00Z",
-          description: "Discuss project updates",
-          location: "Conference Room A",
-        },
-        {
-          id: "2",
-          title: "Budget Review",
-          requesterName: "Jane Smith",
-          meetingTime: "2024-12-19T10:00:00Z",
-          description: "Finalize next quarter's budget",
-          location: "Conference Room B",
-        },
-      ];
-      setRequests(mockRequests);
+    const getRequests = async () => {
+      try {
+        const response = await fetchRequests(user.id);
+        setRequests(response.requests);
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+      }
     };
 
-    fetchRequests();
+    getRequests();
   }, []);
 
   const handleAccept = (id) => {
     console.log(`Request ${id} accepted`);
     setRequests((prevRequests) => prevRequests.filter((req) => req.id !== id));
-
   };
 
   const handleReject = (id) => {
@@ -49,7 +38,7 @@ const RequestsPage = () => {
       {requests.length > 0 ? (
         requests.map((request) => (
           <RequestItem
-            key={request.id}
+            key={request._id}
             request={request}
             onAccept={handleAccept}
             onReject={handleReject}
@@ -61,6 +50,5 @@ const RequestsPage = () => {
     </div>
   );
 };
-
 
 export default RequestsPage;

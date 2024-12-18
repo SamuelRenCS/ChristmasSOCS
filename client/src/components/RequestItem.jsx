@@ -3,6 +3,18 @@ import PropTypes from "prop-types";
 import styles from "./RequestItem.module.css";
 
 const RequestItem = ({ request, onAccept, onReject }) => {
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date);
+  };
+
   const [isAccepted, setIsAccepted] = useState(false);
 
   const handleAccept = () => {
@@ -19,14 +31,14 @@ const RequestItem = ({ request, onAccept, onReject }) => {
           <strong>Requester:</strong> {request.requesterName}
         </p>
         <p>
-          <strong>Time:</strong>{" "}
-          {new Date(request.meetingTime).toLocaleString()}
+          <strong>Time:</strong> {formatDate(request.startDate)} -{" "}
+          {formatDate(request.endDate)}
         </p>
         <p>
-          <strong>Description:</strong> {request.purpose}
+          <strong>Description:</strong> {request.description}
         </p>
         <p>
-          <strong>Location:</strong> {request.purpose}
+          <strong>Location:</strong> {request.location}
         </p>
       </div>
 
@@ -52,16 +64,16 @@ const RequestItem = ({ request, onAccept, onReject }) => {
   );
 };
 
-RequestItem.propTypes = {
-  request: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    requesterName: PropTypes.string.isRequired,
-    meetingTime: PropTypes.string.isRequired,
-    purpose: PropTypes.string.isRequired,
-  }).isRequired,
-  onAccept: PropTypes.func.isRequired,
-  onReject: PropTypes.func.isRequired,
-};
+// RequestItem.propTypes = {
+//   request: PropTypes.shape({
+//     id: PropTypes.string.isRequired,
+//     title: PropTypes.string.isRequired,
+//     requesterName: PropTypes.string.isRequired,
+//     meetingTime: PropTypes.string.isRequired,
+//     purpose: PropTypes.string.isRequired,
+//   }).isRequired,
+//   onAccept: PropTypes.func.isRequired,
+//   onReject: PropTypes.func.isRequired,
+// };
 
 export default RequestItem;

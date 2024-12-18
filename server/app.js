@@ -11,6 +11,7 @@ const { validateUser } = require("./middleware");
 // models
 const User = require("./models/user");
 const Meeting = require("./models/meeting");
+const Request = require("./models/request");
 const e = require("express");
 const MeetingSlot = require("./models/meetingSlot");
 
@@ -87,7 +88,6 @@ app.post("/api/login", async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        isMcGillMember: user.isMcGillMember,
       },
       SECRET_KEY,
       { expiresIn: "1h" }
@@ -155,7 +155,6 @@ app.post("/api/register", validateUser, async (req, res) => {
       firstName,
       lastName,
       email,
-      isMcGillMember,
       passwordHash: password, // The pre-save hook in user.js will hash this
     });
 
@@ -215,6 +214,118 @@ app.put("/api/password", async (req, res) => {
     res
       .status(500)
       .json({ message: "Password update failed", error: error.message });
+  }
+});
+
+// get user info
+app.get("/api/user/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  try {
+    if (!userID) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findById(userID);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      data: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "User fetch failed", error: error.message });
+  }
+});
+
+// handle request creation
+app.post("/api/requests/new", async (req, res) => {
+  const {
+    requester,
+    host,
+    title,
+    location,
+    startDate,
+    endDate,
+    numberOfSlots,
+    description,
+  } = req.body;
+
+  if (!requester || !host || !title || !location || !startDate || !endDate) {
+    return res.status(400).json({
+      message:
+        "Requester, host, title, location, start date, and end date are required",
+    });
+  }
+
+  try {
+    // check if valid requester
+    const requesterUser = await User.findById(requester);
+    if (!requesterUser) {
+      return res.status(404).json({ message: "Requester not found" });
+    }
+
+    // check if valid host
+    const hostUser = await User.findById(host);
+    if (!hostUser) {
+      return res.status(404).json({ message: "Host not found" });
+    }
+
+    // create new request
+    const newRequest = new Request({
+      requester,
+      host,
+      requesterName: `${requesterUser.firstName} ${requesterUser.lastName}`,
+      title,
+      location,
+      startDate,
+      endDate,
+      numberOfSlots,
+      description,
+    });
+
+    await newRequest.save();
+
+    res.status(201).json({ message: "Request created successfully" });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: messages,
+      });
+    }
+    res
+      .status(500)
+      .json({ message: "Request creation failed", error: error.message });
+  }
+});
+
+// get requests for a user
+app.get("/api/requests/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  try {
+    if (!userID) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const requests = await Request.find({ host: userID });
+
+    res.status(200).json({ requests });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Request fetch failed", error: error.message });
   }
 });
 
@@ -373,66 +484,60 @@ app.get("/api/meetings/:token", async (req, res) => {
     if (repeat === "None") {
       dates = calculateDates(startDate, endDate);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
-      return res
-        .status(200)
-        .json({
-          data: {
-            title,
-            host,
-            startDate,
-            endDate,
-            location,
-            description,
-            interval,
-            seatsPerSlot,
-            repeat,
-            endRepeatDate,
-            formattedDates,
-            meetingID,
-          },
-        });
+      return res.status(200).json({
+        data: {
+          title,
+          host,
+          startDate,
+          endDate,
+          location,
+          description,
+          interval,
+          seatsPerSlot,
+          repeat,
+          endRepeatDate,
+          formattedDates,
+          meetingID,
+        },
+      });
     } else if (repeat === "Daily") {
       dates = calculateDates(startDate, endRepeatDate);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
-      return res
-        .status(200)
-        .json({
-          data: {
-            title,
-            host,
-            startDate,
-            endDate,
-            location,
-            description,
-            interval,
-            seatsPerSlot,
-            repeat,
-            endRepeatDate,
-            formattedDates,
-            meetingID,
-          },
-        });
+      return res.status(200).json({
+        data: {
+          title,
+          host,
+          startDate,
+          endDate,
+          location,
+          description,
+          interval,
+          seatsPerSlot,
+          repeat,
+          endRepeatDate,
+          formattedDates,
+          meetingID,
+        },
+      });
     } else if (repeat === "Weekly") {
       dates = calculateWeeklyDates(repeatingDays, endRepeatDate);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
-      return res
-        .status(200)
-        .json({
-          data: {
-            title,
-            host,
-            startDate,
-            endDate,
-            location,
-            description,
-            interval,
-            seatsPerSlot,
-            repeat,
-            endRepeatDate,
-            formattedDates,
-            meetingID,
-          },
-        });
+      return res.status(200).json({
+        data: {
+          title,
+          host,
+          startDate,
+          endDate,
+          location,
+          description,
+          interval,
+          seatsPerSlot,
+          repeat,
+          endRepeatDate,
+          formattedDates,
+          meetingID,
+        },
+      });
     } else {
       return res.status(400).json({ message: "Invalid repeat value" });
     }

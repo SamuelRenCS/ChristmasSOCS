@@ -38,11 +38,7 @@ const Header = ({ hidden = false, isAppearable = false }) => {
     };
   }, []);
 
-  const navLinks = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Meetings", path: "/meetings" },
-    { name: "Private", path: "/private" },
-  ];
+  const navLinks = [{ name: "Dashboard", path: "/dashboard" }];
 
   const handleLogout = () => {
     logout(); // Clear authentication

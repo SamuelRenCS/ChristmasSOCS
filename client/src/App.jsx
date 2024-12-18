@@ -14,7 +14,6 @@ import Footer from "./partials/Footer";
 import ViewMeeting from "./pages/ViewMeeting";
 import CreateRequest from "./pages/CreateRequest";
 import CreateBooking from "./pages/CreateBooking";
-import RequestList from "./components/RequestList";
 //import MeetingPage from "./pages/MeetingPage";
 import Dashboard from "./pages/Dashboard";
 
@@ -63,18 +62,16 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
-            <Route path="/test" element={<ViewMeeting />} />
-            <Route path="/test2" element={<RequestList />} />
-            <Route path="/requests/new/:hostID" element={<CreateRequest />} />
-            <Route path="/meetings/:token" element={<CreateBooking />} />
-
-            <Route path="/meetings/new" element={<CreateMeeting />} />
 
             <Route path="/testing" element={<TestingPage />} />
 
             {/* Private Routes */}
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/meetings/new" element={<CreateMeeting />} />
+              <Route path="/meetings/:token" element={<ViewMeeting />} />
+              <Route path="/booking/:token" element={<CreateBooking />} />
+              <Route path="/requests/new/:hostID" element={<CreateRequest />} />
             </Route>
           </Routes>
         </div>

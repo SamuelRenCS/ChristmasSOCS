@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import InputField from "../InputField";
 import Button from "../Button";
 import styles from "./RequestForm.module.css";
+import { fetchUser, createRequest } from "../../api/api";
+import ErrorPage from "../../pages/ErrorPage";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
+import TextAreaField from "../TextAreaField";
 
-const RequestForm = () => {
+const RequestForm = ({ hostID }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isValidHost, setIsValidHost] = useState(true);
+
   // Helper function to format date and time
   const formatDate = (date) => date.toISOString().split("T")[0];
   const formatTime = (date) =>
@@ -17,14 +27,34 @@ const RequestForm = () => {
 
   // State for form fields
   const [formData, setFormData] = useState({
-    host: "Anonymous", // Default host
+    host: "",
     title: "",
     date: formatDate(now),
     startTime: formatTime(now),
     endTime: formatTime(oneHourLater),
     numberOfSlots: 1,
     location: "",
+    description: "",
   });
+
+  // start by getting host info with the hostID
+  useEffect(() => {
+    const fetchHost = async () => {
+      try {
+        const response = await fetchUser(hostID);
+
+        setFormData((prevState) => ({
+          ...prevState,
+          host: response.firstName + " " + response.lastName,
+        }));
+      } catch (error) {
+        // Not a valid host ID, display error page
+        setIsValidHost(false);
+      }
+    };
+
+    fetchHost();
+  }, [hostID]);
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -36,7 +66,7 @@ const RequestForm = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const startDateTime = new Date(
@@ -47,27 +77,45 @@ const RequestForm = () => {
     ).toISOString();
 
     const formattedData = {
-      requester: "",
-      host: formData.host,
+      requester: user.id,
+      host: hostID,
       title: formData.title,
       location: formData.location,
       startDate: startDateTime,
       endDate: endDateTime,
       numberOfSlots: formData.numberOfSlots,
+      description: formData.description,
     };
 
-    console.log("Form submitted:", formattedData);
+    try {
+      const response = await createRequest(formattedData);
+      toast.success(response.message);
+
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
+
+  // If host is not valid, render the error page
+  if (!isValidHost) {
+    return (
+      <ErrorPage
+        message="The host you're trying to request from does not exist."
+        title="Host Not Found"
+        buttonText="Back to Dashboard"
+        onButtonClick={() => {
+          // Navigate to hosts list or wherever appropriate
+          navigate("/dashboard");
+        }}
+      />
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <InputField
-        label="Host"
-        name="host"
-        value={formData.host}
-        onChange={handleInputChange}
-        readOnly
-      />
+      <InputField label="Host" name="host" value={formData.host} readOnly />
 
       <InputField
         label="Title"
@@ -122,6 +170,15 @@ const RequestForm = () => {
         value={formData.numberOfSlots}
         onChange={handleInputChange}
         min="1"
+        required={true}
+      />
+
+      <TextAreaField
+        label="Description"
+        name="description"
+        value={formData.description}
+        onChange={handleInputChange}
+        placeholder="Enter description"
         required={true}
       />
 

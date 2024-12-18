@@ -12,6 +12,10 @@ const RequestSchema = new Schema({
     ref: "User",
     required: true,
   },
+  requesterName: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
@@ -31,6 +35,9 @@ const RequestSchema = new Schema({
   numberOfSlots: {
     type: Number,
     required: true,
+  },
+  description: {
+    type: String,
   },
   approved: {
     type: Boolean,

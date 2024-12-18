@@ -29,8 +29,9 @@ const ViewMeeting = () => {
         <div className="left-section">
           {/* Time Slots */}
           <Container height={"75%"} padding={"20px"} overflow={"auto"}>
-            {timeSlots.map((slot, index) => (
+            {timeSlots.map((slot) => (
               <TimeSlot
+                key={slot.time}
                 time={slot.time}
                 student={slot.student}
                 isBooked={slot.isBooked}
