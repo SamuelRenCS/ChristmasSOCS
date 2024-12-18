@@ -23,7 +23,10 @@ const RequestItem = ({ request, onAccept, onReject }) => {
           {new Date(request.meetingTime).toLocaleString()}
         </p>
         <p>
-          <strong>Purpose:</strong> {request.purpose}
+          <strong>Description:</strong> {request.purpose}
+        </p>
+        <p>
+          <strong>Location:</strong> {request.purpose}
         </p>
       </div>
 
