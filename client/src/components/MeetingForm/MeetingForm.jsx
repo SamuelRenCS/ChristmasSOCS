@@ -38,7 +38,7 @@ const MeetingForm = () => {
     repeat: "None",
     repeatDays: [],
     endRepeatDate: formatDate(now), // same as endDate
-    endRepeatTime: `T${"23:59"}`, // default to midnight
+    endRepeatTime: `23:59`, // default to midnight
     //token: "UNSET",
   });
 
@@ -158,14 +158,40 @@ const MeetingForm = () => {
       "1 hour": 60,
     };
 
-    const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
-    const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
+    const startDateTime = new Date(
+      `${formData.startDate}T${formData.startTime}`
+    ).toISOString();
+    const endDateTime = new Date(
+      `${formData.endDate}T${formData.endTime}`
+    ).toISOString();
+
+    const endRepeatDate = new Date(
+      `${formData.endRepeatDate}T${formData.endRepeatTime}`
+    ).toISOString();
+
+    const formattedRepeatDays = [];
+
+    // compute a list of dates for weekly repeating meetings
+    for (const dayNumber of formData.repeatDays) {
+      const startDate = new Date(startDateTime);
+      const dayDiff = (dayNumber - startDate.getDay() + 7) % 7;
+      const dayDate = new Date(startDate);
+      dayDate.setDate(dayDate.getDate() + dayDiff);
+      formattedRepeatDays.push(dayDate.toISOString());
+    }
 
     const formattedData = {
-      ...formData,
-      startTime: startDateTime,
-      endTime: endDateTime,
+      title: formData.title,
+      host: formData.host,
+      startDate: startDateTime,
+      endDate: endDateTime,
+      location: formData.location,
+      description: formData.description,
       interval: intervalMapping[formData.interval], // Map to numeric value
+      seatsPerSlot: formData.seatsPerSlot,
+      repeat: formData.repeat,
+      endRepeatDate: endRepeatDate,
+      repeatDays: formattedRepeatDays,
     };
 
     try {
@@ -178,8 +204,8 @@ const MeetingForm = () => {
         return;
       }
 
-      setTokenPopup({ show: true, token: response.msgToken });
-      toast.success("Meeting created successfully");
+      // setTokenPopup({ show: true, token: response.msgToken });
+      // toast.success("Meeting created successfully");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||

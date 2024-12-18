@@ -11,15 +11,11 @@ const MeetingSchema = new Schema({
     ref: "User",
     required: true,
   },
-  date: {
+  startDate: {
     type: Date,
     required: true,
   },
-  startTime: {
-    type: Date,
-    required: true,
-  },
-  endTime: {
+  endDate: {
     type: Date,
     required: true,
   },
@@ -43,35 +39,13 @@ const MeetingSchema = new Schema({
     enum: ["None", "Daily", "Weekly"],
     default: "None",
   },
-  endDate: {
+  endRepeatDate: {
     type: Date, // When the repeating meetings end
   },
-
-  token: {
-    type: String,
-    required: true,
+  repeatingDays: {
+    // for weekly repeating meetings
+    type: [Date],
   },
-
-  /*
-  daysOfWeek: {
-    type: [String], // Days of the week for repeating meetings
-    enum: [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ],
-    validate: {
-      validator: function (days) {
-        return this.repeat === "weekly" ? days.length > 0 : days.length === 0;
-      },
-      message: "daysOfWeek can only be set for weekly repeating meetings.",
-    },
-  },
-  */
   meetingSlots: [
     {
       type: Schema.Types.ObjectId,
