@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Description.module.css"; // Import the CSS module
 
-const Description = ({ image, title, text, reverse = false, onClick}) => {
+const Description = ({ image, title, text, reverse = false, display, onClick}) => {
   return (
     <div className={`${styles.descriptionSection} ${reverse ? styles.reverseOrder : ""}`}>
       {/* Left Side - Image */}
@@ -13,7 +13,7 @@ const Description = ({ image, title, text, reverse = false, onClick}) => {
       <div className={styles.descriptionContent}>
         <h2>{title}</h2>
         <p>{text}</p>
-        <button className={styles.ctaButton} onClick={onClick}>Get Started →</button>
+        <button className={styles.ctaButton} onClick={onClick} style={display}>Get Started →</button>
     
       </div>
     </div>

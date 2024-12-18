@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import mcgillImage from "/Mcgill.jpg";
 import { useAuth } from "../context/AuthContext";
 import dashboardImage from "../assets/dashboard.png";
+import createmeetingImage from "../assets/createmeeting.png";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -110,15 +111,17 @@ export default function Landing() {
             onClick={handleDashboardClick}
           />
           <Description
-            image={exampleImage}
+            image={createmeetingImage}
             title="Streamline meeting scheduling and management"
             text="Easily schedule and manage meetings with our intuitive platform, designed to simplify the process and keep everyone on the same page."
             reverse={true}
+            display={{ display: "none" }}
           />
           <Description
             image={exampleImage}
             title="Stay organized and focused on your goals"
             text="Keep track of all your meetings and tasks in one place, so you can stay organized and focused on what matters most."
+            display={{ display: "none" }}
           />
         </div>
       </div>
