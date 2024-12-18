@@ -195,18 +195,12 @@ const MeetingForm = () => {
     };
 
     try {
-      //const response = await createMeeting(formattedData);
-
-      // mock response
-      const response = {
-        msgToken: "123456",
-      };
+      const response = await createMeeting(formattedData);
 
       if (!response) {
         toast.error("Error creating meeting");
         return;
       }
-      console.log(response);
 
       setTokenPopup({ show: true, token: response.msgToken });
       toast.success("Meeting created successfully");
