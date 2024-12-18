@@ -57,7 +57,8 @@
   }
   
   .rejectButton:hover {
-    background-color: #d24341;
+    background-color: #fd6e6b;
+    transition: 0.3s;
   }
   
   @media screen and (max-width: 768px) {

@@ -53,6 +53,7 @@ const NotificationsPage = () => {
       {notifications.length > 0 ? (
         notifications.map((notification) => (
           <div key={notification.id} className={styles.notificationItem}>
+            <div className={styles.info}>
             <p>
               <b>User:</b> {notification.user}
             </p>
@@ -63,12 +64,15 @@ const NotificationsPage = () => {
               <b>Date:</b>{" "}
               {new Date(notification.date).toLocaleString()}
             </p>
-            <button
-              className={styles.deleteButton}
-              onClick={() => handleDeleteNotification(notification.id)}
-            >
-              &#10006;
-            </button>
+            </div>
+            <div className={styles.deleteButton}>
+              <button
+                className={styles.deleteButton}
+                onClick={() => handleDeleteNotification(notification.id)}
+              >
+                &#10006;
+              </button>
+            </div>
           </div>
         ))
       ) : (
