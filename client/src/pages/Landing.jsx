@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import "../styles/Landing.css";
-import Input from "../components/Input";
 import Description from "../components/Description";
 import exampleImage from "../assets/landing-page.png";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import mcgillImage from "/Mcgill.jpg";
+import { useAuth } from "../context/AuthContext";
+import dashboardImage from "../assets/dashboard.png";
 
 export default function Landing() {
   const navigate = useNavigate();
-
+  const { isAuthenticated } = useAuth();
   const [meetingCode, setMeetingCode] = useState("");
 
   const handleChange = (e) => {
@@ -18,7 +20,12 @@ export default function Landing() {
   };
 
   const handleDashboardClick = () => {
-    navigate("/dashboard");
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      toast.warning("Please log in to access the dashboard.");
+      navigate("/login");
+    }
   };
 
   const handleBookNowClick = () => {
@@ -32,39 +39,41 @@ export default function Landing() {
   return (
     <>
       <div className="main-section">
-        <div className="info-section">
-          <div className="booking-section">
-            <h1>Book a meeting now!</h1>
-            <form
-              className="booking-form"
-              onSubmit={(e) => {
-                e.preventDefault(); // Prevent form submission and page reload
-                handleBookNowClick();
-              }}
-            >
-              <input
-                name="meetingCode"
-                type="text"
-                placeholder="Enter Meeting Code"
-                className="meeting-code"
-                value={meetingCode}
-                onChange={handleChange} // Update meetingCode state
-              />
-              <button className="book-button" type="submit">
-                <b>Book now</b>
-              </button>
-            </form>
-          </div>
-          <div className="dashboard-section">
-            <h1>Looking to create a meeting?</h1>
-            <button className="dashboard-button" onClick={handleDashboardClick}>
-              <b>Access Dashboard</b>
-            </button>
-          </div>
+        <div className="hero-section">
+            <div className="info-section">
+            <div className="booking-section">
+                <h1>Book a meeting now!</h1>
+                <form
+                className="booking-form"
+                onSubmit={(e) => {
+                    e.preventDefault(); // Prevent form submission and page reload
+                    handleBookNowClick();
+                }}
+                >
+                <input
+                    name="meetingCode"
+                    type="text"
+                    placeholder="Enter Meeting Code"
+                    className="meeting-code"
+                    value={meetingCode}
+                    onChange={handleChange} // Update meetingCode state
+                />
+                <button className="book-button" type="submit">
+                    <b>Book now</b>
+                </button>
+                </form>
+            </div>
+            <div className="dashboard-section">
+                <h1>Looking to create a meeting?</h1>
+                <button className="dashboard-button" onClick={handleDashboardClick}>
+                <b>Access Dashboard</b>
+                </button>
+            </div>
+            </div>
+            <div className="image-section">
+                <img  src={mcgillImage} alt="McGill Campus" />
+            </div>
         </div>
-        {/* <div className="image-section">
-            <img  src={mcgillImage} alt="McGill Campus" />
-          </div> */}
         <div className="description-section">
           <h1>Welcome to McGill Campus Connect</h1>
           <p>
@@ -95,9 +104,10 @@ export default function Landing() {
 
         <div className="features-section">
           <Description
-            image={exampleImage}
+            image={dashboardImage}
             title="Boost team collaboration and improve productivity"
             text="Simplify communication across teams and hit goals faster, with team management software that maximizes productivity and empowers everyone to work smarter together."
+            onClick={handleDashboardClick}
           />
           <Description
             image={exampleImage}

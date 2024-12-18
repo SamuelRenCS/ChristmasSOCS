@@ -45,6 +45,7 @@
   
   .acceptButton:hover {
     background-color: #00274c;
+    transition: 0.3s;
   }
   
   .rejectButton {
