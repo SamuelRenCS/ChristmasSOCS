@@ -70,11 +70,10 @@ function App() {
 
             <Route path="/testing" element={<TestingPage />} />
 
+            <Route path="/dashboard" element={<Dashboard />} />
+
             {/* Private Routes */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              {/* <Route path="/meeting/:id" element={<MeetingPage />} /> */}
-            </Route>
+            <Route element={<PrivateRoute />}></Route>
           </Routes>
         </div>
         <ToastContainer />
