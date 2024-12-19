@@ -57,20 +57,21 @@ const HistoryPage = () => {
   }, [userId]);
 
   const handleCancelClick = async (bookingId) => {
-    try {
+    
+      try {
 
-      console.log("Booking ID: ", bookingId);
-      console.log("User ID: ", userId);
-      const response = await deleteBooking(bookingId, userId);
-      console.log("Response: ", response);
-      toast.success("Booking cancelled successfully");
-      // Remove the cancelled booking from the list
-      setNotifications(notifications.filter((booking) => booking.id !== bookingId));
-      
-    } catch (error) {
-      console.error("Error cancelling booking:", error);
-      toast.error("Failed to cancel booking");
-    }
+        console.log("Booking ID: ", bookingId);
+        console.log("User ID: ", userId);
+        const response = await deleteBooking(bookingId, userId);
+        console.log("Response: ", response);
+        toast.success("Booking cancelled successfully");
+        // Remove the cancelled booking from the list
+        setNotifications(notifications.filter((booking) => booking.id !== bookingId));
+        
+      } catch (error) {
+        console.error("Error cancelling booking:", error);
+        toast.error("Failed to cancel booking");
+      }
   }
 
   return (
