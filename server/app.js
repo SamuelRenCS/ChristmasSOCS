@@ -536,6 +536,19 @@ const generateSlots = (startTime, endTime, interval) => {
   const start = new Date(startTime);
   const end = new Date(endTime);
 
+  // Check if the interval equals the entire duration
+  const durationInMinutes = (end - start) / (1000 * 60); // Convert milliseconds to minutes
+  if (interval >= durationInMinutes) {
+    // If the interval is equal to or greater than the entire duration, only add the start time
+    slots.push([
+      start.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    ]);
+    return slots;
+  }
+
   let current = new Date(start);
   let currentDay = current.toDateString();
   let daySlots = [];
@@ -565,7 +578,7 @@ const generateSlots = (startTime, endTime, interval) => {
     current.setMinutes(current.getMinutes() + interval);
   }
 
-  // Add the last day's slots if not empty
+  // Add the last day's slots if there are any
   if (daySlots.length > 0) {
     slots.push(daySlots);
   }
@@ -615,7 +628,12 @@ app.get("/api/meetings/:token", async (req, res) => {
     let formattedDates = [];
 
     if (repeat === "None") {
-      dates = calculateDates(startDate, endDate);
+      if (interval !== 10 && interval !== 15 && interval !== 20 && interval !== 30 && interval !== 60) {
+        dates = calculateDates(startDate, startDate);
+      }else{
+        dates = calculateDates(startDate, endRepeatDate);
+      }
+      
       console.log("Dates:", dates);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
       return res.status(200).json({
