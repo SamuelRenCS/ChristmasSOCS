@@ -37,6 +37,49 @@ const RequestForm = ({ hostID }) => {
     description: "",
   });
 
+  // Validation function
+  const validateForm = () => {
+    // Title validation
+    if (!formData.title.trim()) {
+      return "Title is required";
+    }
+
+    // Location validation
+    if (!formData.location.trim()) {
+      return "Location is required";
+    }
+
+    // Date validation
+    const selectedDate = new Date(formData.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      return "Date cannot be in the past";
+    }
+
+    // Time validation
+    const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
+    const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
+    const currentDateTime = new Date();
+
+    if (startDateTime < currentDateTime) {
+      return "Start time cannot be in the past";
+    }
+
+    if (endDateTime <= startDateTime) {
+      return "End time must be after start time";
+    }
+
+    // Number of seats validation
+    const seats = parseInt(formData.numberOfSeats);
+    if (isNaN(seats) || seats < 1) {
+      return "Number of seats must be at least 1";
+    }
+
+    return "Valid";
+  };
+
   // start by getting host info with the hostID
   useEffect(() => {
     const fetchHost = async () => {
@@ -68,6 +111,13 @@ const RequestForm = ({ hostID }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationStatus = validateForm();
+
+    if (validationStatus !== "Valid") {
+      toast.error(validationStatus);
+      return;
+    }
 
     const startDateTime = new Date(
       `${formData.date}T${formData.startTime}`
@@ -181,7 +231,6 @@ const RequestForm = ({ hostID }) => {
           value={formData.description}
           onChange={handleInputChange}
           placeholder="Enter description"
-          required={true}
         />
 
         <Button type="submit" text="Submit Request" onClick={handleSubmit} />

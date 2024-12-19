@@ -174,8 +174,49 @@ const MeetingForm = () => {
     });
   };
 
+  const validateForm = () => {
+    if (!formData.title) {
+      return "Title is required";
+    }
+
+    if (!formData.location) {
+      return "Location is required";
+    }
+
+    if (formData.startDate === formData.endDate) {
+      if (formData.startTime >= formData.endTime) {
+        return "End time must be after start time";
+      }
+    }
+
+    if (formData.startDate > formData.endDate) {
+      return "End date must be after start date";
+    }
+
+    if (
+      formData.repeat !== "None" &&
+      formData.endRepeatDate < formData.endDate
+    ) {
+      return "End repeat date must be after end date";
+    }
+
+    if (formData.seatsPerSlot < 1) {
+      return "Seats per slot must be at least 1";
+    }
+
+    return "Valid";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // validate form
+    const validationStatus = validateForm();
+
+    if (validationStatus !== "Valid") {
+      toast.error(validationStatus);
+      return;
+    }
 
     // Map interval string to numeric value
     const intervalMapping = {
@@ -184,7 +225,10 @@ const MeetingForm = () => {
       "20 min": 20,
       "30 min": 30,
       "1 hour": 60,
-      "None": (new Date(formData.endDate + 'T' + formData.endTime) - new Date(formData.startDate + 'T' + formData.startTime)) / 60000,
+      None:
+        (new Date(formData.endDate + "T" + formData.endTime) -
+          new Date(formData.startDate + "T" + formData.startTime)) /
+        60000,
     };
 
     // Create dates using the local timezone
@@ -333,7 +377,14 @@ const MeetingForm = () => {
               name="interval"
               value={formData.interval}
               onChange={handleChange}
-              options={["None", "10 min", "15 min", "20 min", "30 min", "1 hour"]}
+              options={[
+                "None",
+                "10 min",
+                "15 min",
+                "20 min",
+                "30 min",
+                "1 hour",
+              ]}
             />
           </div>
 

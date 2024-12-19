@@ -28,7 +28,6 @@ const BookingForm = ({ token }) => {
   const [hostID, setHostID] = useState("");
   const [tokenPopup, setTokenPopup] = useState({ show: false, token: "" });
 
-
   const [isValidToken, setIsValidToken] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -149,8 +148,41 @@ const BookingForm = ({ token }) => {
     }
   };
 
+  // validate form
+  const validateForm = () => {
+    if (!formData.attendee) {
+      return "Name is required";
+    }
+
+    if (!formData.meetingDate) {
+      return "Date is required";
+    }
+
+    if (!formData.timeSlot) {
+      return "Time slot is required";
+    }
+
+    if (!formData.seats && formData.seats < 1) {
+      return "Number of seats is required and at least 1";
+    }
+
+    if (formData.seats > remainingSeats) {
+      return "Number of seats exceeds the remaining seats";
+    }
+
+    return "Valid";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // validate form
+    const validationStatus = validateForm();
+    if (validationStatus !== "Valid") {
+      toast.error(validationStatus);
+      return;
+    }
+
     try {
       const response = await createBooking(formData);
       if (!response) {
@@ -162,7 +194,7 @@ const BookingForm = ({ token }) => {
       toast.success(message);
 
       // Redirect to the dashboard after successful booking after 2 seconds
-      
+
       setTokenPopup({ show: true, msg: "Booking created successfully!" });
     } catch (error) {
       const errorMessage =

@@ -75,7 +75,7 @@ function App() {
             {/* 404 Route */}
             <Route
               path="*"
-              element={<ErrorPage message="404 Page not found" />}
+              element={<ErrorPage message="404 Page Not Found" />}
             />
           </Routes>
         </div>
