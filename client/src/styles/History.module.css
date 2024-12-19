@@ -2,6 +2,8 @@
     padding: 20px;
     background-color: #f9f9f9;
     height: auto;
+    max-height: 85vh;
+    overflow-y: auto;
   }
   
   .notificationsContainer h2 {

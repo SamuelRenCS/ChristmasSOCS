@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { fetchUserMeetings } from "../../api/api";
 
 
@@ -15,7 +14,6 @@ const MeetingsPage = () => {
   const userId = user ? user.id : "";
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Used to navigate to other pages
 
   // On load fetch all meetings
   useEffect(() => {
@@ -45,7 +43,9 @@ const MeetingsPage = () => {
 
 
   const handleViewClick = (meetingId) => {
-    navigate(`/meetings/${meetingId}`);
+    const meetingUrl = `/meetings/${meetingId}`;
+    window.open(meetingUrl, "_blank");
+
   };
 
 
@@ -82,7 +82,7 @@ const MeetingsPage = () => {
                 VIEW
               </button>
               <button className={styles.urlButton} onClick={() => handleGetIDClick(notification.id)}>
-                GET ID
+                COPY ID
               </button>
             </div>
            
