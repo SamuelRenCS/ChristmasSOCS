@@ -56,10 +56,11 @@ const HistoryPage = () => {
     if (userId) fetchMeetings();
   }, [userId]);
 
-  const handleCancelClick = async (bookingId) => {
-    
-      try {
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
+  const handleCancelClick = async (bookingId) => {
+    if (confirmingDeleteId === bookingId) {
+      try {
         console.log("Booking ID: ", bookingId);
         console.log("User ID: ", userId);
         const response = await deleteBooking(bookingId, userId);
@@ -67,12 +68,26 @@ const HistoryPage = () => {
         toast.success("Booking cancelled successfully");
         // Remove the cancelled booking from the list
         setNotifications(notifications.filter((booking) => booking.id !== bookingId));
-        
+        setConfirmingDeleteId(null); 
       } catch (error) {
         console.error("Error cancelling booking:", error);
         toast.error("Failed to cancel booking");
       }
+    }
+    else {
+      // If not confirming, show the confirmation state
+      setConfirmingDeleteId(bookingId);
+    }
+    setTimeout(() => {
+      setConfirmingDeleteId(null);
+    }, 4000);
   }
+
+
+  const handleCancelDelete = () => {
+    // Cancel deletion and reset the button
+    setConfirmingDeleteId(null);
+  };
 
   return (
     <div className={styles.notificationsContainer}>
@@ -106,11 +121,11 @@ const HistoryPage = () => {
             <div className={styles.requestActions}>
               {!notification.isPast && (
                   <button
-                    className={styles.cancelButton}
-                    onClick={() => handleCancelClick(notification.id)}
-                  >
-                    CANCEL
-                  </button>
+                  className={styles.cancelButton}
+                  onClick={() => handleCancelClick(notification.id)} // Pass meeting ID
+                onBlur={handleCancelDelete}>
+                  {confirmingDeleteId === notification.id ? "CONFIRM" : "CANCEL"}
+                </button>
                 )}
             </div>
           </div>

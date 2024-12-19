@@ -88,15 +88,15 @@ export default function Landing() {
           </p>
           <ul>
             <li>
-              📅 <b>Book a Meeting:</b> Use our streamlined booking tool to join
+              <b>Book a Meeting:</b> Use our streamlined booking tool to join
               meetings effortlessly.
             </li>
             <li>
-              📝 <b>Create a Meeting:</b> Set up and manage your own meetings
+              <b>Create a Meeting:</b> Set up and manage your own meetings
               with ease.
             </li>
             <li>
-              🔍 <b>View Scheduled Meetings:</b> Keep track of all your upcoming
+              <b>View Scheduled Meetings:</b> Keep track of all your upcoming
               meetings in one place.
             </li>
           </ul>
