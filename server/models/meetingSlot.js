@@ -16,6 +16,13 @@ const MeetingSlotSchema = new Schema({
     },
   ],
   seatsAvailable: Number,
+
+  registeredAttendees: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 module.exports = mongoose.model("MeetingSlot", MeetingSlotSchema);
