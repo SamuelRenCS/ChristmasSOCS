@@ -15,9 +15,9 @@
 }
 
 .profileHeader h1 {
-  color: #333;
   font-size: 24px;
   margin: 0;
+  color: #007bff;
 }
 
 .profileDetails {

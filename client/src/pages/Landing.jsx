@@ -8,6 +8,7 @@ import mcgillImage from "/Mcgill.jpg";
 import { useAuth } from "../context/AuthContext";
 import dashboardImage from "../assets/dashboard.png";
 import createmeetingImage from "../assets/createmeeting.png";
+import homepageImage from "../assets/homepage.png";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function Landing() {
 
   const handleBookNowClick = () => {
     if (meetingCode.trim()) {
-      navigate(`/meetings/${meetingCode}`);
+      navigate(`/requests/new/${meetingCode}`);
     } else {
       toast.error("Please enter a valid meeting code.");
     }
@@ -118,7 +119,7 @@ export default function Landing() {
             display={{ display: "none" }}
           />
           <Description
-            image={exampleImage}
+            image={homepageImage}
             title="Stay organized and focused on your goals"
             text="Keep track of all your meetings and tasks in one place, so you can stay organized and focused on what matters most."
             display={{ display: "none" }}
