@@ -78,6 +78,19 @@ const MeetingForm = () => {
         updatedFormData.endTime = updatedFormData.startTime;
       }
 
+      // make sure the start date is not before now
+      if (name === "startDate" && new Date(value) < now) {
+        updatedFormData.startDate = formatDate(now);
+      }
+
+      // make sure the end date is not before the start date
+      if (
+        name === "endDate" &&
+        new Date(value) < new Date(updatedFormData.startDate)
+      ) {
+        updatedFormData.endDate = updatedFormData.startDate;
+      }
+
       // case where startDate changes to the same date as endDate, but the end time becomes earlier than the start time
       if (
         name === "startDate" &&
