@@ -5,7 +5,7 @@ import TimeSlot from "../components/TimeSlot";
 import CalendarDateInput from "../components/CalendarDateInput";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMeetingWithID, deleteMeeting } from "../api/api";
+import { fetchMeeting, deleteMeeting, fetchMeetingSlot } from "../api/api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -13,12 +13,19 @@ const ViewMeeting = () => {
   const navigate = useNavigate();
   const { meetingId } = useParams();
 
+  const [highlightedDates, setHighlightedDates] = useState([]);
+  const [meetingDate, setMeetingDate] = useState("");
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+
   useEffect(() => {
     // Fetch the meeting data on load
     const fetchMeetingDetails = async () => {
       try {
         // pass token as a string
-        const response = await fetchMeetingWithID(meetingId);
+        const response = await fetchMeeting(meetingId);
         const {
           title,
           host,
@@ -29,9 +36,39 @@ const ViewMeeting = () => {
           interval,
           seatsPerSlot,
           repeat,
-          dates,
+          endRepeatDate,
+          formattedDates,
+          meetingID,
         } = response.data;
         console.log("Meeting details", response.data);
+        console.log("Formatted dates", formattedDates);
+        setHighlightedDates(formattedDates);
+
+        //keep the date part of the datetime
+        const dateObj = new Date(startDate);
+
+        // set the meeting date
+        setMeetingDate(dateObj.toISOString().split("T")[0]);
+
+        // set the location
+        setLocation(location);
+
+        // set the description
+        setDescription(description);
+
+        // set the start time
+        const startTime = new Date(startDate).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        setStartTime(startTime);
+
+        // set the end time
+        const endTime = new Date(endDate).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        setEndTime(endTime);
       } catch (error) {
         console.log("Error fetching meeting details", error);
       }
@@ -41,14 +78,18 @@ const ViewMeeting = () => {
 
   const [timeSlots, setTimeSlots] = useState([
     { time: "15:00 to 15:15", student: "Eric", isBooked: true },
-    { time: "15:15 to 15:30", student: null, isBooked: false },
-    { time: "15:30 to 15:45", student: "Samuel", isBooked: true },
-    { time: "15:45 to 16:00", student: "Daniel", isBooked: true },
-    { time: "16:00 to 16:15", student: "Shotaro", isBooked: true },
-    { time: "16:15 to 16:30", student: null, isBooked: false },
-    { time: "16:45 to 17:00", student: null, isBooked: false },
   ]);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false); // Track confirmation state
+
+  const handleDateChange = async (date) => {
+    try {
+      const response = await fetchMeetingSlot(meetingId, date);
+      console.log("Meeting slots:", response.data);
+    } catch (error) {
+      console.error("Error fetching slots for the date:", error);
+      toast.error("Error fetching available slots.");
+    }
+  };
 
   const handleDelete = () => {
     if (isConfirmingDelete) {
@@ -92,9 +133,9 @@ const ViewMeeting = () => {
             <h3>Available Time Slots</h3>
             <CalendarDateInput
               label="Date:"
-              value="2021-11-25"
-              onChange={() => {}}
-              highlightedDates={["2021-11-25"]}
+              value={meetingDate}
+              onChange={handleDateChange}
+              highlightedDates={highlightedDates}
             />
           </Container>
         </div>
@@ -106,13 +147,13 @@ const ViewMeeting = () => {
             padding={"20px"}
             overflow={"auto"}
           >
-            <h3>Location: ENGMC 327</h3>
+            <h3>Location: {location}</h3>
             <p>
-              <strong>Description:</strong> Lorem ipsum dolor sit amet,
-              consectetur adipiscing elit. Phasellus fringilla, purus placerat
-              sollicitudin interdum, neque lacus consequat magna.
+              <strong>Description:</strong> {description}
             </p>
-            <p>From 15:00 to 18:30 EST</p>
+            <p>
+              From {startTime} to {endTime} EST
+            </p>
           </Container>
           <Container
             maxHeight={"300px"}

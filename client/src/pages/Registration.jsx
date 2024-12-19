@@ -6,6 +6,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Registration() {
   const navigate = useNavigate();
@@ -32,28 +33,31 @@ function Registration() {
 
   const validate = () => {
     const validationErrors = {};
-  
+
     // First Name validation (only letters, no numbers/symbols)
     if (!formData.firstName.trim()) {
       validationErrors.firstName = "First Name is required.";
     } else if (!/^[A-Za-z]+$/.test(formData.firstName.trim())) {
       validationErrors.firstName = "First Name must only contain letters.";
-    } 
-  
+    }
+
     // Last Name validation (only letters, no numbers/symbols)
     if (!formData.lastName.trim()) {
       validationErrors.lastName = "Last Name is required.";
     } else if (!/^[A-Za-z]+$/.test(formData.lastName.trim())) {
       validationErrors.lastName = "Last Name must only contain letters.";
-    } 
-  
+    }
+
     // Email validation (valid email structure)
     if (!formData.email.trim()) {
-        validationErrors.email = "Email is required.";
-      } else if (!/^[\w\.-]+@(mail\.mcgill\.ca|mcgill\.ca)$/.test(formData.email)) {
-        validationErrors.email = "Email must be a valid McGill email (e.g., @mail.mcgill.ca or @mcgill.ca).";
-      } 
-  
+      validationErrors.email = "Email is required.";
+    } else if (
+      !/^[\w\.-]+@(mail\.mcgill\.ca|mcgill\.ca)$/.test(formData.email)
+    ) {
+      validationErrors.email =
+        "Email must be a valid McGill email (e.g., @mail.mcgill.ca or @mcgill.ca).";
+    }
+
     // Password validation (strong rules)
     if (!formData.password) {
       validationErrors.password = "Password is required.";
@@ -71,20 +75,21 @@ function Registration() {
       if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) {
         passwordRules.push("one special character");
       }
-  
+
       if (passwordRules.length > 0) {
-        validationErrors.password = `Password must include ${passwordRules.join(", ")}.`;
+        validationErrors.password = `Password must include ${passwordRules.join(
+          ", "
+        )}.`;
       } else delete validationErrors.password;
-    } 
-  
+    }
+
     // Confirm Password validation
     if (formData.password !== formData.confirmPassword) {
       validationErrors.confirmPassword = "Passwords do not match.";
-    } 
-  
+    }
+
     return validationErrors;
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,36 +100,36 @@ function Registration() {
     // if (name === "password") {
     //     let score = 0;
     //     setShowStrengthBar(true);
-    
-    //     if (value.length >= 8) score += 25; 
-    //     if (/[A-Z]/.test(value)) score += 25; 
-    //     if (/[0-9]/.test(value)) score += 25; 
-    //     if (/[!@#$%^&*(),.?":{}|<>]/.test(value)) score += 25; 
-    
+
+    //     if (value.length >= 8) score += 25;
+    //     if (/[A-Z]/.test(value)) score += 25;
+    //     if (/[0-9]/.test(value)) score += 25;
+    //     if (/[!@#$%^&*(),.?":{}|<>]/.test(value)) score += 25;
+
     //     setPasswordStrength(score);
     //   }
     if (name === "password") {
-        const hasLength = value.length >= 8;
-        const hasUppercase = /[A-Z]/.test(value);
-        const hasNumber = /[0-9]/.test(value);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-  
-        const strengthScore =
-          (hasLength ? 25 : 0) +
-          (hasUppercase ? 25 : 0) +
-          (hasNumber ? 25 : 0) +
-          (hasSpecialChar ? 25 : 0);
-  
-        setPasswordStrength(strengthScore);
-        setPasswordRules({ hasLength, hasUppercase, hasNumber, hasSpecialChar });
-        if (strengthScore < 50) {
-            setPasswordStrengthLabel("Weak");
-          } else if (strengthScore < 100) {
-            setPasswordStrengthLabel("Good");
-          } else {
-            setPasswordStrengthLabel("Strong");
-          }
+      const hasLength = value.length >= 8;
+      const hasUppercase = /[A-Z]/.test(value);
+      const hasNumber = /[0-9]/.test(value);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+      const strengthScore =
+        (hasLength ? 25 : 0) +
+        (hasUppercase ? 25 : 0) +
+        (hasNumber ? 25 : 0) +
+        (hasSpecialChar ? 25 : 0);
+
+      setPasswordStrength(strengthScore);
+      setPasswordRules({ hasLength, hasUppercase, hasNumber, hasSpecialChar });
+      if (strengthScore < 50) {
+        setPasswordStrengthLabel("Weak");
+      } else if (strengthScore < 100) {
+        setPasswordStrengthLabel("Good");
+      } else {
+        setPasswordStrengthLabel("Strong");
       }
+    }
   };
   const handleBlur = (e) => {
     const { name, value } = e.target;
@@ -153,7 +158,6 @@ function Registration() {
 
     setErrors({}); // Clear errors if validation passes
 
-
     // basic client-side validation
     // if (formData.password !== formData.confirmPassword) {
     //   toast.error("Passwords do not match");
@@ -181,7 +185,7 @@ function Registration() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2 >Create an Account</h2>
+        <h2>Create an Account</h2>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-row" style={{ display: "flex", gap: "10px" }}>
             <Input
@@ -193,7 +197,7 @@ function Registration() {
               onChange={handleChange}
               onBlur={handleBlur}
             />
-            
+
             <Input
               label="Last Name"
               type="text"
@@ -203,14 +207,17 @@ function Registration() {
               onChange={handleChange}
               onBlur={handleBlur}
             />
-            
           </div>
-          <div style={{ display: 'flex', gap: '50px'}}>
+          <div style={{ display: "flex", gap: "50px" }}>
             {errors.firstName && (
-              <p className={`error-text ${errors.firstName ? "show" : ""}`}>{errors.firstName}</p>
+              <p className={`error-text ${errors.firstName ? "show" : ""}`}>
+                {errors.firstName}
+              </p>
             )}
             {errors.lastName && (
-              <p className={`error-text ${errors.lastName ? "show" : ""}`}>{errors.lastName}</p>
+              <p className={`error-text ${errors.lastName ? "show" : ""}`}>
+                {errors.lastName}
+              </p>
             )}
           </div>
           <Input
@@ -222,7 +229,11 @@ function Registration() {
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          {errors.email && <p className={`error-text ${errors.email ? "show" : ""}`}>{errors.email}</p>}
+          {errors.email && (
+            <p className={`error-text ${errors.email ? "show" : ""}`}>
+              {errors.email}
+            </p>
+          )}
           <Input
             label="Password"
             type="password"
@@ -231,31 +242,45 @@ function Registration() {
             formType="register"
             onChange={handleChange}
             onFocus={() => {
-                setShowPasswordValidation(true);
-              }}
+              setShowPasswordValidation(true);
+            }}
             onBlur={handleBlur}
           />
-            {errors.password && <p className={`error-text ${errors.password ? "show" : ""}`}>{errors.password}</p>}
-            
-            {showPasswordValidation && (
+          {errors.password && (
+            <p className={`error-text ${errors.password ? "show" : ""}`}>
+              {errors.password}
+            </p>
+          )}
+
+          {showPasswordValidation && (
             <ul className="password-rules">
-            <li style={{ color: passwordStrengthLabel === "Weak" ? "red" : "green" }}>
+              <li
+                style={{
+                  color: passwordStrengthLabel === "Weak" ? "red" : "green",
+                }}
+              >
                 Password Strength: {passwordStrengthLabel}
-            </li>
-            <li style={{ color: passwordRules.hasLength ? "green" : "red" }}>
-              {passwordRules.hasLength ? "✔" : "✖"} At least 8 characters
-            </li>
-            <li style={{ color: passwordRules.hasUppercase ? "green" : "red" }}>
-              {passwordRules.hasUppercase ? "✔" : "✖"} One uppercase letter
-            </li>
-            <li style={{ color: passwordRules.hasNumber ? "green" : "red" }}>
-              {passwordRules.hasNumber ? "✔" : "✖"} One number
-            </li>
-            <li style={{ color: passwordRules.hasSpecialChar ? "green" : "red" }}>
-              {passwordRules.hasSpecialChar ? "✔" : "✖"} One special character
-            </li>
-          </ul>
-            )}
+              </li>
+              <li style={{ color: passwordRules.hasLength ? "green" : "red" }}>
+                {passwordRules.hasLength ? "✔" : "✖"} At least 8 characters
+              </li>
+              <li
+                style={{ color: passwordRules.hasUppercase ? "green" : "red" }}
+              >
+                {passwordRules.hasUppercase ? "✔" : "✖"} One uppercase letter
+              </li>
+              <li style={{ color: passwordRules.hasNumber ? "green" : "red" }}>
+                {passwordRules.hasNumber ? "✔" : "✖"} One number
+              </li>
+              <li
+                style={{
+                  color: passwordRules.hasSpecialChar ? "green" : "red",
+                }}
+              >
+                {passwordRules.hasSpecialChar ? "✔" : "✖"} One special character
+              </li>
+            </ul>
+          )}
           <Input
             label="Confirm Password"
             type="password"
@@ -266,10 +291,12 @@ function Registration() {
             onBlur={handleBlur}
           />
           {errors.confirmPassword && (
-            <p className={`error-text ${errors.confirmPassword ? "show" : ""}`}>{errors.confirmPassword}</p>
+            <p className={`error-text ${errors.confirmPassword ? "show" : ""}`}>
+              {errors.confirmPassword}
+            </p>
           )}
           <div className="no-account">
-            <a href="/login">Already have an account? Login</a>
+            <Link to="/login">Already have an account? Login</Link>
           </div>
           <Button type="submit" text="Register" />
         </form>

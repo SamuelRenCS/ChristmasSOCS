@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ function Login() {
             onChange={handleChange}
           />
           <div className="no-account">
-            <a href="/register">Do not have an account? Register</a>
+            <Link to="/register">Do not have an account? Register</Link>
           </div>
           <Button type="submit" text="Login" />
         </form>

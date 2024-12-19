@@ -67,17 +67,6 @@ export const fetchMeeting = async (token) => {
   }
 };
 
-// fetch meetings function to send a GET request to /meetings with meeting ID
-export const fetchMeetingWithID = async (meetingID) => {
-  try {
-    const response = await api.get(`/meetings/${meetingID}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching meeting details:", error);
-    throw error;
-  }
-};
-
 // fetchMeetingSlots function to send a GET request to /meetings/
 // TODO ADD PARAMS
 export const fetchMeetingSlot = async (meetingID, date) => {
