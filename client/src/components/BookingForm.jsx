@@ -162,7 +162,7 @@ const BookingForm = ({ token }) => {
       return "Time slot is required";
     }
 
-    if (!formData.seats && formData.seats < 1) {
+    if (!formData.seats || formData.seats < 1) {
       return "Number of seats is required and at least 1";
     }
 
