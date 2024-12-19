@@ -16,8 +16,12 @@
     height: auto;
     border-radius: 8px; /* Optional rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    transition: transform 0.3s ease-in-out;
   }
 
+  .descriptionImage img:hover {
+    transform: scale(1.05); /* Optional hover effect */
+  }
   
   .descriptionContent {
     

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
-
+import { useNavigate } from "react-router-dom";
 import { fetchUserMeetings } from "../../api/api";
 
 
@@ -15,6 +15,7 @@ const MeetingsPage = () => {
   const userId = user ? user.id : "";
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Used to navigate to other pages
 
   // On load fetch all meetings
   useEffect(() => {
@@ -43,6 +44,21 @@ const MeetingsPage = () => {
   }, [userId]);
 
 
+  const handleViewClick = (meetingId) => {
+    navigate(`/meetings/${meetingId}`);
+  };
+
+
+  const handleGetIDClick = (meetingId) => {
+    const meetingToken = meetingId;
+    navigator.clipboard.writeText(meetingToken).then(() => {
+      toast.success("Meeting ID copied to clipboard!");
+    }).catch((error) => {
+      console.error("Error copying ID to clipboard: ", error);
+      toast.error("Failed to copy meeting ID.");
+    });
+  };
+
   return (
     <div className={styles.notificationsContainer}>
       <div className={styles.header}>
@@ -60,6 +76,14 @@ const MeetingsPage = () => {
                 <b>Location:</b> {notification.location}
               </p>
               
+            </div>
+            <div className={styles.requestActions}>
+              <button className={styles.viewButton} onClick={() => handleViewClick(notification.id)}>
+                VIEW
+              </button>
+              <button className={styles.urlButton} onClick={() => handleGetIDClick(notification.id)}>
+                GET ID
+              </button>
             </div>
            
           </div>
