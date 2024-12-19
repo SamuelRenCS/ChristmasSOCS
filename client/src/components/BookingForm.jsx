@@ -153,7 +153,7 @@ const BookingForm = ({ token }) => {
         return;
       }
 
-      const { message } = response.data;
+      const message = response.data;
       toast.success(message);
 
       // Redirect to the dashboard after successful booking

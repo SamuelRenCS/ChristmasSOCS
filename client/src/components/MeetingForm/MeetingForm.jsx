@@ -16,9 +16,13 @@ const MeetingForm = () => {
   const { user } = useAuth();
 
   // Helper function to format date and time
-  const formatDate = (date) => date.toISOString().split("T")[0];
+  const formatDate = (date) => date.toLocaleDateString("en-CA");
   const formatTime = (date) =>
-    date.toTimeString().split(":").slice(0, 2).join(":");
+    date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: false,
+    });
 
   // Set initial values for date and time
   const now = new Date();
@@ -29,7 +33,7 @@ const MeetingForm = () => {
     host: user ? user.id : "",
     startDate: formatDate(now), // Current date
     startTime: formatTime(now), // Current time
-    endDate: formatDate(now), // Same date as startDate
+    endDate: formatDate(oneHourLater), // Same date as startDate
     endTime: formatTime(oneHourLater), // One hour after current time
     location: "",
     description: "",
@@ -37,12 +41,14 @@ const MeetingForm = () => {
     seatsPerSlot: "",
     repeat: "None",
     repeatDays: [],
-    endRepeatDate: formatDate(now), // same as endDate
+    endRepeatDate: formatDate(oneHourLater), // same as endDate
     endRepeatTime: `23:59`, // default to midnight
     //token: "UNSET",
   });
 
-  const [enableRepeat, setEnableRepeat] = useState(true);
+  const [enableRepeat, setEnableRepeat] = useState(
+    formData.startDate === formData.endDate
+  );
   const [repeatValue, setRepeat] = useState("None");
   const [tokenPopup, setTokenPopup] = useState({ show: false, token: "" });
 
@@ -69,6 +75,15 @@ const MeetingForm = () => {
         updatedFormData.startTime > value
       ) {
         // if the user tries to set the end time before the start time, set the end time to the start time
+        updatedFormData.endTime = updatedFormData.startTime;
+      }
+
+      // case where startDate changes to the same date as endDate, but the end time becomes earlier than the start time
+      if (
+        name === "startDate" &&
+        updatedFormData.startDate === updatedFormData.endDate &&
+        updatedFormData.startTime > updatedFormData.endTime
+      ) {
         updatedFormData.endTime = updatedFormData.startTime;
       }
 
@@ -158,13 +173,13 @@ const MeetingForm = () => {
       "1 hour": 60,
     };
 
+    // Create dates using the local timezone
     const startDateTime = new Date(
       `${formData.startDate}T${formData.startTime}`
     ).toISOString();
     const endDateTime = new Date(
       `${formData.endDate}T${formData.endTime}`
     ).toISOString();
-
     const endRepeatDate = new Date(
       `${formData.endRepeatDate}T${formData.endRepeatTime}`
     ).toISOString();
