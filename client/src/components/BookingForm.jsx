@@ -156,8 +156,10 @@ const BookingForm = ({ token }) => {
       const message = response.data;
       toast.success(message);
 
-      // Redirect to the dashboard after successful booking
-      navigate("/dashboard");
+      // Redirect to the dashboard after successful booking after 2 seconds
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||

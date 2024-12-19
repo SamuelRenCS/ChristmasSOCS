@@ -840,6 +840,7 @@ app.get("/api/meetings/:meetingID/:date/:slot", async (req, res) => {
 // Serve the booking creation api route
 
 app.post("/api/bookings/new", async (req, res) => {
+  console.log("Booking request:");
   console.log(req.body);
   const { attendee, meetingID, userID, meetingDate, timeSlot, seats } =
     req.body;
@@ -982,7 +983,7 @@ app.post("/api/bookings/new", async (req, res) => {
         //check if a user is logged in and add the booking to the user
         if (userID) {
           const user = await User.findById(userID);
-          user.reservations.push(newSlot);
+          user.reservations.push(existingSlot);
           await user.save();
 
           //add the user to the list of registered attendees for the slot
@@ -1131,7 +1132,7 @@ app.get("/api/dashboard/events/:userID", async (req, res) => {
         });
       });
     });
-    
+
 
     // Add the bookings the user has made. Each booking is an event. Take the host name from the meeting
     user.reservations.forEach((booking) => {

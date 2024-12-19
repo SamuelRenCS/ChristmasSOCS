@@ -10,8 +10,11 @@ const CalendarDateInput = ({
   onChange,
   highlightedDates = [],
 }) => {
+  // Ensure the date is correctly formatted as 'yyyy-mm-dd' for comparisons
+  const formatDate = (date) => date.toISOString().split("T")[0];
+
   const handleDateChange = (date) => {
-    const formattedDate = date.toISOString().split("T")[0];
+    const formattedDate = formatDate(date);
     if (highlightedDates.includes(formattedDate)) {
       onChange(formattedDate);
     }
@@ -19,14 +22,16 @@ const CalendarDateInput = ({
 
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
-      const formattedDate = date.toISOString().split("T")[0];
+      const formattedDate = formatDate(date);
       const classes = [];
 
+      // Add 'highlight' class if the date is in the highlightedDates array
       if (highlightedDates.includes(formattedDate)) {
         classes.push("highlight");
       }
 
-      if (value && date.toISOString().split("T")[0] === value) {
+      // Add 'selected' class if this date is the selected date
+      if (value && formatDate(date) === value) {
         classes.push("selected");
       }
 
@@ -37,7 +42,7 @@ const CalendarDateInput = ({
 
   const tileDisabled = ({ date, view }) => {
     if (view === "month") {
-      const formattedDate = date.toISOString().split("T")[0];
+      const formattedDate = formatDate(date);
       return !highlightedDates.includes(formattedDate);
     }
     return false;

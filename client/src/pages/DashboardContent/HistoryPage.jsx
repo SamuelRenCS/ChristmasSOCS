@@ -64,7 +64,8 @@ const HistoryPage = () => {
       {notifications.length > 0 ? (
         notifications.map((notification) => (
           <div
-            key={notification.id}
+          
+            key={notification.id + notification.date + notification.start}
             className={`${styles.notificationItem} ${notification.isPast ? styles.pastMeeting : ""}`}
           >
             <div className={styles.info}>

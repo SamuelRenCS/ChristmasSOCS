@@ -197,4 +197,56 @@ export const rejectRequest = async (requestID) => {
   }
 };
 
+//TODO
+
+// Delete meeting function to send a DELETE request to /meetings
+export const deleteMeeting = async (meetingID) => {
+  try {
+    const response = await api.delete(`/meetings/delete/${meetingID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Delete booking function to send a DELETE request to /bookings
+export const deleteBooking = async (bookingID) => {
+  try {
+    const response = await api.delete(`/bookings/delete/${bookingID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//create a notification function to send a POST request to /notifications
+export const createNotification = async (notificationData) => {
+  try {
+    const response = await api.post("/notifications/new", notificationData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//fetch all notifications function to send a GET request to /notifications
+export const fetchNotifications = async (userID) => {
+  try {
+    const response = await api.get(`/notifications/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+//delete notification function to send a DELETE request to /notifications
+export const deleteNotification = async (notificationID) => {
+  try {
+    const response = await api.delete(`/notifications/delete/${notificationID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export default api;
