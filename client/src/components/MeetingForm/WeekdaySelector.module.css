@@ -1,7 +1,7 @@
 .weekDaySelector {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
+  margin-bottom: 1rem;
   background-color: #f4f4f4;
   padding: 1rem;
   border-radius: 8px;

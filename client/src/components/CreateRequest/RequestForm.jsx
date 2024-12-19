@@ -115,74 +115,77 @@ const RequestForm = ({ hostID }) => {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <InputField label="Host" name="host" value={formData.host} readOnly />
+      <div className={styles.container}>
+        <InputField label="Host" name="host" value={formData.host} readOnly />
 
-      <InputField
-        label="Title"
-        name="title"
-        value={formData.title}
-        onChange={handleInputChange}
-        placeholder="Enter title"
-        required={true}
-      />
-
-      <InputField
-        label="Location"
-        name="location"
-        value={formData.location}
-        onChange={handleInputChange}
-        placeholder="Enter location"
-        required={true}
-      />
-
-      <InputField
-        label="Select Date"
-        type="date"
-        name="date"
-        value={formData.date}
-        onChange={handleInputChange}
-        required={true}
-      />
-
-      <div className={styles.timeInputContainer}>
         <InputField
-          label="Start Time"
-          type="time"
-          name="startTime"
-          value={formData.startTime}
+          label="Title"
+          name="title"
+          value={formData.title}
           onChange={handleInputChange}
+          placeholder="Enter title"
           required={true}
         />
+
         <InputField
-          label="End Time"
-          type="time"
-          name="endTime"
-          value={formData.endTime}
+          label="Location"
+          name="location"
+          value={formData.location}
+          onChange={handleInputChange}
+          placeholder="Enter location"
+          required={true}
+        />
+
+        <InputField
+          label="Select Date"
+          type="date"
+          name="date"
+          value={formData.date}
           onChange={handleInputChange}
           required={true}
         />
       </div>
+      <div className={styles.container}>
+        <div className={styles.timeInputContainer}>
+          <InputField
+            label="Start Time"
+            type="time"
+            name="startTime"
+            value={formData.startTime}
+            onChange={handleInputChange}
+            required={true}
+          />
+          <InputField
+            label="End Time"
+            type="time"
+            name="endTime"
+            value={formData.endTime}
+            onChange={handleInputChange}
+            required={true}
+          />
+        </div>
 
-      <InputField
-        label="Number of Slots"
-        type="number"
-        name="numberOfSeats"
-        value={formData.numberOfSeats}
-        onChange={handleInputChange}
-        min="1"
-        required={true}
-      />
+        <InputField
+          label="Number of Seats"
+          type="number"
+          name="numberOfSeats"
+          value={formData.numberOfSeats}
+          onChange={handleInputChange}
+          min="1"
+          required={true}
+        />
 
-      <TextAreaField
-        label="Description"
-        name="description"
-        value={formData.description}
-        onChange={handleInputChange}
-        placeholder="Enter description"
-        required={true}
-      />
+        <TextAreaField
+          label="Description"
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          placeholder="Enter description"
+          required={true}
+        />
 
-      <Button type="submit" text="Submit Request" onClick={handleSubmit} />
+        <Button type="submit" text="Submit Request" onClick={handleSubmit} />
+      </div>
     </form>
   );
 };

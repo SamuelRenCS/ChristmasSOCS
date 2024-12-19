@@ -38,7 +38,10 @@ const Header = ({ hidden = false, isAppearable = false }) => {
     };
   }, []);
 
-  const navLinks = [{ name: "Dashboard", path: "/dashboard" }];
+  const navLinks = [
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "New Meeting", path: "/meetings/new" },
+  ];
 
   const handleLogout = () => {
     logout(); // Clear authentication
@@ -55,7 +58,7 @@ const Header = ({ hidden = false, isAppearable = false }) => {
           <NavbarLogo />
 
           <div className={styles.desktopNavigation}>
-            <NavLinks links={navLinks} />
+            {isAuthenticated && <NavLinks links={navLinks} />}
             <AuthButtons
               isAuthenticated={isAuthenticated}
               onLogout={handleLogout}

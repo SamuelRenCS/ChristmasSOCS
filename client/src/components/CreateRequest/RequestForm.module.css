@@ -1,6 +1,5 @@
 .form {
   display: flex;
-  flex-direction: column;
   gap: 20px;
   background-color: white;
   padding: 20px;
@@ -17,4 +16,22 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 50%;
+}
+
+@media (max-width: 768px) {
+  .form {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .container {
+    width: 100%;
+  }
 }

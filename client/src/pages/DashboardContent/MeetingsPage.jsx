@@ -4,10 +4,8 @@ import { useAuth } from "../../context/AuthContext";
 import { fetchUserMeetings } from "../../api/api";
 import { fetchToken } from "../../api/api";
 
-
 import styles from "../../styles/MeetingsList.module.css";
 //import { fetchUser } from "../../api/api";
-
 
 const MeetingsPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -15,8 +13,11 @@ const MeetingsPage = () => {
   const userId = user ? user.id : "";
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tokenPopup, setTokenPopup] = useState({ show: false, token: "", meetingId: null });
-  
+  const [tokenPopup, setTokenPopup] = useState({
+    show: false,
+    token: "",
+    meetingId: null,
+  });
 
   useEffect(() => {
     const fetchMeetings = async () => {
@@ -44,7 +45,6 @@ const MeetingsPage = () => {
   const handleViewClick = (meetingId) => {
     const meetingUrl = `/meetings/${meetingId}`;
     window.open(meetingUrl, "_blank");
-
   };
 
   const handleGetIDClick = async (meetingId) => {
@@ -61,8 +61,6 @@ const MeetingsPage = () => {
     }
   };
 
-  
-
   const handleCopyToken = () => {
     navigator.clipboard.writeText(tokenPopup.token).then(() => {
       toast.info("Token copied to clipboard");
@@ -77,6 +75,7 @@ const MeetingsPage = () => {
     <div className={styles.notificationsContainer}>
       <div className={styles.header}>
         <h2>My Meetings</h2>
+        <Button text="Add Meeting" onClick={() => navigate("/meetings/new")} />
       </div>
       {notifications.length > 0 ? (
         notifications.map((notification) => (
@@ -90,10 +89,16 @@ const MeetingsPage = () => {
               </p>
             </div>
             <div className={styles.requestActions}>
-              <button className={styles.viewButton} onClick={() => handleViewClick(notification.id)}>
+              <button
+                className={styles.viewButton}
+                onClick={() => handleViewClick(notification.id)}
+              >
                 VIEW
               </button>
-              <button className={styles.urlButton} onClick={() => handleGetIDClick(notification.id)}>
+              <button
+                className={styles.urlButton}
+                onClick={() => handleGetIDClick(notification.id)}
+              >
                 GET TOKEN
               </button>
             </div>
@@ -107,7 +112,11 @@ const MeetingsPage = () => {
         <div className={styles["token-popup"]}>
           <div className={styles["popup-content"]}>
             <h3>Meeting Token</h3>
-            <p>{typeof tokenPopup.token === 'string' ? tokenPopup.token : JSON.stringify(tokenPopup.token)}</p>
+            <p>
+              {typeof tokenPopup.token === "string"
+                ? tokenPopup.token
+                : JSON.stringify(tokenPopup.token)}
+            </p>
             <button onClick={handleCopyToken}>Copy Token</button>
             <button onClick={closePopup}>Close</button>
           </div>
