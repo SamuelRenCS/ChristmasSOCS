@@ -9,6 +9,7 @@
   .notificationsContainer h2 {
     text-align: center;
     margin-bottom: 1.5rem;
+    color: #007bff;
   }
 
   .header {
@@ -19,17 +20,16 @@
     margin-left: 10px;
   }
 
-  .clearButton {
-    color: black;
+  .cancelButton {
     background-color: white;
+    color: black;
     border: 2px solid #fd6e6b;
     padding: 10px 20px;
     border-radius: 30px;
     cursor: pointer;
-    font-size: 16px;
   }
   
-  .clearButton:hover {
+  .cancelButton:hover {
     background-color: #fd6e6b;
     transition: 0.3s;
   }

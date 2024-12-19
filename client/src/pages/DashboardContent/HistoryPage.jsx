@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
-import { fetchUserBookings } from "../../api/api";
+import { fetchUserBookings, deleteBooking } from "../../api/api";
 
 import styles from "../../styles/History.module.css";
 
@@ -56,6 +56,10 @@ const HistoryPage = () => {
     if (userId) fetchMeetings();
   }, [userId]);
 
+  const handleCancelClick = async (bookingId) => {
+    //TODO: Implement deleteBooking API call
+  }
+
   return (
     <div className={styles.notificationsContainer}>
       <div className={styles.header}>
@@ -84,6 +88,16 @@ const HistoryPage = () => {
               <p>
                 <b>End:</b> {notification.end}
               </p>
+            </div>
+            <div className={styles.requestActions}>
+              {!notification.isPast && (
+                  <button
+                    className={styles.cancelButton}
+                    onClick={() => handleCancelClick(notification.id)}
+                  >
+                    CANCEL
+                  </button>
+                )}
             </div>
           </div>
         ))
