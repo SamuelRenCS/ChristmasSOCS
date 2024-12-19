@@ -15,13 +15,6 @@ const RequestItem = ({ request, onAccept, onReject }) => {
     }).format(date);
   };
 
-  const [isAccepted, setIsAccepted] = useState(false);
-
-  const handleAccept = () => {
-    onAccept(request.id);
-    setIsAccepted(true);
-  };
-
   return (
     <div className={styles.requestItem}>
       {/* Request Details */}
@@ -44,19 +37,10 @@ const RequestItem = ({ request, onAccept, onReject }) => {
 
       {/* Action Buttons */}
       <div className={styles.requestActions}>
-        {isAccepted ? (
-          <button className={styles.acceptedButton} disabled>
-            ACCEPTED
-          </button>
-        ) : (
-          <button className={styles.acceptButton} onClick={handleAccept}>
-            ACCEPT
-          </button>
-        )}
-        <button
-          className={styles.rejectButton}
-          onClick={() => onReject(request.id)}
-        >
+        <button className={styles.acceptButton} onClick={onAccept}>
+          ACCEPT
+        </button>
+        <button className={styles.rejectButton} onClick={onReject}>
           REJECT
         </button>
       </div>
