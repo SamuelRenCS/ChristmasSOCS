@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "../styles/Dashboard.module.css";
 import {
   Home,
-  Settings,
+  History,
   User,
   Archive,
   Calendar,
@@ -15,7 +15,7 @@ import HomePage from "./DashboardContent/HomePage";
 import MeetingsPage from "./DashboardContent/MeetingsPage";
 import RequestsPage from "./DashboardContent/RequestsPage";
 import NotificationsPage from "./DashboardContent/NotificationsPage";
-import SettingsPage from "./DashboardContent/SettingsPage";
+import HistoryPage from "./DashboardContent/HistoryPage";
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("home");
@@ -35,6 +35,12 @@ const Dashboard = () => {
       component: MeetingsPage,
     },
     {
+      name: "history",
+      icon: History,
+      label: "History",
+      component: HistoryPage,
+    },
+    {
       name: "requests",
       icon: Archive,
       label: "Requests",
@@ -51,12 +57,6 @@ const Dashboard = () => {
       icon: User,
       label: "Profile",
       component: ProfilePage,
-    },
-    {
-      name: "settings",
-      icon: Settings,
-      label: "Settings",
-      component: SettingsPage,
     },
   ];
 
