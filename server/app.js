@@ -4,6 +4,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const http = require("http");
 
 // middleware
 const { validateUser } = require("./middleware");
@@ -1244,8 +1245,6 @@ app.get("/api/token/:meetingID", async (req, res) => {
   }
 });
 
-
-    
 app.delete("/api/meetings/delete/:meetingID", async (req, res) => {
   const { meetingID } = req.params;
 
@@ -1255,20 +1254,21 @@ app.delete("/api/meetings/delete/:meetingID", async (req, res) => {
     }
 
     // Find the meeting and populate the necessary fields
-    const meeting = await Meeting.findById(meetingID)
-      .populate({
-        path: "meetingSlots",
-        populate: {
-          path: "registeredAttendees",
-        },
-      });
+    const meeting = await Meeting.findById(meetingID).populate({
+      path: "meetingSlots",
+      populate: {
+        path: "registeredAttendees",
+      },
+    });
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
     // Get the list of attendees from the meeting slots
-    const attendees = meeting.meetingSlots.flatMap(slot => slot.registeredAttendees);
+    const attendees = meeting.meetingSlots.flatMap(
+      (slot) => slot.registeredAttendees
+    );
 
     // Update each attendee's reservations
     for (const attendee of attendees) {
@@ -1297,14 +1297,18 @@ app.delete("/api/meetings/delete/:meetingID", async (req, res) => {
     // Remove the meeting from the host's list of meetings
     const host = await User.findById(deletedMeeting.host);
     if (host) {
-      host.meetings = host.meetings.filter((meeting) => meeting.toString() !== meetingID);
+      host.meetings = host.meetings.filter(
+        (meeting) => meeting.toString() !== meetingID
+      );
       await host.save();
     } else {
       console.error(`Host with ID ${deletedMeeting.host} not found.`);
     }
 
     // Respond with a success message
-    res.status(200).json({ message: "Meeting deleted successfully", deletedMeeting });
+    res
+      .status(200)
+      .json({ message: "Meeting deleted successfully", deletedMeeting });
   } catch (error) {
     console.error("Error deleting meeting:", error.message);
     res
@@ -1402,6 +1406,8 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
 
-app.listen(3000, () => {
+const server = http.createServer(app);
+
+server.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
