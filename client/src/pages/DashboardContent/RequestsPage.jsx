@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RequestItem from "../../components/RequestItem";
 import styles from "../../styles/RequestPage.module.css";
-import { fetchRequests } from "../../api/api";
+import { fetchRequests, acceptRequest, rejectRequest } from "../../api/api";
 import { useAuth } from "../../context/AuthContext";
 
 const RequestsPage = () => {
@@ -13,6 +13,7 @@ const RequestsPage = () => {
     const getRequests = async () => {
       try {
         const response = await fetchRequests(user.id);
+        console.log(response.requests);
         setRequests(response.requests);
       } catch (error) {
         console.error("Error fetching requests:", error);
@@ -22,14 +23,32 @@ const RequestsPage = () => {
     getRequests();
   }, []);
 
-  const handleAccept = (id) => {
-    console.log(`Request ${id} accepted`);
-    setRequests((prevRequests) => prevRequests.filter((req) => req.id !== id));
+  const handleAccept = async (id) => {
+    try {
+      const response = await acceptRequest(id);
+      const approvedRequest = response.request;
+
+      // Update the state to remove the accepted request
+      setRequests((prevRequests) =>
+        prevRequests.filter((req) => req.id !== approvedRequest.id)
+      );
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    }
   };
 
-  const handleReject = (id) => {
-    console.log(`Request ${id} rejected`);
-    setRequests((prevRequests) => prevRequests.filter((req) => req.id !== id));
+  const handleReject = async (id) => {
+    try {
+      const response = await rejectRequest(id);
+      const deletedRequest = response.deletedRequest;
+
+      // Update the state to remove the deleted request
+      setRequests((prevRequests) =>
+        prevRequests.filter((req) => req.id !== deletedRequest.id)
+      );
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+    }
   };
 
   return (
@@ -40,8 +59,8 @@ const RequestsPage = () => {
           <RequestItem
             key={request._id}
             request={request}
-            onAccept={handleAccept}
-            onReject={handleReject}
+            onAccept={() => handleAccept(request._id)}
+            onReject={() => handleReject(request._id)}
           />
         ))
       ) : (

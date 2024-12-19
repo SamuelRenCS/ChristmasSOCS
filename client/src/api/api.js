@@ -155,12 +155,22 @@ export const fetchUserMeetings = async (userID) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 // handle accept request function to send a PUT request to /requests
 export const acceptRequest = async (requestID) => {
   try {
     const response = await api.put(`/requests/${requestID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// handle reject request function to send a DELETE request to /requests
+export const rejectRequest = async (requestID) => {
+  try {
+    const response = await api.delete(`/requests/${requestID}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -15,7 +15,6 @@ const Request = require("./models/request");
 const e = require("express");
 const MeetingSlot = require("./models/meetingSlot");
 
-
 // PUT IN ENV FILE LATER
 const SECRET_KEY = "ChristmasSOCS";
 
@@ -320,13 +319,70 @@ app.get("/api/requests/:userID", async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    const requests = await Request.find({ host: userID });
+    // find requests that have not been accepted
+    const requests = await Request.find({ host: userID, approved: false });
 
     res.status(200).json({ requests });
   } catch (error) {
     res
       .status(500)
       .json({ message: "Request fetch failed", error: error.message });
+  }
+});
+
+// handle accept request
+app.put("/api/requests/:requestID", async (req, res) => {
+  const { requestID } = req.params;
+
+  try {
+    if (!requestID) {
+      return res.status(400).json({ message: "Request ID is required" });
+    }
+
+    const request = await Request.findById(requestID);
+
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    request.approved = true;
+    await request.save();
+
+    res.status(200).json({ message: "Request accepted successfully", request });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Request acceptance failed", error: error.message });
+  }
+});
+
+// handle request rejection
+app.delete("/api/requests/:requestID", async (req, res) => {
+  const { requestID } = req.params;
+
+  console.log("Delete request ID:", requestID);
+
+  try {
+    // Validate if `requestID` is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(requestID)) {
+      return res.status(400).json({ message: "Invalid request ID" });
+    }
+
+    // Find and delete the request
+    const deletedRequest = await Request.findByIdAndDelete(requestID);
+
+    if (!deletedRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Request rejected successfully", deletedRequest });
+  } catch (error) {
+    console.error("Error rejecting request:", error.message);
+    res
+      .status(500)
+      .json({ message: "Request rejection failed", error: error.message });
   }
 });
 
@@ -652,7 +708,7 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
-    const cmpDate = new Date(date).toISOString().split('T')[0]; // Get date portion in UTC
+    const cmpDate = new Date(date).toISOString().split("T")[0]; // Get date portion in UTC
     console.log("cmpDate", cmpDate);
     //CHECK IF DATE COMPARISON IS VALID
     const populatedMeetingSlots = await meeting.populate("meetingSlots");
@@ -660,19 +716,26 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
 
     console.log("Meeting slots:", meetingSlots);
     const fileteredSlots = meetingSlots.filter(
-      (slot) => new Date(slot.occurrenceDate).toISOString().split('T')[0] === cmpDate
+      (slot) =>
+        new Date(slot.occurrenceDate).toISOString().split("T")[0] === cmpDate
     );
-   
+
     console.log("fileteredSlots", fileteredSlots);
 
     // find slots that have 0 seats available
-    const slotsWithNoSeats = fileteredSlots.filter((slot) => slot.seatsAvailable <= 0).map((slot) => slot.startTime);
+    const slotsWithNoSeats = fileteredSlots
+      .filter((slot) => slot.seatsAvailable <= 0)
+      .map((slot) => slot.startTime);
 
     console.log("slotsWithNoSeats", slotsWithNoSeats);
 
-    formattedNoSeats = slotsWithNoSeats.map(slot => {
+    formattedNoSeats = slotsWithNoSeats.map((slot) => {
       const date = new Date(slot);
-      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
     });
 
     console.log("formattedNoSeats", formattedNoSeats);
@@ -681,8 +744,6 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
     console.log("allSlots", allSlots);
 
     let possibleSlots = [];
-
-    
 
     const cmpStartDate = new Date(startDate).toISOString().split("T")[0]; // Get date portion in UTC
     console.log("cmpStartDate", cmpStartDate);
@@ -716,7 +777,9 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
     console.log("possibleSlots", possibleSlots);
 
     // remove slots that are booked and have no seats available
-    const finalSlots = possibleSlots.filter((slot) => !formattedNoSeats.includes(slot));
+    const finalSlots = possibleSlots.filter(
+      (slot) => !formattedNoSeats.includes(slot)
+    );
     console.log("finalSlots", finalSlots);
 
     res.status(200).json({ data: { finalSlots } });
@@ -733,10 +796,10 @@ app.get("/api/meetings/:meetingID/:date/:slot", async (req, res) => {
   console.log("Meeting ID:", meetingID);
 
   const savedDate = new Date(date);
-  const slotString = `${savedDate.toISOString().split('T')[0]} ${slot}`;
+  const slotString = `${savedDate.toISOString().split("T")[0]} ${slot}`;
   const slotTime = new Date(slotString);
   console.log("Slot time:", slotTime);
-  
+
   try {
     if (!meetingID || !date || !slot) {
       return res
@@ -752,7 +815,9 @@ app.get("/api/meetings/:meetingID/:date/:slot", async (req, res) => {
 
     //TODO COMPARE WITH THE ACTUAL TIME
     const meetingSlot = meeting.meetingSlots.find((slot) => {
-      return new Date(slot.startTime).getTime() === new Date(slotTime).getTime();
+      return (
+        new Date(slot.startTime).getTime() === new Date(slotTime).getTime()
+      );
     });
     console.log("Meeting slot:", meetingSlot);
 
@@ -762,7 +827,7 @@ app.get("/api/meetings/:meetingID/:date/:slot", async (req, res) => {
     } else {
       const seatsLeft = meetingSlot.seatsAvailable;
       console.log("Seats left:", seatsLeft);
-      res.status(200).json({ data: { seats : seatsLeft } });
+      res.status(200).json({ data: { seats: seatsLeft } });
     }
   } catch (error) {
     console.error("Meeting slots fetch error:", error);
@@ -776,7 +841,8 @@ app.get("/api/meetings/:meetingID/:date/:slot", async (req, res) => {
 
 app.post("/api/bookings/new", async (req, res) => {
   console.log(req.body);
-  const { attendee, meetingID, userID, meetingDate, timeSlot, seats } = req.body;
+  const { attendee, meetingID, userID, meetingDate, timeSlot, seats } =
+    req.body;
 
   console.log("User ID:", userID);
   // server-side validation
@@ -785,21 +851,22 @@ app.post("/api/bookings/new", async (req, res) => {
   }
 
   try {
-   // check if a booking slot already exists for that time slot
+    // check if a booking slot already exists for that time slot
 
-   console.log("Meeting date:", meetingDate);
-    
+    console.log("Meeting date:", meetingDate);
+
     const meeting = await Meeting.findById(meetingID).populate("meetingSlots");
-    const existingSlots = meeting.meetingSlots.filter((slot) => slot.occurrenceDate.toISOString().split('T')[0] === meetingDate);
+    const existingSlots = meeting.meetingSlots.filter(
+      (slot) => slot.occurrenceDate.toISOString().split("T")[0] === meetingDate
+    );
     const interval = meeting.interval;
     const savedDate = new Date(meetingDate);
-    const startString = `${savedDate.toISOString().split('T')[0]} ${timeSlot}`;
-    const startTime = new Date(startString).toISOString()
+    const startString = `${savedDate.toISOString().split("T")[0]} ${timeSlot}`;
+    const startTime = new Date(startString).toISOString();
     let endTime = new Date(startTime); // Create a new Date object to avoid mutating the original
     console.log("end time 1", endTime);
-    endTime.setMinutes(endTime.getMinutes() + interval); 
+    endTime.setMinutes(endTime.getMinutes() + interval);
     console.log("end time 2", endTime);
-    
 
     //TODO WRONG
     const endTimeHours = endTime.getHours();
@@ -808,15 +875,30 @@ app.post("/api/bookings/new", async (req, res) => {
     const meetingEndDateHours = meeting.endDate.getHours();
     const meetingEndDateMinutes = meeting.endDate.getMinutes();
 
-    if (meeting.repeat === "Daily" && (endTimeHours > meetingEndDateHours || (endTimeHours === meetingEndDateHours && endTimeMinutes > meetingEndDateMinutes))) {
+    if (
+      meeting.repeat === "Daily" &&
+      (endTimeHours > meetingEndDateHours ||
+        (endTimeHours === meetingEndDateHours &&
+          endTimeMinutes > meetingEndDateMinutes))
+    ) {
       // Set endTime to meeting endDate if the end time exceeds the meeting's end time
       endTime.setHours(meetingEndDateHours);
       endTime.setMinutes(meetingEndDateMinutes);
-    } else if (meeting.repeat === "Weekly" && (endTimeHours > meetingEndDateHours || (endTimeHours === meetingEndDateHours && endTimeMinutes > meetingEndDateMinutes))) {
+    } else if (
+      meeting.repeat === "Weekly" &&
+      (endTimeHours > meetingEndDateHours ||
+        (endTimeHours === meetingEndDateHours &&
+          endTimeMinutes > meetingEndDateMinutes))
+    ) {
       // Set endTime to meeting endDate if the end time exceeds the meeting's end time
       endTime.setHours(meetingEndDateHours);
       endTime.setMinutes(meetingEndDateMinutes);
-    } else if (meeting.repeat === "None" && (endTimeHours > meetingEndDateHours || (endTimeHours === meetingEndDateHours && endTimeMinutes > meetingEndDateMinutes))) {
+    } else if (
+      meeting.repeat === "None" &&
+      (endTimeHours > meetingEndDateHours ||
+        (endTimeHours === meetingEndDateHours &&
+          endTimeMinutes > meetingEndDateMinutes))
+    ) {
       // Set endTime to meeting endDate if the end time exceeds the meeting's end time
       endTime = meeting.endDate;
     }
@@ -825,7 +907,7 @@ app.post("/api/bookings/new", async (req, res) => {
     console.log("Start time:", startTime);
     console.log("End time:", endTime);
 
-    if (existingSlots.length === 0) {      
+    if (existingSlots.length === 0) {
       const newSlot = new MeetingSlot({
         meeting: meetingID,
         occurrenceDate: savedDate.toISOString(),
@@ -835,7 +917,7 @@ app.post("/api/bookings/new", async (req, res) => {
         attendees: [attendee],
         seatsAvailable: meeting.seatsPerSlot - seats,
       });
-      
+
       //save the new booking
       await newSlot.save();
       //add the booking to the meeting
@@ -849,10 +931,11 @@ app.post("/api/bookings/new", async (req, res) => {
         await user.save();
       }
       return res.status(201).json({ message: "Booking created successfully" });
-
     } else {
       // check is there is a slot for that date and time
-      const existingSlot = existingSlots.find((slot) => slot.startTime === startTime);
+      const existingSlot = existingSlots.find(
+        (slot) => slot.startTime === startTime
+      );
       if (!existingSlot) {
         const newSlot = new MeetingSlot({
           meeting: meetingID,
@@ -863,7 +946,7 @@ app.post("/api/bookings/new", async (req, res) => {
           attendees: [attendee],
           seatsAvailable: meeting.seatsPerSlot - seats,
         });
-        
+
         //save the new booking
         await newSlot.save();
         //add the booking to the meeting
@@ -876,25 +959,28 @@ app.post("/api/bookings/new", async (req, res) => {
           user.reservations.push(newSlot);
           await user.save();
         }
-        return res.status(201).json({ message: "Booking created successfully" });
+        return res
+          .status(201)
+          .json({ message: "Booking created successfully" });
       } else {
         //push the attendee to the attendees array
         existingSlot.attendees.push(attendee);
         //update the seats available
         existingSlot.seatsAvailable -= seats;
         await existingSlot.save();
-        
+
         //check if a user is logged in and add the booking to the user
         if (userID) {
           const user = await User.findById(userID);
           user.reservations.push(newSlot);
           await user.save();
         }
-        return res.status(201).json({ message: "Booking created successfully" });
+        return res
+          .status(201)
+          .json({ message: "Booking created successfully" });
       }
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Booking creation error:", error);
 
     if (error.name === "ValidationError") {
@@ -932,8 +1018,6 @@ app.get("/api/dashboard/meetings/:userID", async (req, res) => {
     }));
 
     res.status(200).json({ data: meetingList });
-
-   
   } catch (error) {
     res
       .status(500)
