@@ -264,4 +264,14 @@ export const fetchToken = async (meetingID) => {
   }
 };
 
+//fetch meeting slots for a specific date function to send a GET request to /meetings
+export const fetchMeetingAllSlots = async (meetingID, date) => {
+  try {
+    const response = await api.get(`/allslots/${meetingID}/${date}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export default api;

@@ -5,7 +5,7 @@ import TimeSlot from "../components/TimeSlot";
 import CalendarDateInput from "../components/CalendarDateInput";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMeeting, deleteMeeting, fetchMeetingSlot } from "../api/api";
+import { fetchMeeting, deleteMeeting, fetchMeetingAllSlots } from "../api/api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +19,42 @@ const ViewMeeting = () => {
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [interval, setInterval] = useState(0);
+
+  const getEndTime = (startTime, interval, endTime) => {
+    // start time format is HH:MM AM/PM (e.g. 12:00 PM)
+    // first convert to 24-hour format
+    const [time, period] = startTime.split(" ");
+    let [hours, minutes] = time.split(":");
+    hours = parseInt(hours);
+    minutes = parseInt(minutes);
+
+    if (period === "PM" && hours !== 12) {
+      hours += 12;
+    }
+
+    // add the interval to the start time
+    minutes += interval;
+    hours += Math.floor(minutes / 60);
+    minutes = minutes % 60;
+    hours = hours % 24;
+
+    // return the end time in 12-hour format
+    let endPeriod = "AM";
+    if (hours >= 12) {
+      endPeriod = "PM";
+    }
+    if (hours > 12) {
+      hours -= 12;
+    }
+    if (hours === 0) {
+      hours = 12;
+    }
+
+    // make sure the returned time is less than the end time
+
+    return `${hours}:${minutes.toString().padStart(2, "0")} ${endPeriod}`;
+  };
 
   useEffect(() => {
     // Fetch the meeting data on load
@@ -40,8 +76,6 @@ const ViewMeeting = () => {
           formattedDates,
           meetingID,
         } = response.data;
-        console.log("Meeting details", response.data);
-        console.log("Formatted dates", formattedDates);
         setHighlightedDates(formattedDates);
 
         //keep the date part of the datetime
@@ -69,6 +103,9 @@ const ViewMeeting = () => {
           minute: "2-digit",
         });
         setEndTime(endTime);
+
+        // set the interval
+        setInterval(interval);
       } catch (error) {
         console.log("Error fetching meeting details", error);
       }
@@ -76,15 +113,24 @@ const ViewMeeting = () => {
     fetchMeetingDetails();
   }, [meetingId]);
 
-  const [timeSlots, setTimeSlots] = useState([
-    { time: "15:00 to 15:15", student: "Eric", isBooked: true },
-  ]);
+  const [timeSlots, setTimeSlots] = useState([]);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false); // Track confirmation state
 
   const handleDateChange = async (date) => {
     try {
-      const response = await fetchMeetingSlot(meetingId, date);
-      console.log("Meeting slots:", response.data);
+      const response = await fetchMeetingAllSlots(meetingId, date);
+
+      const slots = response.data.slots.map((slot) => {
+        return {
+          time: `${slot.time} to ${getEndTime(slot.time, interval, endTime)}`,
+          seatsReserved: slot.totalSeats - slot.seatsAvailable,
+          isBooked: slot.isBooked,
+        };
+      });
+
+      setTimeSlots(slots);
+
+      setMeetingDate(date);
     } catch (error) {
       console.error("Error fetching slots for the date:", error);
       toast.error("Error fetching available slots.");
@@ -165,7 +211,7 @@ const ViewMeeting = () => {
               <TimeSlot
                 key={slot.time}
                 time={slot.time}
-                student={slot.student}
+                seatsReserved={slot.seatsReserved}
                 isBooked={slot.isBooked}
               ></TimeSlot>
             ))}

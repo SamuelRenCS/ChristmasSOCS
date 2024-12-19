@@ -36,7 +36,7 @@
   font-weight: 600;
   font-size: 0.75rem;
   color: #6b7280;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 :global(.react-calendar__month-view__days__day) {
@@ -57,14 +57,14 @@
 }
 
 :global(.react-calendar__tile--now) {
-  background-color: #f3f4f6;
+  background-color: transparent;
 }
 
 /* Highlighted dates style */
 :global(.react-calendar__tile.highlight) {
   color: #2563eb;
   font-weight: bold;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 :global(.react-calendar__tile.highlight:enabled:hover) {
@@ -75,7 +75,7 @@
 :global(.react-calendar__tile:disabled) {
   background-color: transparent;
   color: #d1d5db;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Selected date style */
@@ -83,7 +83,7 @@
 :global(.react-calendar__tile.selected:enabled:hover) {
   background-color: #2563eb;
   color: white;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Navigation arrows */

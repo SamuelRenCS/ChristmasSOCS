@@ -509,14 +509,19 @@ app.post("/api/meetings/new", async (req, res) => {
 
 const calculateDates = (startDate, endDate) => {
   const dates = [];
-  const currentDate = new Date(startDate);
-  // Reset time to ensure we're comparing dates correctly
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(23, 59, 59, 999);
+  // Create new Date objects to avoid mutating the originals
+  let current = new Date(startDate);
+  const end = new Date(endDate);
 
-  while (currentDate <= endDate) {
-    dates.push(new Date(currentDate)); // Push the date
-    currentDate.setDate(currentDate.getDate() + 1); // Increment based on interval
+  // Create comparison dates without changing the originals
+  const startCompare = new Date(startDate);
+  startCompare.setUTCHours(0, 0, 0, 0);
+  const endCompare = new Date(endDate);
+  endCompare.setUTCHours(23, 59, 59, 999);
+
+  while (current <= end) {
+    dates.push(new Date(current));
+    current.setDate(current.getDate() + 1);
   }
 
   return dates;
@@ -650,6 +655,7 @@ app.get("/api/meetings/:token", async (req, res) => {
       endRepeatDate,
       repeatingDays,
     } = meeting;
+
     let dates = [];
     let formattedDates = [];
 
@@ -1398,6 +1404,105 @@ app.delete("/api/bookings/delete/:bookingID/:userID", async (req, res) => {
     res
       .status(500)
       .json({ message: "Booking deletion failed", error: error.message });
+  }
+});
+
+// Serve the meeting slots fetch api route for a specific date and all slots
+app.get("/api/allslots/:meetingID/:date", async (req, res) => {
+  const { meetingID, date } = req.params;
+
+  console.log("Meeting ID:", meetingID);
+  console.log("Date:", date);
+
+  try {
+    if (!meetingID || !date) {
+      return res.status(400).json({
+        message: "Meeting ID and date are required",
+      });
+    }
+
+    // Find the meeting and populate the meeting slots
+    const meeting = await Meeting.findById(meetingID).populate("meetingSlots");
+
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    // Get the possible slots from validSlots array
+    const cmpDate = new Date(date).toISOString().split("T")[0];
+    const cmpStartDate = new Date(meeting.startDate)
+      .toISOString()
+      .split("T")[0];
+    const cmpEndDate = new Date(meeting.endDate).toISOString().split("T")[0];
+
+    let possibleSlots = [];
+
+    // Determine which slots to use based on the date
+    if (cmpStartDate === cmpEndDate) {
+      possibleSlots = meeting.validSlots[0];
+    } else if (cmpDate === cmpStartDate) {
+      possibleSlots = meeting.validSlots[0];
+    } else if (cmpDate === cmpEndDate) {
+      possibleSlots = meeting.validSlots[meeting.validSlots.length - 1];
+    } else if (cmpDate > cmpStartDate && cmpDate < cmpEndDate) {
+      const diff = Math.floor(
+        (new Date(date).setHours(0, 0, 0, 0) -
+          new Date(meeting.startDate).setHours(0, 0, 0, 0)) /
+          (1000 * 60 * 60 * 24)
+      );
+      possibleSlots = meeting.validSlots[diff];
+    } else {
+      return res.status(400).json({ message: "Invalid date" });
+    }
+
+    // Get the booked slots for this date
+    const bookedSlots = meeting.meetingSlots
+      .filter(
+        (slot) =>
+          new Date(slot.occurrenceDate).toISOString().split("T")[0] === cmpDate
+      )
+      .map((slot) => ({
+        time: new Date(slot.startTime).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }),
+        seatsAvailable: slot.seatsAvailable,
+        totalSeats: meeting.seatsPerSlot,
+        attendees: slot.attendees,
+      }));
+
+    // Create a map of booked slots for easy lookup
+    const bookedSlotsMap = new Map(
+      bookedSlots.map((slot) => [slot.time, slot])
+    );
+
+    // Combine all slots with their booking status
+    const allSlots = possibleSlots.map((slotTime) => {
+      const bookedSlot = bookedSlotsMap.get(slotTime);
+      return {
+        time: slotTime,
+        seatsAvailable: bookedSlot
+          ? bookedSlot.seatsAvailable
+          : meeting.seatsPerSlot,
+        totalSeats: meeting.seatsPerSlot,
+        attendees: bookedSlot ? bookedSlot.attendees : [],
+        isBooked: !!bookedSlot,
+      };
+    });
+
+    res.status(200).json({
+      data: {
+        date: cmpDate,
+        slots: allSlots,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching slots:", error);
+    res.status(500).json({
+      message: "Failed to fetch slots",
+      error: error.message,
+    });
   }
 });
 
