@@ -1,0 +1,55 @@
+.bookingForm {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  background-color: white;
+  border-radius: 15px;
+  padding: 24px;
+  min-height: 400px;
+}
+
+.leftColumn {
+  /* Calendar container */
+  border-right: 1px solid #e5e7eb;
+  padding-right: 24px;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 24px;
+}
+
+.formDate {
+  width: 100%;
+}
+
+.formSlot,
+.formSeats,
+.formAttendee {
+  width: 100%;
+}
+
+.formActions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.requestContainer {
+  display: flex;
+  margin-top: 20px;
+  background-color: white;
+  padding: 10px 24px;
+  border-radius: 50px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}

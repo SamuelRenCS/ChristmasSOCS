@@ -1,7 +1,15 @@
 import React from "react";
 import styles from "./SelectField.module.css";
 
-const SelectField = ({ label, name, value, onChange, options, hidden }) => {
+const SelectField = ({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  hidden,
+  timeSlot,
+}) => {
   return (
     <div
       className={`${styles.selectWrapper} ${hidden ? styles.hideInput : ""}`}
@@ -11,7 +19,7 @@ const SelectField = ({ label, name, value, onChange, options, hidden }) => {
       </label>
       <select
         id={name}
-        className={styles.select}
+        className={`${styles.select} ${timeSlot ? styles.timeSlot : ""}`}
         name={name}
         value={value}
         onChange={onChange}

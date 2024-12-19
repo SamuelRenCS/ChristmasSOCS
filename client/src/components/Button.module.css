@@ -1,0 +1,22 @@
+.button {
+  background-color: #175eab;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 40px;
+  cursor: pointer;
+  max-width: 300px;
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #0e4b8f;
+}
+
+.danger {
+  background-color: var(--mcgill-red);
+}
+
+.danger:hover {
+  background-color: darkred;
+}

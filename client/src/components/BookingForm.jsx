@@ -9,13 +9,14 @@ import { fetchSeats } from "../api/api";
 import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
+import Button from "./Button";
 import styles from "./BookingForm.module.css";
 
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const BookingForm = ({token}) => {
+const BookingForm = ({ token }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [meetingID, setMeetingID] = useState("");
@@ -23,6 +24,7 @@ const BookingForm = ({token}) => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [maxSeats, setMaxSeats] = useState(0);
   const [highlightedDates, setHighlightedDates] = useState([]);
+  const [hostID, setHostID] = useState("");
 
   const [formData, setFormData] = useState({
     // Retrieve the first and last name from the user context
@@ -41,12 +43,30 @@ const BookingForm = ({token}) => {
         // pass token as a string
         const response = await fetchMeeting(token);
         // res.status(200).json({ data: { title, host, date, startTime, endTime, location, description, interval, seatsPerSlot, repeat, endDate, dates } });
-        const { title, host, startDate, endDate, location, description, interval, seatsPerSlot, repeat, endRepeatDate, formattedDates, meetingID } = response.data;
+        const {
+          title,
+          host,
+          startDate,
+          endDate,
+          location,
+          description,
+          interval,
+          seatsPerSlot,
+          repeat,
+          endRepeatDate,
+          formattedDates,
+          meetingID,
+        } = response.data;
 
         setMeetingID(meetingID);
         console.log("Meeting details:", response.data);
         console.log("Formatted dates:", formattedDates);
         setHighlightedDates(formattedDates);
+
+        console.log("Host:", host);
+
+        // set the host
+        setHostID(host._id);
 
         //keep the date part of the datetime
         const dateObj = new Date(startDate);
@@ -58,7 +78,6 @@ const BookingForm = ({token}) => {
           meetingDate: dateObj.toISOString().split("T")[0],
           userID: user ? `${user.id}` : "",
         });
-
       } catch (error) {
         console.error("Error fetching meeting data:", error);
       }
@@ -77,17 +96,17 @@ const BookingForm = ({token}) => {
       const remainingSlots = response.data.finalSlots;
       console.log("Available slots:", remainingSlots);
       setAvailableSlots(remainingSlots);
-  
+
       // Directly use the date passed to the function instead of relying on state
       const firstSlot = remainingSlots[0];
-      
+
       // Update form data in one go
-      setFormData(prevData => ({
+      setFormData((prevData) => ({
         ...prevData,
         meetingDate: date,
         timeSlot: firstSlot || "",
       }));
-  
+
       // Fetch seats for the first slot
       if (firstSlot) {
         const seatsResponse = await fetchSeats(meetingID, date, firstSlot);
@@ -111,7 +130,11 @@ const BookingForm = ({token}) => {
 
     try {
       //console.log("Meeting ID:", meetingID);
-      const response = await fetchSeats(meetingID, formData.meetingDate, selectedSlot);
+      const response = await fetchSeats(
+        meetingID,
+        formData.meetingDate,
+        selectedSlot
+      );
       const remainingSeats = response.data.seats;
       console.log("Remaining seats:", remainingSeats);
       setMaxSeats(remainingSeats);
@@ -119,7 +142,7 @@ const BookingForm = ({token}) => {
       console.error("Error fetching remaining seats for the slot:", error);
       toast.error("Error fetching remaining seats.");
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -138,59 +161,73 @@ const BookingForm = ({token}) => {
     }
   };
 
+  const handleRequestRedirection = () => {
+    navigate(`/requests/new/${hostID}`);
+  };
+
   return (
-    // display the name of the meeting, the host, the location
-    <form onSubmit={handleSubmit} className="booking-form">
-      <div className="form-date">
-        <CalendarDateInput
-          label="Date:"
-          value={formData.meetingDate}
-          onChange={handleDateChange}
-          highlightedDates={highlightedDates}
+    <>
+      <form className={styles.bookingForm}>
+        <div className={styles.leftColumn}>
+          <div className={styles.formDate}>
+            <CalendarDateInput
+              label="Date:"
+              value={formData.meetingDate}
+              onChange={handleDateChange}
+              highlightedDates={highlightedDates}
+            />
+          </div>
+        </div>
+
+        <div className={styles.rightColumn}>
+          <div className={styles.formAttendee}>
+            <InputField
+              label="Name:"
+              name="attendee"
+              type="text"
+              value={formData.attendee}
+              onChange={handleChange}
+              required={true}
+            />
+          </div>
+          <div className={styles.formSlot}>
+            <SelectField
+              label="Time slot:"
+              name="timeSlot"
+              value={formData.timeSlot}
+              onChange={handleSlotChange}
+              options={availableSlots}
+              width="125px"
+            />
+          </div>
+
+          <div className={styles.formSeats}>
+            <InputField
+              label="Number of seats:"
+              name="seats"
+              type="number"
+              min="1"
+              max={maxSeats}
+              value={formData.seats || ""}
+              onChange={handleChange}
+              placeholder="1"
+            />
+          </div>
+
+          <div className={styles.formActions}>
+            <Button type="submit" text="Book now" onClick={handleSubmit} />
+          </div>
+        </div>
+      </form>
+      <div className={styles.requestContainer}>
+        <p className={styles.text}>Can't find a suitable time slot?</p>
+        <Button
+          text="Request a new meeting"
+          onClick={handleRequestRedirection}
+          danger={true}
         />
       </div>
-
-      <div className="form-slot">
-        <SelectField
-          label="Time slot:"
-          name="timeSlot"
-          value={formData.timeSlot}
-          onChange={handleSlotChange}
-          options={availableSlots}
-        />
-      </div>
-
-      <div className="form-seats">
-        <InputField
-          label="Number of seats:"
-          name="seats"
-          type="number"
-          min="1"
-          max={maxSeats}
-          value={formData.seats || ""}
-          onChange={handleChange}
-          placeholder="Enter the number of seats"
-        />
-      </div>
-
-      {/* show a field to input name of the attendee (autocomplete if token is provided)  */}
-      <div className="form-attendee">
-        <InputField
-          label="Name:"
-          name="attendee"
-          type="text"
-          value={formData.attendee}
-          onChange={handleChange}
-          required={true}
-        />
-      </div>
-
-
-
-      <div className="form-submit">
-        <button type="submit">Book Meeting</button>
-      </div>
-    </form>
+    </>
   );
 };
 

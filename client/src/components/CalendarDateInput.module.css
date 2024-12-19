@@ -1,0 +1,104 @@
+/* Calendar container styles */
+.calendarContainer {
+  width: 100%;
+}
+
+/* Override react-calendar default styles */
+:global(.react-calendar) {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+:global(.react-calendar__navigation) {
+  margin-bottom: 16px;
+}
+
+:global(.react-calendar__navigation button) {
+  min-width: 36px;
+  background: none;
+  font-size: 16px;
+  color: #374151;
+}
+
+:global(.react-calendar__navigation button:enabled:hover),
+:global(.react-calendar__navigation button:enabled:focus) {
+  background-color: #f3f4f6;
+  border-radius: 6px;
+}
+
+:global(.react-calendar__month-view__weekdays) {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #6b7280;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:global(.react-calendar__month-view__days__day) {
+  aspect-ratio: 1;
+  padding: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+:global(.react-calendar__tile) {
+  border-radius: 6px;
+  text-align: center;
+}
+
+:global(.react-calendar__tile:enabled:hover),
+:global(.react-calendar__tile:enabled:focus) {
+  background-color: #f3f4f6;
+}
+
+:global(.react-calendar__tile--now) {
+  background-color: #f3f4f6;
+}
+
+/* Highlighted dates style */
+:global(.react-calendar__tile.highlight) {
+  color: #2563eb;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:global(.react-calendar__tile.highlight:enabled:hover) {
+  background-color: #eff6ff;
+}
+
+/* Disabled dates */
+:global(.react-calendar__tile:disabled) {
+  background-color: transparent;
+  color: #d1d5db;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Selected date style */
+:global(.react-calendar__tile.selected),
+:global(.react-calendar__tile.selected:enabled:hover) {
+  background-color: #2563eb;
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navigation arrows */
+:global(.react-calendar__navigation__arrow) {
+  font-size: 1.5rem;
+  color: #6b7280;
+}
+
+:global(.react-calendar__navigation__label) {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Remove the weekday underline */
+:global(.react-calendar__month-view__weekdays__weekday abbr) {
+  text-decoration: none;
+  text-transform: capitalize;
+}

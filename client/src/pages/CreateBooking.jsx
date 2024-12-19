@@ -6,7 +6,7 @@ const CreateBooking = () => {
   const { token } = useParams();
 
   return (
-    <div className={styles["create-meeting"]}>
+    <div className={styles["create-booking"]}>
       <div className={styles["form-container"]}>
         <h2>Book a meeting</h2>
         <BookingForm token={token} />
