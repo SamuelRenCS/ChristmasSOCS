@@ -57,7 +57,20 @@ const HistoryPage = () => {
   }, [userId]);
 
   const handleCancelClick = async (bookingId) => {
-    //TODO: Implement deleteBooking API call
+    try {
+
+      console.log("Booking ID: ", bookingId);
+      console.log("User ID: ", userId);
+      const response = await deleteBooking(bookingId, userId);
+      console.log("Response: ", response);
+      toast.success("Booking cancelled successfully");
+      // Remove the cancelled booking from the list
+      setNotifications(notifications.filter((booking) => booking.id !== bookingId));
+      
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      toast.error("Failed to cancel booking");
+    }
   }
 
   return (
@@ -69,7 +82,7 @@ const HistoryPage = () => {
         notifications.map((notification) => (
           <div
           
-            key={notification.id + notification.date + notification.start}
+            key={notification.id}
             className={`${styles.notificationItem} ${notification.isPast ? styles.pastMeeting : ""}`}
           >
             <div className={styles.info}>

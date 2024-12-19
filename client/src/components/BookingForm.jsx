@@ -26,6 +26,8 @@ const BookingForm = ({ token }) => {
   const [maxSeats, setMaxSeats] = useState(0);
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [hostID, setHostID] = useState("");
+  const [tokenPopup, setTokenPopup] = useState({ show: false, token: "" });
+
 
   const [isValidToken, setIsValidToken] = useState(true);
 
@@ -160,9 +162,8 @@ const BookingForm = ({ token }) => {
       toast.success(message);
 
       // Redirect to the dashboard after successful booking after 2 seconds
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
+      
+      setTokenPopup({ show: true, msg: "Booking created successfully!" });
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -170,6 +171,11 @@ const BookingForm = ({ token }) => {
         "Booking creation failed";
       toast.error(errorMessage);
     }
+  };
+
+  const closePopup = () => {
+    setTokenPopup({ show: false, token: "" });
+    navigate("/dashboard"); // Navigate to the dashboard
   };
 
   const handleRequestRedirection = () => {
@@ -253,6 +259,14 @@ const BookingForm = ({ token }) => {
           danger={true}
         />
       </div>
+      {tokenPopup.show && (
+        <div className={styles["token-popup"]}>
+          <div className={styles["popup-content"]}>
+            <p>{tokenPopup.msg}</p>
+            <button onClick={closePopup}>Close</button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

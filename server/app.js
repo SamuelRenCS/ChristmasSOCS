@@ -14,6 +14,7 @@ const Meeting = require("./models/meeting");
 const Request = require("./models/request");
 const e = require("express");
 const MeetingSlot = require("./models/meetingSlot");
+const Notification = require("./models/notification");
 
 // PUT IN ENV FILE LATER
 const SECRET_KEY = "ChristmasSOCS";
@@ -568,7 +569,7 @@ const generateSlots = (startTime, endTime, interval) => {
   let currentDay = current.toDateString();
   let daySlots = [];
 
-  while (current <= end) {
+  while (current < end) { // Modified condition to exclude the end time
     // Check if we've moved to a new day
     if (current.toDateString() !== currentDay) {
       // Add the previous day's slots to the main array
@@ -971,7 +972,10 @@ app.post("/api/bookings/new", async (req, res) => {
         await user.save();
 
         //add the user to the list of registered attendees for the slot
-        newSlot.registeredAttendees.push(user);
+        newSlot.registeredAttendees.push({
+          attendeeId: userID, // The user's ID
+          seatsBooked: seats, // Number of seats booked
+        });
         await newSlot.save();
       }
       return res.status(201).json({ message: "Booking created successfully" });
@@ -1004,7 +1008,11 @@ app.post("/api/bookings/new", async (req, res) => {
           await user.save();
 
           //add the user to the list of registered attendees for the slot
-          newSlot.registeredAttendees.push(user);
+          newSlot.registeredAttendees.push({
+            attendeeId: userID, // The user's ID
+            seatsBooked: seats, // Number of seats booked
+          });
+          
           await newSlot.save();
         }
         return res
@@ -1024,7 +1032,10 @@ app.post("/api/bookings/new", async (req, res) => {
           await user.save();
 
           //add the user to the list of registered attendees for the slot
-          existingSlot.registeredAttendees.push(user);
+          existingSlot.registeredAttendees.push({
+            attendeeId: userID, // The user's ID
+            seatsBooked: seats, // Number of seats booked
+          });
           await existingSlot.save();
         }
         return res
@@ -1089,51 +1100,39 @@ app.get("/api/dashboard/bookings/:userID", async (req, res) => {
 
     const user = await User.findById(userID).populate({
       path: "reservations",
-      populate: { path: "meeting" },
+      populate: {
+        path: "meeting",
+      },
     });
 
-    //return a list of meeting IDs with the corresponding title, location
+    // Return a list of meeting IDs with the corresponding title, location
     const bookingList = user.reservations.map((booking) => {
-      // Format the occurrence date (including the date part)
+      // Format the occurrence date (keep it in UTC and extract the date portion)
       const occurrenceDate = new Date(booking.occurrenceDate);
-      const formattedDate = occurrenceDate.toLocaleDateString("en-US", {
-        weekday: "long", // e.g., Wednesday
-        year: "numeric", // e.g., 2024
-        month: "long", // e.g., December
-        day: "numeric", // e.g., 18
-      });
+      const formattedDate = `${occurrenceDate.getUTCFullYear()}-${(occurrenceDate.getUTCMonth() + 1).toString().padStart(2, '0')}-${occurrenceDate.getUTCDate().toString().padStart(2, '0')}`;
 
-      // Format the start time (excluding seconds)
+      // Format the start time (keep it in UTC)
       const startTime = new Date(booking.startTime);
-      const formattedStartTime = startTime.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true, // Use 12-hour format with AM/PM
-      });
+      const formattedStartTime = startTime.toISOString().substring(11, 16); // HH:mm format (UTC)
 
-      // Format the end time (excluding seconds)
+      // Format the end time (keep it in UTC)
       const endTime = new Date(booking.endTime);
-      const formattedEndTime = endTime.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true, // Use 12-hour format with AM/PM
-      });
+      const formattedEndTime = endTime.toISOString().substring(11, 16); // HH:mm format (UTC)
 
       return {
         id: booking._id,
         title: booking.meeting.title,
         location: booking.meeting.location,
-        date: formattedDate, // formatted occurrence date
-        startTime: formattedStartTime, // formatted start time
-        endTime: formattedEndTime, // formatted end time
+        date: formattedDate,  // UTC formatted occurrence date
+        startTime: formattedStartTime, // UTC formatted start time
+        endTime: formattedEndTime, // UTC formatted end time
       };
     });
 
     res.status(200).json({ data: bookingList });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Booking fetch failed", error: error.message });
+    console.error("Error fetching bookings: ", error);
+    res.status(500).json({ message: "Booking fetch failed", error: error.message });
   }
 });
 
@@ -1201,6 +1200,168 @@ app.get("/api/dashboard/events/:userID", async (req, res) => {
     res
       .status(500)
       .json({ message: "Event fetch failed", error: error.message });
+  }
+}
+);
+
+//generate the token for the meeting
+app.get("/api/token/:meetingID", async (req, res) => {
+  const { meetingID } = req.params;
+
+  try {
+    if (!meetingID) {
+      return res.status(400).json({ message: "Meeting ID is required" });
+    }
+
+    const payload = { ID: meetingID };
+    const token = jwt.sign(payload, SECRET_KEY, { algorithm: "HS256" });
+
+    console.log("Token:", token);
+
+    res.status(200).json({ data: { token } });
+  } catch (error) {
+    console.error("Token generation error:", error);
+    res
+      .status(500)
+      .json({ message: "Token generation failed", error: error.message });
+  }
+});
+
+//FIX
+    
+app.delete("/api/meetings/delete/:meetingID", async (req, res) => {
+  const { meetingID } = req.params;
+
+  try {
+    if (!meetingID) {
+      return res.status(400).json({ message: "Meeting ID is required" });
+    }
+
+    // Before deleting the meeting, go through all the slots and remove the meeting from the registered attendees' list of reservations
+    const meeting = await Meeting.findById(meetingID)
+      .populate({
+        path: "meetingSlots",
+        populate: {
+          path: "registeredAttendees",
+        },
+      });
+
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    // Get the list of attendees
+    const attendees = meeting.meetingSlots.flatMap(slot => slot.registeredAttendees);
+
+    // Update each attendee's reservations
+    for (const attendee of attendees) {
+      // Filter out reservations for the given meetingID
+      attendee.reservations = attendee.reservations.filter((reservation) => reservation.meeting.toString() !== meetingID);
+
+      // Save the attendee after modifying their reservations
+      await attendee.save();
+    }
+
+    // Find and delete the meeting
+    const deletedMeeting = await Meeting.findByIdAndDelete(meetingID);
+
+    if (!deletedMeeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    // Delete all slots for the meeting
+    await MeetingSlot.deleteMany({ meeting: meetingID });
+
+    // Remove the meeting from the host's list of meetings
+    const host = await User.findById(deletedMeeting.host);
+    host.meetings = host.meetings.filter((meeting) => meeting.toString() !== meetingID); // Ensure you compare ObjectIds properly
+    await host.save();
+
+    res.status(200).json({ message: "Meeting deleted successfully", deletedMeeting });
+  } catch (error) {
+    console.error("Error deleting meeting:", error.message);
+    res.status(500).json({ message: "Meeting deletion failed", error: error.message });
+  }
+});
+
+//delete a booking
+// When a booking is deleted, the seats available for the slot should be updated
+// The booking should be removed from the user's list of reservations
+// The booking should be removed from the slot's list of attendees and registered attendees
+app.delete("/api/bookings/delete/:bookingID/:userID", async (req, res) => {
+  const { bookingID, userID } = req.params;
+
+  try {
+    // Ensure bookingID and userID are provided
+    if (!bookingID || !userID) {
+      return res.status(400).json({ message: "Booking ID and User ID are required" });
+    }
+
+    // Find the booking slot and populate necessary fields
+    const booking = await MeetingSlot.findById(bookingID)
+    .populate({
+      path: 'registeredAttendees.attendeeId',  // Populate attendeeId inside registeredAttendees
+      model: 'User',  // Refers to the User model
+    })
+    .populate({
+      path: 'meeting',
+      populate: { path: 'host' },  // Optionally populate meeting and host details if needed
+    });
+
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Find the user
+    const registeree = await User.findById(userID);
+    if (!registeree) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Format the user's name
+    const userName = `${registeree.firstName} ${registeree.lastName}`;
+
+    // Remove the user from the list of attendees
+    booking.attendees = booking.attendees.filter((attendee) => attendee !== userName);
+
+    // Find the booking to remove from the registered attendees list
+    // Find the booking to remove from the registered attendees list
+    const bookingToRemove = booking.registeredAttendees.find(
+      (attendee) => attendee.attendeeId._id.toString() === userID
+    );
+    console.log("Booking to remove:", bookingToRemove);
+
+    if (bookingToRemove) {
+      // Update the available seats by adding back the number of seats the user booked
+      booking.seatsAvailable += bookingToRemove.seatsBooked;
+
+      console.log("Seats available:", booking.seatsAvailable);
+
+      // Remove the booking from the registered attendees list
+      booking.registeredAttendees = booking.registeredAttendees.filter(
+        (attendee) => attendee.attendeeId._id.toString() !== userID
+      );
+
+      console.log("Registered attendees:", booking.registeredAttendees);
+
+      
+    }
+
+    // Remove the booking from the user's list of reservations
+    registeree.reservations = registeree.reservations.filter(
+      (reservation) => reservation.toString() !== bookingID
+    );
+
+    // Save the updated user and booking slot
+    await registeree.save();
+    await booking.save();
+
+    console.log("Successfully deleted booking");
+    res.status(200).json({ message: "Booking deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting booking:", error.message);
+    res.status(500).json({ message: "Booking deletion failed", error: error.message });
   }
 });
 

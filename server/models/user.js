@@ -33,6 +33,12 @@ const UserSchema = new Schema({
       ref: "Meeting",
     },
   ],
+  Notifications: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Notification",
+    },
+  ],
 });
 
 UserSchema.pre("save", async function (next) {

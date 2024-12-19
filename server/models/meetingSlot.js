@@ -19,10 +19,17 @@ const MeetingSlotSchema = new Schema({
 
   registeredAttendees: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      attendeeId: {
+        type: mongoose.Schema.Types.ObjectId, // Assuming you're using ObjectId for the attendee
+        ref: "User", // Referring to the User model, if applicable
+      },
+      seatsBooked: {
+        type: Number, // Number of seats they booked
+        required: true,
+      },
     },
   ],
+
 });
 
 module.exports = mongoose.model("MeetingSlot", MeetingSlotSchema);

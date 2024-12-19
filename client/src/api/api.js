@@ -210,9 +210,11 @@ export const deleteMeeting = async (meetingID) => {
 };
 
 // Delete booking function to send a DELETE request to /bookings
-export const deleteBooking = async (bookingID) => {
+export const deleteBooking = async (bookingID, userID) => {
+  console.log("Deleting booking:", bookingID);
+  console.log("User ID:", userID);
   try {
-    const response = await api.delete(`/bookings/delete/${bookingID}`);
+    const response = await api.delete(`/bookings/delete/${bookingID}/${userID}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -242,6 +244,16 @@ export const fetchNotifications = async (userID) => {
 export const deleteNotification = async (notificationID) => {
   try {
     const response = await api.delete(`/notifications/delete/${notificationID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//fetch token function to send a GET request to /token
+export const fetchToken = async (meetingID) => {
+  try {
+    const response = await api.get(`/token/${meetingID}`);
     return response.data;
   } catch (error) {
     throw error;
