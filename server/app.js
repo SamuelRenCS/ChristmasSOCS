@@ -337,11 +337,9 @@ app.get("/api/requests/:userID", async (req, res) => {
       approved: false,
     });
 
-    res
-      .status(200)
-      .json({
-        data: { confirmedRequests, incomingRequests, outgoingRequests },
-      });
+    res.status(200).json({
+      data: { confirmedRequests, incomingRequests, outgoingRequests },
+    });
   } catch (error) {
     res
       .status(500)
@@ -378,8 +376,6 @@ app.put("/api/requests/:requestID", async (req, res) => {
 // handle request rejection
 app.delete("/api/requests/:requestID", async (req, res) => {
   const { requestID } = req.params;
-
-  console.log("Delete request ID:", requestID);
 
   try {
     // Validate if `requestID` is a valid MongoDB ObjectId

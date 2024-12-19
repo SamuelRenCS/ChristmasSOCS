@@ -1,49 +1,53 @@
 import React, { useState, useEffect } from "react";
 import RequestItem from "./RequestItem";
+import { fetchRequests, acceptRequest, rejectRequest } from "../api/api";
 import styles from "./RequestsSubPage.module.css";
+import { useAuth } from "../context/AuthContext";
 
-const RequestsSubPage = ({
-  requests,
-  handleAccept,
-  handleReject,
-  handleCancel,
-  requestType,
-}) => {
-  console.log(requestType);
+const RequestsSubPage = ({ requestType }) => {
+  const { user } = useAuth();
+  const [currentRequests, setCurrentRequests] = useState([]);
 
-  // const handleAccept = async (id) => {
-  //   try {
-  //     const response = await acceptRequest(id);
-  //     const approvedRequest = response.request;
+  // Fetch requests based on the request type
+  const getRequests = async () => {
+    try {
+      const response = await fetchRequests(user.id);
+      const requests = response.data[`${requestType.toLowerCase()}Requests`];
+      setCurrentRequests(requests);
 
-  //     // Update the incoming requests state to remove the accepted request
-  //     setIncomingRequests((prevRequests) =>
-  //       prevRequests.filter((req) => req.id !== approvedRequest.id)
-  //     );
-  //   } catch (error) {
-  //     console.error("Error accepting request:", error);
-  //   }
-  // };
+      console.log("Getting requests");
+    } catch (error) {
+      console.error(`Error fetching ${requestType} requests:`, error);
+    }
+  };
 
-  // const handleReject = async (id) => {
-  //   try {
-  //     const response = await rejectRequest(id);
-  //     const deletedRequest = response.deletedRequest;
+  useEffect(() => {
+    getRequests();
+  }, [requestType]);
 
-  //     // Update the state to remove the deleted request
-  //     setIncomingRequests((prevRequests) =>
-  //       prevRequests.filter((req) => req.id !== deletedRequest.id)
-  //     );
-  //   } catch (error) {
-  //     console.error("Error rejecting request:", error);
-  //   }
-  // };
+  const handleAccept = async (id) => {
+    try {
+      await acceptRequest(id);
+      await getRequests();
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    }
+  };
+
+  const handleReject = async (id) => {
+    try {
+      await rejectRequest(id);
+      await getRequests();
+    } catch (error) {
+      console.error("Error cancelling request:", error);
+    }
+  };
 
   return (
     <div className={styles.requestList}>
       <h2>{`${requestType} Requests`}</h2>
-      {requests.length > 0 ? (
-        requests.map((request) => (
+      {currentRequests.length > 0 ? (
+        currentRequests.map((request) => (
           <RequestItem
             key={request.id}
             request={request}
@@ -53,7 +57,7 @@ const RequestsSubPage = ({
           />
         ))
       ) : (
-        <p>{`No ${requestType} requests at the moment.`}</p>
+        <p>{`No ${requestType.toLowerCase()} requests at the moment.`}</p>
       )}
     </div>
   );

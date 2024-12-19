@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import styles from "./RequestItem.module.css";
 
 const RequestItem = ({ request, onAccept, onReject, itemType }) => {
@@ -49,27 +48,17 @@ const RequestItem = ({ request, onAccept, onReject, itemType }) => {
         )}
 
         {itemType === "Outgoing" && (
-          <p className={styles.pendingText}>Pending</p>
+          <p className={styles.pendingText}>Pending...</p>
         )}
 
         {itemType === "Confirmed" && (
-          <button className={styles.cancelButton}>Cancel</button>
+          <button onClick={onReject} className={styles.rejectButton}>
+            Cancel
+          </button>
         )}
       </div>
     </div>
   );
 };
-
-// RequestItem.propTypes = {
-//   request: PropTypes.shape({
-//     id: PropTypes.string.isRequired,
-//     title: PropTypes.string.isRequired,
-//     requesterName: PropTypes.string.isRequired,
-//     meetingTime: PropTypes.string.isRequired,
-//     purpose: PropTypes.string.isRequired,
-//   }).isRequired,
-//   onAccept: PropTypes.func.isRequired,
-//   onReject: PropTypes.func.isRequired,
-// };
 
 export default RequestItem;
