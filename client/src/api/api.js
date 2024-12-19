@@ -67,6 +67,17 @@ export const fetchMeeting = async (token) => {
   }
 };
 
+// fetch meetings function to send a GET request to /meetings with meeting ID
+export const fetchMeetingWithID = async (meetingID) => {
+  try {
+    const response = await api.get(`/meetings/${meetingID}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching meeting details:", error);
+    throw error;
+  }
+};
+
 // fetchMeetingSlots function to send a GET request to /meetings/
 // TODO ADD PARAMS
 export const fetchMeetingSlot = async (meetingID, date) => {
@@ -165,7 +176,7 @@ export const fetchUserBookings = async (userID) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 export const fetchAllUserEvents = async (userID) => {
   try {
@@ -175,7 +186,7 @@ export const fetchAllUserEvents = async (userID) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 // handle accept request function to send a PUT request to /requests
 export const acceptRequest = async (requestID) => {
@@ -214,7 +225,9 @@ export const deleteBooking = async (bookingID, userID) => {
   console.log("Deleting booking:", bookingID);
   console.log("User ID:", userID);
   try {
-    const response = await api.delete(`/bookings/delete/${bookingID}/${userID}`);
+    const response = await api.delete(
+      `/bookings/delete/${bookingID}/${userID}`
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -243,7 +256,9 @@ export const fetchNotifications = async (userID) => {
 //delete notification function to send a DELETE request to /notifications
 export const deleteNotification = async (notificationID) => {
   try {
-    const response = await api.delete(`/notifications/delete/${notificationID}`);
+    const response = await api.delete(
+      `/notifications/delete/${notificationID}`
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -259,6 +274,5 @@ export const fetchToken = async (meetingID) => {
     throw error;
   }
 };
-
 
 export default api;
