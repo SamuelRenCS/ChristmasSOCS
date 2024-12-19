@@ -52,6 +52,12 @@ const MeetingSchema = new Schema({
       ref: "MeetingSlot",
     },
   ],
+  validSlots: [[
+    {
+      type: String,
+      required: true,
+    },
+  ]],
 });
 
 module.exports = mongoose.model("Meeting", MeetingSchema);

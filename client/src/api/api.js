@@ -147,6 +147,16 @@ export const fetchRequests = async (userID) => {
   }
 };
 
+export const fetchUserMeetings = async (userID) => {
+  try {
+    console.log("Fetching meetings for user:", userID);
+    const response = await api.get(`/dashboard/meetings/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // handle accept request function to send a PUT request to /requests
 export const acceptRequest = async (requestID) => {
   try {

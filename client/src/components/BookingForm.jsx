@@ -28,7 +28,7 @@ const BookingForm = ({token}) => {
     // Retrieve the first and last name from the user context
     attendee: user ? `${user.firstName} ${user.lastName}` : "",
     meetingID: "",
-    userID: user ? user.id : "",
+    userID: user ? `${user.id}` : "",
     meetingDate: "",
     timeSlot: "",
     seats: "",
@@ -56,6 +56,7 @@ const BookingForm = ({token}) => {
           attendee: user ? `${user.firstName} ${user.lastName}` : "",
           meetingID: meetingID,
           meetingDate: dateObj.toISOString().split("T")[0],
+          userID: user ? `${user.id}` : "",
         });
 
       } catch (error) {

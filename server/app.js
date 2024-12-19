@@ -14,7 +14,6 @@ const Meeting = require("./models/meeting");
 const Request = require("./models/request");
 const e = require("express");
 const MeetingSlot = require("./models/meetingSlot");
-const meeting = require("./models/meeting");
 
 
 // PUT IN ENV FILE LATER
@@ -373,6 +372,10 @@ app.post("/api/meetings/new", async (req, res) => {
 
   try {
     // Create new meeting
+
+    const allSlots = generateSlots(startDate, endDate, interval);
+    console.log("All slots:", allSlots);
+
     const newMeeting = new Meeting({
       title,
       host,
@@ -385,9 +388,25 @@ app.post("/api/meetings/new", async (req, res) => {
       repeat,
       endRepeatDate,
       repeatingDays: repeatDays,
+      validSlots: allSlots,
     });
 
     await newMeeting.save();
+
+    //save the meeting under the host
+    const hostUser = await User.findById(host);
+    console.log("Host user:", hostUser);
+
+    if (hostUser) {
+      // Push the meeting ID to the meetings array
+      // Initialize meetings array if it doesn't exist
+      if (!hostUser.meetings) {
+        hostUser.meetings = [];
+      }
+      hostUser.meetings.push(newMeeting._id);
+      // Save the user
+      await hostUser.save();
+    }
 
     const payload = { ID: newMeeting._id };
 
@@ -417,7 +436,10 @@ app.post("/api/meetings/new", async (req, res) => {
 
 const calculateDates = (startDate, endDate) => {
   const dates = [];
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
+  // Reset time to ensure we're comparing dates correctly
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(23, 59, 59, 999);
 
   while (currentDate <= endDate) {
     dates.push(new Date(currentDate)); // Push the date
@@ -427,12 +449,23 @@ const calculateDates = (startDate, endDate) => {
   return dates;
 };
 
-// Inputs an array of repeating days and the end date. Every repeating day should repeat weekly until the end date
 const calculateWeeklyDates = (repeatingDays, endDate) => {
   const dates = [];
 
+  // Reset endDate time to ensure the comparison is only date-based
+  endDate.setHours(23, 59, 59, 999);
+
   for (let i = 0; i < repeatingDays.length; i++) {
     let currentDate = new Date(repeatingDays[i]);
+
+    // Reset the time of currentDate to ensure comparison is only date-based
+    currentDate.setHours(0, 0, 0, 0);
+
+    // If the initial repeating day is after the end date, skip to next
+    if (currentDate > endDate) {
+      continue;
+    }
+
     while (currentDate <= endDate) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 7); // Increment by 7 days
@@ -440,6 +473,48 @@ const calculateWeeklyDates = (repeatingDays, endDate) => {
   }
 
   return dates;
+};
+
+const generateSlots = (startTime, endTime, interval) => {
+  const slots = [];
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+
+  let current = new Date(start);
+  let currentDay = current.toDateString();
+  let daySlots = [];
+
+  while (current <= end) {
+    // Check if we've moved to a new day
+    if (current.toDateString() !== currentDay) {
+      // Add the previous day's slots to the main array
+      if (daySlots.length > 0) {
+        slots.push(daySlots);
+      }
+
+      // Reset for the new day
+      daySlots = [];
+      currentDay = current.toDateString();
+    }
+
+    // Add current time slot to the day's slots
+    daySlots.push(
+      current.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+
+    // Increment time
+    current.setMinutes(current.getMinutes() + interval);
+  }
+
+  // Add the last day's slots if not empty
+  if (daySlots.length > 0) {
+    slots.push(daySlots);
+  }
+
+  return slots;
 };
 
 app.get("/api/meetings/:token", async (req, res) => {
@@ -485,6 +560,7 @@ app.get("/api/meetings/:token", async (req, res) => {
 
     if (repeat === "None") {
       dates = calculateDates(startDate, endDate);
+      console.log("Dates:", dates);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
       return res.status(200).json({
         data: {
@@ -551,56 +627,10 @@ app.get("/api/meetings/:token", async (req, res) => {
   }
 });
 
-const generateSlots = (startTime, endTime, interval) => {
-  const slots = [];
-  const start = new Date(startTime);
-  const end = new Date(endTime);
-
-  let current = new Date(start);
-  let currentDay = current.toDateString();
-  let daySlots = [];
-
-  while (current <= end) {
-    // Check if we've moved to a new day
-    if (current.toDateString() !== currentDay) {
-      // Add the previous day's slots to the main array
-      if (daySlots.length > 0) {
-        slots.push(daySlots);
-      }
-
-      // Reset for the new day
-      daySlots = [];
-      currentDay = current.toDateString();
-    }
-
-    // Add current time slot to the day's slots
-    daySlots.push(
-      current.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-
-    // Increment time
-    current.setMinutes(current.getMinutes() + interval);
-  }
-
-  // Add the last day's slots if not empty
-  if (daySlots.length > 0) {
-    slots.push(daySlots);
-  }
-
-  return slots;
-};
-
 // Serve the meeting slots fetch api route
 // Meeting contains a list of slots called meetingSlots
 app.get("/api/meetings/:meetingID/:date", async (req, res) => {
   const { meetingID, date } = req.params;
-
-  
-
-  //convert date to a date object matching the format ISODate('2024-12-19T04:30:00.000Z')
 
   try {
     if (!meetingID || !date) {
@@ -614,7 +644,7 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
     //retrieve the meeting start and end date and interval
     const startDate = new Date(meeting.startDate);
     const endDate = new Date(meeting.endDate);
-    const interval = meeting.interval;
+    //const interval = meeting.interval;
 
     console.log("Start Date:", startDate);
     console.log("End Date:", endDate);
@@ -647,7 +677,7 @@ app.get("/api/meetings/:meetingID/:date", async (req, res) => {
 
     console.log("formattedNoSeats", formattedNoSeats);
 
-    const allSlots = generateSlots(startDate, endDate, interval);
+    const allSlots = meeting.validSlots;
     console.log("allSlots", allSlots);
 
     let possibleSlots = [];
@@ -748,6 +778,7 @@ app.post("/api/bookings/new", async (req, res) => {
   console.log(req.body);
   const { attendee, meetingID, userID, meetingDate, timeSlot, seats } = req.body;
 
+  console.log("User ID:", userID);
   // server-side validation
   if (!attendee || !meetingID || !meetingDate || !timeSlot || !seats) {
     return res.status(400).json({ message: "All fields are required" });
@@ -811,7 +842,8 @@ app.post("/api/bookings/new", async (req, res) => {
       meeting.meetingSlots.push(newSlot);
       await meeting.save();
       //check if a user is logged in and add the booking to the user
-      if (userID) {
+      if (userID && userID !== "") {
+        console.log("User ID:", userID);
         const user = await User.findById(userID);
         user.reservations.push(newSlot);
         await user.save();
@@ -838,7 +870,8 @@ app.post("/api/bookings/new", async (req, res) => {
         meeting.meetingSlots.push(newSlot);
         await meeting.save();
         //check if a user is logged in and add the booking to the user
-        if (userID) {
+        if (userID && userID !== "") {
+          console.log("User ID:", userID);
           const user = await User.findById(userID);
           user.reservations.push(newSlot);
           await user.save();
@@ -875,6 +908,36 @@ app.post("/api/bookings/new", async (req, res) => {
     res
       .status(500)
       .json({ message: "Booking creation failed", error: error.message });
+  }
+});
+
+//fetch the meetings a user has created
+app.get("/api/dashboard/meetings/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  console.log("User ID:", userID);
+  try {
+    if (!userID) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const meetings = await Meeting.find({ host: userID });
+    console.log("Meetings:", meetings);
+
+    //return a list of meeting IDs with the corresponding title, location
+    const meetingList = meetings.map((meeting) => ({
+      id: meeting._id,
+      title: meeting.title,
+      location: meeting.location,
+    }));
+
+    res.status(200).json({ data: meetingList });
+
+   
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Meeting fetch failed", error: error.message });
   }
 });
 

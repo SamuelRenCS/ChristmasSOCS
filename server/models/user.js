@@ -27,6 +27,12 @@ const UserSchema = new Schema({
       ref: "MeetingSlot",
     },
   ],
+  meetings: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Meeting",
+    },
+  ],
 });
 
 UserSchema.pre("save", async function (next) {
