@@ -1,11 +1,12 @@
 import React from "react";
 import "../styles/ViewMeeting.css";
-import Button from "../components/Button";
 import Container from "../components/Container";
 import TimeSlot from "../components/TimeSlot";
+import CalendarDateInput from "../components/CalendarDateInput";
+import { useState } from "react";
 
 const ViewMeeting = () => {
-  const timeSlots = [
+  const [timeSlots, setTimeSlots] = useState([
     { time: "15:00 to 15:15", student: "Eric", isBooked: true },
     { time: "15:15 to 15:30", student: null, isBooked: false },
     { time: "15:30 to 15:45", student: "Samuel", isBooked: true },
@@ -13,22 +14,61 @@ const ViewMeeting = () => {
     { time: "16:00 to 16:15", student: "Shotaro", isBooked: true },
     { time: "16:15 to 16:30", student: null, isBooked: false },
     { time: "16:45 to 17:00", student: null, isBooked: false },
-  ];
+  ]);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false); // Track confirmation state
+
+  const handleDelete = () => {
+    if (isConfirmingDelete) {
+      // If already confirming, delete the meeting
+      setTimeSlots([]);
+      setIsConfirmingDelete(false); // Reset the state after deletion
+      console.log("Meeting deleted");
+    } else {
+      // If not confirming, show the confirmation state
+      setIsConfirmingDelete(true);
+    }
+    setTimeout(() => {
+      setIsConfirmingDelete(false);
+    }, 3000);
+  };
+
+  const handleCancelDelete = () => {
+    // Cancel deletion and reset the button
+    setIsConfirmingDelete(false);
+  };
+  
   return (
     <main className="main">
       <div className="top-section">
         <div className="title">
           <h1>Monday Office Hours for COMP 307</h1>
-          <h1>Week of November 25</h1>
-        </div>
-        <div className="share">
-          <Button type={"submit"} text={"Share URL"}></Button>
         </div>
       </div>
       <div className="content">
         <div className="left-section">
-          {/* Time Slots */}
-          <Container height={"75%"} padding={"20px"} overflow={"auto"}>
+          <Container padding={"20px"} height={"auto"} maxHeight={"700px"} overflow={"auto"}>
+            <h3>Available Time Slots</h3>
+            <CalendarDateInput
+              label="Date:"
+              value="2021-11-25"
+              onChange={() => {}}
+              highlightedDates={["2021-11-25"]}
+            />
+          </Container>
+          
+        </div>
+        <div className="right-section">
+          {/* Meeting Details */}
+          <Container maxHeight={'200px'} height={"auto"} padding={"20px"} overflow={"auto"}>
+            <h3>Location: ENGMC 327</h3>
+            <p>
+              <strong>Description:</strong> Lorem ipsum dolor sit amet,
+              consectetur adipiscing elit. Phasellus fringilla, purus placerat
+              sollicitudin interdum, neque lacus consequat magna.
+            </p>
+            <p>From 15:00 to 18:30 EST</p>
+          </Container>
+          <Container maxHeight={'300px'} height={"auto"} padding={"20px"} overflow={"auto"}>
             {timeSlots.map((slot) => (
               <TimeSlot
                 key={slot.time}
@@ -38,19 +78,16 @@ const ViewMeeting = () => {
               ></TimeSlot>
             ))}
           </Container>
-        </div>
-        <div className="right-section">
-          {/* Meeting Details */}
-          <Container height={"60%"} padding={"20px"} overflow={"auto"}>
-            <h3>Location: ENGMC 327</h3>
-            <p>
-              <strong>Description:</strong> Lorem ipsum dolor sit amet,
-              consectetur adipiscing elit. Phasellus fringilla, purus placerat
-              sollicitudin interdum, neque lacus consequat magna.
-            </p>
-            <p>From 15:00 to 18:30 EST</p>
-          </Container>
-          <button className="delete">Delete Meeting</button>
+          <div className="share">
+            <button className="shareButton">Share Meeting</button>
+            <button   
+              className="deleteButton" 
+              onClick={handleDelete}
+              onBlur={handleCancelDelete}>
+                {isConfirmingDelete ? "Confirm Delete" : "Delete Meeting"}
+            </button>
+          </div>
+  
         </div>
       </div>
     </main>
