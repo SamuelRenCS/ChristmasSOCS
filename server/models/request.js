@@ -32,7 +32,7 @@ const RequestSchema = new Schema({
     type: Date,
     required: true,
   },
-  numberOfSlots: {
+  numberOfSeats: {
     type: Number,
     required: true,
   },

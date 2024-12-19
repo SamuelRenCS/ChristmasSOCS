@@ -32,7 +32,7 @@ const RequestForm = ({ hostID }) => {
     date: formatDate(now),
     startTime: formatTime(now),
     endTime: formatTime(oneHourLater),
-    numberOfSlots: 1,
+    numberOfSeats: 1,
     location: "",
     description: "",
   });
@@ -83,7 +83,7 @@ const RequestForm = ({ hostID }) => {
       location: formData.location,
       startDate: startDateTime,
       endDate: endDateTime,
-      numberOfSlots: formData.numberOfSlots,
+      numberOfSeats: formData.numberOfSeats,
       description: formData.description,
     };
 
@@ -166,8 +166,8 @@ const RequestForm = ({ hostID }) => {
       <InputField
         label="Number of Slots"
         type="number"
-        name="numberOfSlots"
-        value={formData.numberOfSlots}
+        name="numberOfSeats"
+        value={formData.numberOfSeats}
         onChange={handleInputChange}
         min="1"
         required={true}

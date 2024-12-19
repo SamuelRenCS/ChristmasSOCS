@@ -256,7 +256,7 @@ app.post("/api/requests/new", async (req, res) => {
     location,
     startDate,
     endDate,
-    numberOfSlots,
+    numberOfSeats,
     description,
   } = req.body;
 
@@ -289,7 +289,7 @@ app.post("/api/requests/new", async (req, res) => {
       location,
       startDate,
       endDate,
-      numberOfSlots,
+      numberOfSeats,
       description,
     });
 

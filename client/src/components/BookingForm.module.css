@@ -34,7 +34,7 @@
 .formActions {
   margin-top: auto;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
 }
 
 .requestContainer {
