@@ -4,7 +4,6 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
-const http = require("http");
 
 // middleware
 const { validateUser } = require("./middleware");
@@ -45,7 +44,10 @@ app.use(express.urlencoded({ extended: true }));
 // enable CORS
 app.use(
   cors({
-    origin: "http://localhost:5173", // allow requests from the React app
+    origin: [
+      "http://localhost:5173",
+      "http://fall2024-comp307-group12.cs.mcgill.ca:5000",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"], // allowed methods
     credentials: true,
   })
@@ -1511,8 +1513,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
 
-const server = http.createServer(app);
-
-server.listen(5000, () => {
+app.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
