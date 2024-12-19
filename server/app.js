@@ -1131,6 +1131,7 @@ app.get("/api/dashboard/events/:userID", async (req, res) => {
         });
       });
     });
+    
 
     // Add the bookings the user has made. Each booking is an event. Take the host name from the meeting
     user.reservations.forEach((booking) => {
