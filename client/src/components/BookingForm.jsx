@@ -10,6 +10,7 @@ import CalendarDateInput from "./CalendarDateInput";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import Button from "./Button";
+import ErrorPage from "../pages/ErrorPage";
 import styles from "./BookingForm.module.css";
 
 import { useAuth } from "../context/AuthContext";
@@ -25,6 +26,8 @@ const BookingForm = ({ token }) => {
   const [maxSeats, setMaxSeats] = useState(0);
   const [highlightedDates, setHighlightedDates] = useState([]);
   const [hostID, setHostID] = useState("");
+
+  const [isValidToken, setIsValidToken] = useState(true);
 
   const [formData, setFormData] = useState({
     // Retrieve the first and last name from the user context
@@ -79,7 +82,7 @@ const BookingForm = ({ token }) => {
           userID: user ? `${user.id}` : "",
         });
       } catch (error) {
-        console.error("Error fetching meeting data:", error);
+        setIsValidToken(false);
       }
     };
 
@@ -172,6 +175,21 @@ const BookingForm = ({ token }) => {
   const handleRequestRedirection = () => {
     navigate(`/requests/new/${hostID}`);
   };
+
+  // return an error page if the token is invalid
+  if (!isValidToken) {
+    return (
+      <ErrorPage
+        message="The meeting you are trying to book does not exit. Please make sure the token is correct and try again."
+        title="Meeting Not Found"
+        buttonText="Back to Home"
+        onButtonClick={() => {
+          // Navigate to hosts list or wherever appropriate
+          navigate("/");
+        }}
+      />
+    );
+  }
 
   return (
     <>

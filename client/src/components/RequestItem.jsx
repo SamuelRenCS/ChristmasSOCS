@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styles from "./RequestItem.module.css";
 
-const RequestItem = ({ request, onAccept, onReject }) => {
+const RequestItem = ({ request, onAccept, onReject, itemType }) => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
@@ -37,12 +37,24 @@ const RequestItem = ({ request, onAccept, onReject }) => {
 
       {/* Action Buttons */}
       <div className={styles.requestActions}>
-        <button className={styles.acceptButton} onClick={onAccept}>
-          ACCEPT
-        </button>
-        <button className={styles.rejectButton} onClick={onReject}>
-          REJECT
-        </button>
+        {itemType === "Incoming" && (
+          <>
+            <button onClick={onAccept} className={styles.acceptButton}>
+              Accept
+            </button>
+            <button onClick={onReject} className={styles.rejectButton}>
+              Reject
+            </button>
+          </>
+        )}
+
+        {itemType === "Outgoing" && (
+          <p className={styles.pendingText}>Pending</p>
+        )}
+
+        {itemType === "Confirmed" && (
+          <button className={styles.cancelButton}>Cancel</button>
+        )}
       </div>
     </div>
   );

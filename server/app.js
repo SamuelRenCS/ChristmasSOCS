@@ -319,10 +319,29 @@ app.get("/api/requests/:userID", async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    // find requests that have not been accepted
-    const requests = await Request.find({ host: userID, approved: false });
+    // find Confirmed requests, where requester or host is the user
+    const confirmedRequests = await Request.find({
+      $or: [{ requester: userID }, { host: userID }],
+      approved: true,
+    });
 
-    res.status(200).json({ requests });
+    // find requests that have not been accepted as the host
+    const incomingRequests = await Request.find({
+      host: userID,
+      approved: false,
+    });
+
+    // find requests that have not been accepted as the requester
+    const outgoingRequests = await Request.find({
+      requester: userID,
+      approved: false,
+    });
+
+    res
+      .status(200)
+      .json({
+        data: { confirmedRequests, incomingRequests, outgoingRequests },
+      });
   } catch (error) {
     res
       .status(500)
@@ -628,12 +647,18 @@ app.get("/api/meetings/:token", async (req, res) => {
     let formattedDates = [];
 
     if (repeat === "None") {
-      if (interval !== 10 && interval !== 15 && interval !== 20 && interval !== 30 && interval !== 60) {
+      if (
+        interval !== 10 &&
+        interval !== 15 &&
+        interval !== 20 &&
+        interval !== 30 &&
+        interval !== 60
+      ) {
         dates = calculateDates(startDate, startDate);
-      }else{
+      } else {
         dates = calculateDates(startDate, endRepeatDate);
       }
-      
+
       console.log("Dates:", dates);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
       return res.status(200).json({
@@ -952,7 +977,6 @@ app.post("/api/bookings/new", async (req, res) => {
         //add the user to the list of registered attendees for the slot
         newSlot.registeredAttendees.push(user);
         await newSlot.save();
-
       }
       return res.status(201).json({ message: "Booking created successfully" });
     } else {
@@ -986,7 +1010,6 @@ app.post("/api/bookings/new", async (req, res) => {
           //add the user to the list of registered attendees for the slot
           newSlot.registeredAttendees.push(user);
           await newSlot.save();
-
         }
         return res
           .status(201)
@@ -1068,7 +1091,10 @@ app.get("/api/dashboard/bookings/:userID", async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    const user = await User.findById(userID).populate({path: "reservations", populate: {path: "meeting",},});    
+    const user = await User.findById(userID).populate({
+      path: "reservations",
+      populate: { path: "meeting" },
+    });
 
     //return a list of meeting IDs with the corresponding title, location
     const bookingList = user.reservations.map((booking) => {
@@ -1077,10 +1103,10 @@ app.get("/api/dashboard/bookings/:userID", async (req, res) => {
       const formattedDate = occurrenceDate.toLocaleDateString("en-US", {
         weekday: "long", // e.g., Wednesday
         year: "numeric", // e.g., 2024
-        month: "long",   // e.g., December
-        day: "numeric",  // e.g., 18
+        month: "long", // e.g., December
+        day: "numeric", // e.g., 18
       });
-    
+
       // Format the start time (excluding seconds)
       const startTime = new Date(booking.startTime);
       const formattedStartTime = startTime.toLocaleTimeString("en-US", {
@@ -1088,7 +1114,7 @@ app.get("/api/dashboard/bookings/:userID", async (req, res) => {
         minute: "2-digit",
         hour12: true, // Use 12-hour format with AM/PM
       });
-    
+
       // Format the end time (excluding seconds)
       const endTime = new Date(booking.endTime);
       const formattedEndTime = endTime.toLocaleTimeString("en-US", {
@@ -1096,12 +1122,12 @@ app.get("/api/dashboard/bookings/:userID", async (req, res) => {
         minute: "2-digit",
         hour12: true, // Use 12-hour format with AM/PM
       });
-    
+
       return {
         id: booking._id,
         title: booking.meeting.title,
         location: booking.meeting.location,
-        date: formattedDate,  // formatted occurrence date
+        date: formattedDate, // formatted occurrence date
         startTime: formattedStartTime, // formatted start time
         endTime: formattedEndTime, // formatted end time
       };
@@ -1128,10 +1154,17 @@ app.get("/api/dashboard/events/:userID", async (req, res) => {
     }
 
     //Populate the host under the meeting object
-    const user = await User.findById(userID).populate({path: "reservations", populate: {path: "meeting", populate: {path: "host", select: "firstName lastName",},},});
+    const user = await User.findById(userID).populate({
+      path: "reservations",
+      populate: {
+        path: "meeting",
+        populate: { path: "host", select: "firstName lastName" },
+      },
+    });
 
-    
-    const meetings = await Meeting.find({ host: userID }).populate("meetingSlots");
+    const meetings = await Meeting.find({ host: userID }).populate(
+      "meetingSlots"
+    );
 
     //return a list of meeting IDs with the corresponding title, location, date, start time, end time, and attendees
     const eventList = [];
@@ -1151,12 +1184,10 @@ app.get("/api/dashboard/events/:userID", async (req, res) => {
       });
     });
 
-
     // Add the bookings the user has made. Each booking is an event. Take the host name from the meeting
     user.reservations.forEach((booking) => {
-     
       const hostName = `${booking.meeting.host.firstName} ${booking.meeting.host.lastName}`;
-     
+
       eventList.push({
         title: booking.meeting.title,
         location: booking.meeting.location,
@@ -1175,13 +1206,7 @@ app.get("/api/dashboard/events/:userID", async (req, res) => {
       .status(500)
       .json({ message: "Event fetch failed", error: error.message });
   }
-}
-);
-
-    
-    
-
-
+});
 
 // For all other routes, send back the index.html from the React app
 app.get("*", (req, res) => {
