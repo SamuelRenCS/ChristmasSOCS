@@ -13,6 +13,7 @@ import Footer from "./partials/Footer";
 import ViewMeeting from "./pages/ViewMeeting";
 import CreateRequest from "./pages/CreateRequest";
 import CreateBooking from "./pages/CreateBooking";
+import ErrorPage from "./pages/ErrorPage";
 //import MeetingPage from "./pages/MeetingPage";
 import Dashboard from "./pages/Dashboard";
 
@@ -70,6 +71,12 @@ function App() {
               <Route path="/meetings/:meetingId" element={<ViewMeeting />} />
               <Route path="/requests/new/:hostID" element={<CreateRequest />} />
             </Route>
+
+            {/* 404 Route */}
+            <Route
+              path="*"
+              element={<ErrorPage message="404 Page not found" />}
+            />
           </Routes>
         </div>
         <ToastContainer />
