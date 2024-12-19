@@ -74,6 +74,9 @@ function Login() {
             formType="login"
             onChange={handleChange}
           />
+          <div className="no-account">
+            <a href="/register">Do not have an account? Register</a>
+          </div>
           <Button type="submit" text="Login" />
         </form>
       </div>

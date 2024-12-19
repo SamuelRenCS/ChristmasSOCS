@@ -205,12 +205,14 @@ function Registration() {
             />
             
           </div>
-          {errors.firstName && (
-                <p className="error-text">{errors.firstName}</p>
+          <div style={{ display: 'flex', gap: '50px'}}>
+            {errors.firstName && (
+              <p className={`error-text ${errors.firstName ? "show" : ""}`}>{errors.firstName}</p>
             )}
             {errors.lastName && (
-                <p className="error-text">{errors.lastName}</p>
+              <p className={`error-text ${errors.lastName ? "show" : ""}`}>{errors.lastName}</p>
             )}
+          </div>
           <Input
             label="Email"
             type="email"
@@ -220,7 +222,7 @@ function Registration() {
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          {errors.email && <p className="error-text">{errors.email}</p>}
+          {errors.email && <p className={`error-text ${errors.email ? "show" : ""}`}>{errors.email}</p>}
           <Input
             label="Password"
             type="password"
@@ -233,7 +235,7 @@ function Registration() {
               }}
             onBlur={handleBlur}
           />
-            {errors.password && <p className="error-text">{errors.password}</p>}
+            {errors.password && <p className={`error-text ${errors.password ? "show" : ""}`}>{errors.password}</p>}
             
             {showPasswordValidation && (
             <ul className="password-rules">
@@ -264,8 +266,11 @@ function Registration() {
             onBlur={handleBlur}
           />
           {errors.confirmPassword && (
-            <p className="error-text">{errors.confirmPassword}</p>
+            <p className={`error-text ${errors.confirmPassword ? "show" : ""}`}>{errors.confirmPassword}</p>
           )}
+          <div className="no-account">
+            <a href="/login">Already have an account? Login</a>
+          </div>
           <Button type="submit" text="Register" />
         </form>
       </div>
