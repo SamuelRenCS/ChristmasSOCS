@@ -6,7 +6,6 @@ import Registration from "./pages/Registration";
 import styles from "./App.module.css";
 import { ToastContainer, toast } from "react-toastify";
 import PrivateRoute from "./components/PrivateRoute";
-import TestingPage from "./pages/TestingPage";
 import { AuthProvider } from "./context/AuthContext";
 import CreateMeeting from "./pages/CreateMeeting";
 import Header from "./partials/Header";
@@ -63,13 +62,12 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
             <Route path="/booking/:token" element={<CreateBooking />} />
-            <Route path="/testing" element={<TestingPage />} />
 
             {/* Private Routes */}
             <Route element={<PrivateRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/meetings/new" element={<CreateMeeting />} />
-              <Route path="/meetings/:token" element={<ViewMeeting />} />
+              <Route path="/meetings/:meetingId" element={<ViewMeeting />} />
               <Route path="/requests/new/:hostID" element={<CreateRequest />} />
             </Route>
           </Routes>

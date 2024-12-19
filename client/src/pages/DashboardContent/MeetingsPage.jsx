@@ -3,12 +3,14 @@ import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import { fetchUserMeetings } from "../../api/api";
 import { fetchToken } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 
 import styles from "../../styles/MeetingsList.module.css";
 //import { fetchUser } from "../../api/api";
 
 const MeetingsPage = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const { user } = useAuth();
   const userId = user ? user.id : "";
@@ -45,7 +47,7 @@ const MeetingsPage = () => {
 
   const handleViewClick = (meetingId) => {
     const meetingUrl = `/meetings/${meetingId}`;
-    window.open(meetingUrl, "_blank");
+    navigate(meetingUrl);
   };
 
   const handleGetIDClick = async (meetingId) => {
