@@ -1244,8 +1244,8 @@ app.get("/api/token/:meetingID", async (req, res) => {
   }
 });
 
-//FIX
 
+    
 app.delete("/api/meetings/delete/:meetingID", async (req, res) => {
   const { meetingID } = req.params;
 
@@ -1254,54 +1254,57 @@ app.delete("/api/meetings/delete/:meetingID", async (req, res) => {
       return res.status(400).json({ message: "Meeting ID is required" });
     }
 
-    // Before deleting the meeting, go through all the slots and remove the meeting from the registered attendees' list of reservations
-    const meeting = await Meeting.findById(meetingID).populate({
-      path: "meetingSlots",
-      populate: {
-        path: "registeredAttendees",
-      },
-    });
+    // Find the meeting and populate the necessary fields
+    const meeting = await Meeting.findById(meetingID)
+      .populate({
+        path: "meetingSlots",
+        populate: {
+          path: "registeredAttendees",
+        },
+      });
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-    // Get the list of attendees
-    const attendees = meeting.meetingSlots.flatMap(
-      (slot) => slot.registeredAttendees
-    );
+    // Get the list of attendees from the meeting slots
+    const attendees = meeting.meetingSlots.flatMap(slot => slot.registeredAttendees);
 
     // Update each attendee's reservations
     for (const attendee of attendees) {
-      // Filter out reservations for the given meetingID
-      attendee.reservations = attendee.reservations.filter(
-        (reservation) => reservation.meeting.toString() !== meetingID
-      );
-
-      // Save the attendee after modifying their reservations
-      await attendee.save();
+      // Ensure the reservations array exists before filtering
+      if (attendee.reservations && Array.isArray(attendee.reservations)) {
+        attendee.reservations = attendee.reservations.filter(
+          (reservation) => reservation.meeting.toString() !== meetingID
+        );
+        // Save the updated attendee
+        await attendee.save();
+      }
     }
 
-    // Find and delete the meeting
-    const deletedMeeting = await Meeting.findByIdAndDelete(meetingID);
+    // Log number of attendees whose reservations were updated
+    console.log(`Updated reservations for ${attendees.length} attendees.`);
 
+    // Delete the meeting
+    const deletedMeeting = await Meeting.findByIdAndDelete(meetingID);
     if (!deletedMeeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-    // Delete all slots for the meeting
+    // Delete all associated meeting slots
     await MeetingSlot.deleteMany({ meeting: meetingID });
 
     // Remove the meeting from the host's list of meetings
     const host = await User.findById(deletedMeeting.host);
-    host.meetings = host.meetings.filter(
-      (meeting) => meeting.toString() !== meetingID
-    ); // Ensure you compare ObjectIds properly
-    await host.save();
+    if (host) {
+      host.meetings = host.meetings.filter((meeting) => meeting.toString() !== meetingID);
+      await host.save();
+    } else {
+      console.error(`Host with ID ${deletedMeeting.host} not found.`);
+    }
 
-    res
-      .status(200)
-      .json({ message: "Meeting deleted successfully", deletedMeeting });
+    // Respond with a success message
+    res.status(200).json({ message: "Meeting deleted successfully", deletedMeeting });
   } catch (error) {
     console.error("Error deleting meeting:", error.message);
     res
