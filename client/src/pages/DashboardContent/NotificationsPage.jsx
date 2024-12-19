@@ -21,6 +21,12 @@ const NotificationsPage = () => {
           message: "Meeting Cancelled",
           date: "2024-12-19T10:00:00Z",
         },
+        {
+          id: 3,
+          user: "Jane Smith",
+          message: "Meeting Cancelled",
+          date: "2024-12-19T10:00:00Z",
+        },
       ];
 
       setNotifications(mockNotifications);

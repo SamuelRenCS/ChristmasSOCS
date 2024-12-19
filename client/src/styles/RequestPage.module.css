@@ -7,7 +7,9 @@
   }
   
   .requestList h2 {
-    text-align: center;
+    text-align: left;
     margin-bottom: 1.5rem;
+    margin: 20px;
+    color: #007bff;
   }
   
