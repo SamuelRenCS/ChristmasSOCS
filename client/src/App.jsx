@@ -62,7 +62,7 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
-
+            <Route path="/booking/:token" element={<CreateBooking />} />
             <Route path="/testing" element={<TestingPage />} />
 
             {/* Private Routes */}
@@ -70,7 +70,6 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/meetings/new" element={<CreateMeeting />} />
               <Route path="/meetings/:token" element={<ViewMeeting />} />
-              <Route path="/booking/:token" element={<CreateBooking />} />
               <Route path="/requests/new/:hostID" element={<CreateRequest />} />
             </Route>
           </Routes>
