@@ -21,30 +21,29 @@ const HomePage = () => {
       try {
         const response = await fetchAllUserEvents(userId);
         console.log("All Events: ", response.data);
-  
+
         // Sort meetings by date and time
         const sortedMeetings = response.data.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
-  
+
           // Compare by date first
           if (dateA.getTime() !== dateB.getTime()) {
             return dateA.getTime() - dateB.getTime();
           }
-  
+
           // If the dates are the same, compare by start time
           const timeA = new Date(a.startTime);
           const timeB = new Date(b.startTime);
           return timeA.getTime() - timeB.getTime();
         });
-  
+
         setMeetings(sortedMeetings);
       } catch (error) {
         console.error("Error fetching meetings: ", error);
-        toast.error("Error fetching meetings");
       }
     };
-  
+
     fetchMeetings();
   }, []);
 
@@ -53,7 +52,9 @@ const HomePage = () => {
     const selectedDateString = selectedDate.toISOString().split("T")[0]; // Get 'yyyy-mm-dd' format
     const todayMeetings = meetings.filter((meeting) => {
       // Convert meeting.date to 'yyyy-mm-dd' format
-      const meetingDateString = new Date(meeting.date).toISOString().split("T")[0];
+      const meetingDateString = new Date(meeting.date)
+        .toISOString()
+        .split("T")[0];
       return meetingDateString === selectedDateString; // Compare only the date part
     });
     setFilteredMeetings(todayMeetings);
@@ -69,13 +70,15 @@ const HomePage = () => {
     if (view === "month") {
       // Convert the calendar tile date to 'yyyy-mm-dd'
       const dateString = date.toISOString().split("T")[0];
-      
+
       // Loop through meetings and compare the date in 'yyyy-mm-dd' format
-      if (meetings.some((meeting) => {
-        const meetingDate = new Date(meeting.date);  // Convert meeting.date to Date object
-        const meetingDateString = meetingDate.toISOString().split("T")[0]; // Convert to 'yyyy-mm-dd'
-        return meetingDateString === dateString;
-      })) {
+      if (
+        meetings.some((meeting) => {
+          const meetingDate = new Date(meeting.date); // Convert meeting.date to Date object
+          const meetingDateString = meetingDate.toISOString().split("T")[0]; // Convert to 'yyyy-mm-dd'
+          return meetingDateString === dateString;
+        })
+      ) {
         return styles.highlightDate; // Add a class to highlight the date
       }
     }
@@ -114,10 +117,21 @@ const HomePage = () => {
             <ul>
               {filteredMeetings.map((meeting, index) => (
                 <li key={index} className={styles.meetingItem}>
-                  <b>{new Date(meeting.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b> <br />
-                  <span>Title: {meeting.title}</span><br />
-                  <span>Location: {meeting.location}</span><br />
-                  <span>Duration: {getDuration(meeting.startTime, meeting.endTime)}</span><br />
+                  <b>
+                    {new Date(meeting.startTime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </b>{" "}
+                  <br />
+                  <span>Title: {meeting.title}</span>
+                  <br />
+                  <span>Location: {meeting.location}</span>
+                  <br />
+                  <span>
+                    Duration: {getDuration(meeting.startTime, meeting.endTime)}
+                  </span>
+                  <br />
                   {meeting.host ? (
                     <span>Host: {meeting.host}</span>
                   ) : meeting.attendees && meeting.attendees.length > 0 ? (
@@ -134,6 +148,5 @@ const HomePage = () => {
     </div>
   );
 };
-  
 
 export default HomePage;

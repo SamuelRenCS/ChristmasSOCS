@@ -152,6 +152,12 @@ const BookingForm = ({ token }) => {
         toast.error("Failed to create the booking.");
         return;
       }
+
+      const { message } = response.data;
+      toast.success(message);
+
+      // Redirect to the dashboard after successful booking
+      navigate("/dashboard");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
