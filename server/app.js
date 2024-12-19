@@ -929,6 +929,11 @@ app.post("/api/bookings/new", async (req, res) => {
         const user = await User.findById(userID);
         user.reservations.push(newSlot);
         await user.save();
+
+        //add the user to the list of registered attendees for the slot
+        newSlot.registeredAttendees.push(user);
+        await newSlot.save();
+
       }
       return res.status(201).json({ message: "Booking created successfully" });
     } else {
@@ -958,6 +963,11 @@ app.post("/api/bookings/new", async (req, res) => {
           const user = await User.findById(userID);
           user.reservations.push(newSlot);
           await user.save();
+
+          //add the user to the list of registered attendees for the slot
+          newSlot.registeredAttendees.push(user);
+          await newSlot.save();
+
         }
         return res
           .status(201)
@@ -974,6 +984,10 @@ app.post("/api/bookings/new", async (req, res) => {
           const user = await User.findById(userID);
           user.reservations.push(newSlot);
           await user.save();
+
+          //add the user to the list of registered attendees for the slot
+          existingSlot.registeredAttendees.push(user);
+          await existingSlot.save();
         }
         return res
           .status(201)
@@ -1024,6 +1038,130 @@ app.get("/api/dashboard/meetings/:userID", async (req, res) => {
       .json({ message: "Meeting fetch failed", error: error.message });
   }
 });
+
+//fetch the bookings a user has made
+app.get("/api/dashboard/bookings/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  console.log("User ID:", userID);
+  try {
+    if (!userID) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findById(userID).populate({path: "reservations", populate: {path: "meeting",},});    
+
+    //return a list of meeting IDs with the corresponding title, location
+    const bookingList = user.reservations.map((booking) => {
+      // Format the occurrence date (including the date part)
+      const occurrenceDate = new Date(booking.occurrenceDate);
+      const formattedDate = occurrenceDate.toLocaleDateString("en-US", {
+        weekday: "long", // e.g., Wednesday
+        year: "numeric", // e.g., 2024
+        month: "long",   // e.g., December
+        day: "numeric",  // e.g., 18
+      });
+    
+      // Format the start time (excluding seconds)
+      const startTime = new Date(booking.startTime);
+      const formattedStartTime = startTime.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true, // Use 12-hour format with AM/PM
+      });
+    
+      // Format the end time (excluding seconds)
+      const endTime = new Date(booking.endTime);
+      const formattedEndTime = endTime.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true, // Use 12-hour format with AM/PM
+      });
+    
+      return {
+        id: booking._id,
+        title: booking.meeting.title,
+        location: booking.meeting.location,
+        date: formattedDate,  // formatted occurrence date
+        startTime: formattedStartTime, // formatted start time
+        endTime: formattedEndTime, // formatted end time
+      };
+    });
+
+    res.status(200).json({ data: bookingList });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Booking fetch failed", error: error.message });
+  }
+});
+
+//fetches all the bookings a user has made and all the slots for meetings the user has created
+//For the meetings the user has created, each event should have the list of attendees
+//For meetings the user has booked, the event should have the host name
+app.get("/api/dashboard/events/:userID", async (req, res) => {
+  const { userID } = req.params;
+
+  console.log("User ID:", userID);
+  try {
+    if (!userID) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    //Populate the host under the meeting object
+    const user = await User.findById(userID).populate({path: "reservations", populate: {path: "meeting", populate: {path: "host", select: "firstName lastName",},},});
+
+    
+    const meetings = await Meeting.find({ host: userID }).populate("meetingSlots");
+
+    //return a list of meeting IDs with the corresponding title, location, date, start time, end time, and attendees
+    const eventList = [];
+
+    // Add the meetings the user has created. Each slot is an event. Take the attendees array from the slot (not registeredAttendees)
+    meetings.forEach((meeting) => {
+      meeting.meetingSlots.forEach((slot) => {
+        const attendees = slot.attendees.map((attendee) => attendee);
+        eventList.push({
+          title: meeting.title,
+          location: meeting.location,
+          date: slot.occurrenceDate,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          attendees,
+        });
+      });
+    });
+
+    // Add the bookings the user has made. Each booking is an event. Take the host name from the meeting
+    user.reservations.forEach((booking) => {
+     
+      const hostName = `${booking.meeting.host.firstName} ${booking.meeting.host.lastName}`;
+     
+      eventList.push({
+        title: booking.meeting.title,
+        location: booking.meeting.location,
+        date: booking.occurrenceDate,
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        host: hostName,
+      });
+    });
+
+    console.log("Event list:", eventList);
+
+    res.status(200).json({ data: eventList });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Event fetch failed", error: error.message });
+  }
+}
+);
+
+    
+    
+
+
 
 // For all other routes, send back the index.html from the React app
 app.get("*", (req, res) => {

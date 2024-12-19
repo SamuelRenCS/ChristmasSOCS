@@ -157,6 +157,26 @@ export const fetchUserMeetings = async (userID) => {
   }
 };
 
+export const fetchUserBookings = async (userID) => {
+  try {
+    console.log("Fetching bookings for user:", userID);
+    const response = await api.get(`/dashboard/bookings/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchAllUserEvents = async (userID) => {
+  try {
+    console.log("Fetching all events for user:", userID);
+    const response = await api.get(`/dashboard/events/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 // handle accept request function to send a PUT request to /requests
 export const acceptRequest = async (requestID) => {
   try {
