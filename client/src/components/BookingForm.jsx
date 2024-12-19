@@ -166,7 +166,7 @@ const BookingForm = ({ token }) => {
       return "Number of seats is required and at least 1";
     }
 
-    if (formData.seats > remainingSeats) {
+    if (formData.seats > maxSeats) {
       return "Number of seats exceeds the remaining seats";
     }
 
