@@ -79,7 +79,7 @@ const MeetingForm = () => {
       }
 
       // make sure the start date is not before now
-      if (name === "startDate" && new Date(value) < now) {
+      if (name === "startDate" && value < formatDate(now)) {
         updatedFormData.startDate = formatDate(now);
       }
 

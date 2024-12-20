@@ -17,9 +17,13 @@ const RequestForm = ({ hostID }) => {
   const [isValidHost, setIsValidHost] = useState(true);
 
   // Helper function to format date and time
-  const formatDate = (date) => date.toISOString().split("T")[0];
+  const formatDate = (date) => date.toLocaleDateString("en-CA");
   const formatTime = (date) =>
-    date.toTimeString().split(":").slice(0, 2).join(":");
+    date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: false,
+    });
 
   // Set initial values for date and time
   const now = new Date();
@@ -49,22 +53,19 @@ const RequestForm = ({ hostID }) => {
       return "Location is required";
     }
 
+    if (!formData.date.trim()) {
+      return "Date is required";
+    }
+
     // Date validation
-    const selectedDate = new Date(formData.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    console.log("Selected date:", selectedDate);
-    console.log("Today:", today);
-
-    if (selectedDate < today) {
+    if (formData.date < formatDate(now)) {
       return "Date cannot be in the past";
     }
 
-    // Time validation
-    const startDateTime = new Date(`${formData.date}T${formData.startTime}`);
-    const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
-    const currentDateTime = new Date();
+    // Time validation;
+    const currentDateTime = `${formatDate(now)}T${formatTime(now)}`;
+    const startDateTime = `${formData.date}T${formData.startTime}`;
+    const endDateTime = `${formData.date}T${formData.endTime}`;
 
     if (startDateTime < currentDateTime) {
       return "Start time cannot be in the past";
@@ -105,10 +106,26 @@ const RequestForm = ({ hostID }) => {
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setFormData((prevState) => {
+      const updatedFormState = { ...prevState, [name]: value };
+
+      // If the start time is after the end time, update the end time to be the same as the start time
+      if (name === "startTime" && updatedFormState.endTime < value) {
+        updatedFormState.endTime = value;
+      }
+
+      // If the end time is before the start time, do not allow the change
+      if (name === "endTime" && updatedFormState.startTime > value) {
+        updatedFormState.endTime = updatedFormState.startTime;
+      }
+
+      // If the date is in the past, update the date to be the current date
+      if (name === "date" && value < formatDate(now)) {
+        updatedFormState.date = formatDate(now);
+      }
+
+      return updatedFormState;
+    });
   };
 
   // Handle form submission
@@ -196,6 +213,7 @@ const RequestForm = ({ hostID }) => {
           value={formData.date}
           onChange={handleInputChange}
           required={true}
+          min={formatDate(now)}
         />
       </div>
       <div className={styles.container}>
