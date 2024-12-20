@@ -4,6 +4,7 @@ const User = require("../models/user");
 const Meeting = require("../models/meeting");
 const MeetingSlot = require("../models/meetingSlot");
 const Notification = require("../models/notification");
+const { formatDateTime } = require("../utils");
 
 // POST /api/bookings/new to create a new booking
 router.post("/new", async (req, res) => {
@@ -270,7 +271,9 @@ router.delete("/:bookingID/:userID", async (req, res) => {
     const notification = new Notification({
       user: booking.meeting.host._id,
       title: "Booking Cancelled",
-      message: `${userName} has cancelled their booking for the meeting on ${booking.occurrenceDate}.`,
+      message: `${userName} has cancelled their booking for the meeting on ${formatDateTime(
+        booking.startTime
+      )}.`,
       date: Date.now(),
     });
 
