@@ -1,3 +1,5 @@
+//Shotaro Nakamura
+
 import React, { useState } from "react";
 import { register } from "../api/api.js";
 import "../styles/Login.css";

@@ -1,3 +1,5 @@
+//Shotaro Nakamura
+
 import React, { useState } from "react";
 import { login } from "../api/api.js"; // import the login function from api.js
 import "../styles/Login.css";

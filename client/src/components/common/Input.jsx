@@ -1,4 +1,4 @@
-// Input.js
+// Shotaro Nakamura
 import React from 'react';
 
 const Input = ({

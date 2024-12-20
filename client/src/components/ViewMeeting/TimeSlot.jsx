@@ -1,3 +1,5 @@
+//Shotaro Nakamura
+
 import React from "react";
 
 const TimeSlot = ({ time, seatsReserved, isBooked }) => {
