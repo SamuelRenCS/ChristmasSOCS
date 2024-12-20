@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../common/Button";
 import WeekdaySelector from "./WeekdaySelector";
+import { AlignCenter } from "lucide-react";
 
 const MeetingForm = () => {
   const navigate = useNavigate();
@@ -414,16 +415,18 @@ const MeetingForm = () => {
             />
           </div>
 
-          <InputField
-            label="Seats per slot"
-            name="seatsPerSlot"
-            type="number"
-            value={formData.seatsPerSlot}
-            onChange={handleChange}
-            required={true}
-            placeholder="1"
-            min="1"
-          />
+          <div className={styles.dateInput}>
+            <InputField
+              label="Seats per slot"
+              name="seatsPerSlot"
+              type="number"
+              value={formData.seatsPerSlot}
+              onChange={handleChange}
+              required={true}
+              placeholder="1"
+              min="1"
+            />
+          </div>
 
           <TextAreaField
             label="Description (Optional)"
