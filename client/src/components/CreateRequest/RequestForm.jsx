@@ -54,6 +54,9 @@ const RequestForm = ({ hostID }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    console.log("Selected date:", selectedDate);
+    console.log("Today:", today);
+
     if (selectedDate < today) {
       return "Date cannot be in the past";
     }

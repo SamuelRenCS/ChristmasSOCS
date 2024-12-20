@@ -16,8 +16,6 @@ const config = {
   allowedOrigins: process.env.ALLOWED_ORIGINS || ["http://localhost:5173"],
 };
 
-console.log("Config:", config);
-
 // validate required environment variables
 const requiredEnvVars = ["SECRET_KEY"];
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
