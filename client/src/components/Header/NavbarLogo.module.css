@@ -1,11 +1,18 @@
 .logoContainer {
-    height: 100%;
-    display: flex;
-    align-items: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .logoImage {
-    height: 100%;
-    width: auto;
-    margin-right: 10px;
+  height: 100%;
+  width: auto;
+  margin-right: 10px;
+}
+
+/* handle mobile view */
+@media screen and (max-width: 768px) {
+  .logoImage {
+    height: 70px;
+  }
 }
