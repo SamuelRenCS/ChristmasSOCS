@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Request = require("../models/request");
 const User = require("../models/user");
+const Notification = require("../models/notification");
 const mongoose = require("mongoose");
 
 // POST /api/requests/new to handle new request creation
@@ -51,6 +52,21 @@ router.post("/new", async (req, res) => {
     });
 
     await newRequest.save();
+
+    // create notification for host
+    const notification = new Notification({
+      user: host,
+      title: "New Request",
+      message: `You have a new request from ${requesterUser.firstName} ${requesterUser.lastName}.`,
+      date: Date.now(),
+    });
+
+    await notification.save();
+
+    // add notification to user's notifications array
+    await User.findByIdAndUpdate(host, {
+      $push: { Notifications: notification._id },
+    });
 
     res.status(201).json({ message: "Request created successfully" });
   } catch (error) {
@@ -122,6 +138,21 @@ router.put("/:requestID", async (req, res) => {
     request.approved = true;
     await request.save();
 
+    // create notification for requester
+    const notification = new Notification({
+      user: request.requester,
+      title: "Request Accepted",
+      message: `Your request "${request.title}" has been accepted.`,
+      date: Date.now(),
+    });
+
+    await notification.save();
+
+    // add notification user's notifications array
+    await User.findByIdAndUpdate(request.requester, {
+      $push: { Notifications: notification._id },
+    });
+
     res.status(200).json({ message: "Request accepted successfully", request });
   } catch (error) {
     res
@@ -134,7 +165,7 @@ router.put("/:requestID", async (req, res) => {
 router.delete("/:requestID", async (req, res) => {
   const { requestID } = req.params;
 
-  console.log("Request ID:", requestID);
+  // console.log("Request ID:", requestID);
 
   try {
     // Validate if `requestID` is a valid MongoDB ObjectId
@@ -148,6 +179,23 @@ router.delete("/:requestID", async (req, res) => {
     if (!deletedRequest) {
       return res.status(404).json({ message: "Request not found" });
     }
+
+    const notification = new Notification({
+      user: deletedRequest.requester,
+      title: "Request Cancelled/Rejected",
+      message: `Your request "${deletedRequest.title}" has been cancelled/rejected.`,
+      date: Date.now(),
+    });
+
+    await notification.save();
+
+    // add notification to user's notifications array
+    await User.findByIdAndUpdate(deletedRequest.requester, {
+      $push: { Notifications: notification._id },
+    });
+
+    // delete the request
+    await Request.findByIdAndDelete(requestID);
 
     res
       .status(200)

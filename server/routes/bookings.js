@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/user");
 const Meeting = require("../models/meeting");
 const MeetingSlot = require("../models/meetingSlot");
+const Notification = require("../models/notification");
 
 // POST /api/bookings/new to create a new booking
 router.post("/new", async (req, res) => {
@@ -264,6 +265,23 @@ router.delete("/:bookingID/:userID", async (req, res) => {
     // Save the updated user and booking slot
     await registeree.save();
     await booking.save();
+
+    // notify the host that the booking has been cancelled
+    const notification = new Notification({
+      user: booking.meeting.host._id,
+      title: "Booking Cancelled",
+      message: `${userName} has cancelled their booking for the meeting on ${booking.occurrenceDate}.`,
+      date: Date.now(),
+    });
+
+    console.log("Notification:", notification);
+
+    await notification.save();
+
+    // add notification to host's notifications array
+    await User.findByIdAndUpdate(booking.meeting.host._id, {
+      $push: { Notifications: notification._id },
+    });
 
     // console.log("Successfully deleted booking");
     res.status(200).json({ message: "Booking deleted successfully" });

@@ -45,6 +45,33 @@ export const register = async (formData) => {
   }
 };
 
+// update password function to send a PUT request to /password
+export const updatePassword = async (passwordData) => {
+  // Hash the password and new password before sending it to the server
+  const securePasswordData = {
+    ...passwordData,
+    currentPassword: sha256(passwordData.currentPassword).toString(),
+    newPassword: sha256(passwordData.newPassword).toString(),
+  };
+
+  try {
+    const response = await api.put("/auth/password", securePasswordData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// fetchUser function to send a GET request to /user
+export const fetchUser = async (userID) => {
+  try {
+    const response = await api.get(`/auth/user/${userID}`);
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // createMeeting function to send a POST request to /meetings
 export const createMeeting = async (meetingData) => {
   try {
@@ -97,33 +124,6 @@ export const fetchSeats = async (meetingID, date, slot) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching bookings:", error);
-    throw error;
-  }
-};
-
-// update password function to send a PUT request to /password
-export const updatePassword = async (passwordData) => {
-  // Hash the password and new password before sending it to the server
-  const securePasswordData = {
-    ...passwordData,
-    currentPassword: sha256(passwordData.currentPassword).toString(),
-    newPassword: sha256(passwordData.newPassword).toString(),
-  };
-
-  try {
-    const response = await api.put("/auth/password", securePasswordData);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-// fetchUser function to send a GET request to /user
-export const fetchUser = async (userID) => {
-  try {
-    const response = await api.get(`/auth/user/${userID}`);
-    return response.data.data;
-  } catch (error) {
     throw error;
   }
 };
@@ -217,10 +217,20 @@ export const deleteBooking = async (bookingID, userID) => {
   }
 };
 
-//create a notification function to send a POST request to /notifications
-export const createNotification = async (notificationData) => {
+//fetch token function to send a GET request to /token
+export const fetchToken = async (meetingID) => {
   try {
-    const response = await api.post("/notifications/new", notificationData);
+    const response = await api.get(`/meetings/token/${meetingID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//fetch meeting slots for a specific date function to send a GET request to /meetings
+export const fetchMeetingAllSlots = async (meetingID, date) => {
+  try {
+    const response = await api.get(`/meetings/allslots/${meetingID}/${date}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -236,32 +246,21 @@ export const fetchNotifications = async (userID) => {
     throw error;
   }
 };
+
 //delete notification function to send a DELETE request to /notifications
 export const deleteNotification = async (notificationID) => {
   try {
-    const response = await api.delete(
-      `/notifications/delete/${notificationID}`
-    );
+    const response = await api.delete(`/notifications/${notificationID}`);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-//fetch token function to send a GET request to /token
-export const fetchToken = async (meetingID) => {
+// delete all notifications function to send a DELETE request to /notifications/all
+export const deleteAllNotifications = async (userID) => {
   try {
-    const response = await api.get(`/meetings/token/${meetingID}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-//fetch meeting slots for a specific date function to send a GET request to /meetings
-export const fetchMeetingAllSlots = async (meetingID, date) => {
-  try {
-    const response = await api.get(`/meetings/allslots/${meetingID}/${date}`);
+    const response = await api.delete(`/notifications/all/${userID}`);
     return response.data;
   } catch (error) {
     throw error;

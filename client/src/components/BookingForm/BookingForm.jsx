@@ -63,11 +63,7 @@ const BookingForm = ({ token }) => {
         } = response.data;
 
         setMeetingID(meetingID);
-        console.log("Meeting details:", response.data);
-        console.log("Formatted dates:", formattedDates);
         setHighlightedDates(formattedDates);
-
-        console.log("Host:", host);
 
         // set the host
         setHostID(host._id);
@@ -98,7 +94,6 @@ const BookingForm = ({ token }) => {
     try {
       const response = await fetchMeetingSlot(meetingID, date);
       const remainingSlots = response.data.finalSlots;
-      console.log("Available slots:", remainingSlots);
       setAvailableSlots(remainingSlots);
 
       // Directly use the date passed to the function instead of relying on state
@@ -115,7 +110,6 @@ const BookingForm = ({ token }) => {
       if (firstSlot) {
         const seatsResponse = await fetchSeats(meetingID, date, firstSlot);
         const remainingSeats = seatsResponse.data.seats;
-        console.log("Remaining seats:", remainingSeats);
         setMaxSeats(remainingSeats);
       }
     } catch (error) {
@@ -140,7 +134,6 @@ const BookingForm = ({ token }) => {
         selectedSlot
       );
       const remainingSeats = response.data.seats;
-      console.log("Remaining seats:", remainingSeats);
       setMaxSeats(remainingSeats);
     } catch (error) {
       console.error("Error fetching remaining seats for the slot:", error);

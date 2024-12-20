@@ -10,6 +10,7 @@ const requestRoutes = require("./routes/requests");
 const meetingRoutes = require("./routes/meetings");
 const dashboardRoutes = require("./routes/dashboard");
 const bookingRoutes = require("./routes/bookings");
+const notificationRoutes = require("./routes/notifications");
 
 // connect to MongoDB
 mongoose.connect(config.mongoUrl);
@@ -52,6 +53,9 @@ app.use("/api/dashboard", dashboardRoutes);
 
 // serve bookings routes
 app.use("/api/bookings", bookingRoutes);
+
+// serve notifications routes
+app.use("/api/notifications", notificationRoutes);
 
 // For all other routes, send back the index.html from the React app
 app.get("*", (req, res) => {

@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/user");
 const Meeting = require("../models/meeting");
 const MeetingSlot = require("../models/meetingSlot");
+const Notification = require("../models/notification");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 const {
@@ -125,7 +126,7 @@ router.get("/token/:meetingID", async (req, res) => {
     const payload = { ID: meetingID };
     const token = jwt.sign(payload, config.secretKey, { algorithm: "HS256" });
 
-    console.log("Token:", token);
+    // console.log("Token:", token);
 
     res.status(200).json({ data: { token } });
   } catch (error) {
@@ -200,7 +201,6 @@ router.get("/:token", async (req, res) => {
         dates = calculateDates(startDate, endRepeatDate);
       }
 
-      console.log("Dates:", dates);
       formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
       return res.status(200).json({
         data: {
@@ -447,14 +447,18 @@ router.get("/allslots/:meetingID/:date", async (req, res) => {
     // Combine all slots with their booking status
     const allSlots = possibleSlots.map((slotTime) => {
       const bookedSlot = bookedSlotsMap.get(slotTime);
+      const seatsAvailable = bookedSlot
+        ? bookedSlot.seatsAvailable
+        : meeting.seatsPerSlot;
+
+      const isBooked = meeting.seatsPerSlot - seatsAvailable > 0;
+
       return {
         time: slotTime,
-        seatsAvailable: bookedSlot
-          ? bookedSlot.seatsAvailable
-          : meeting.seatsPerSlot,
+        seatsAvailable: seatsAvailable,
         totalSeats: meeting.seatsPerSlot,
         attendees: bookedSlot ? bookedSlot.attendees : [],
-        isBooked: !!bookedSlot,
+        isBooked: isBooked,
       };
     });
 
@@ -529,32 +533,57 @@ router.delete("/:meetingID", async (req, res) => {
     }
 
     // Find the meeting and populate the necessary fields
-    const meeting = await Meeting.findById(meetingID).populate({
-      path: "meetingSlots",
-      populate: {
-        path: "registeredAttendees",
-      },
-    });
+    const meeting = await Meeting.findById(meetingID)
+      .populate({
+        path: "meetingSlots",
+        populate: {
+          path: "registeredAttendees",
+          populate: {
+            path: "attendeeId",
+            model: "User",
+            populate: {
+              path: "reservations",
+            },
+          },
+        },
+      })
+      .populate("host");
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-    // Get the list of attendees from the meeting slots
-    const attendees = meeting.meetingSlots.flatMap(
-      (slot) => slot.registeredAttendees
+    // Get attendees with their populated data
+    const attendees = meeting.meetingSlots.flatMap((slot) =>
+      slot.registeredAttendees.map((registration) => registration.attendeeId)
     );
 
     // Update each attendee's reservations
     for (const attendee of attendees) {
-      // Ensure the reservations array exists before filtering
-      if (attendee.reservations && Array.isArray(attendee.reservations)) {
-        attendee.reservations = attendee.reservations.filter(
-          (reservation) => reservation.meeting.toString() !== meetingID
-        );
-        // Save the updated attendee
-        await attendee.save();
-      }
+      attendee.reservations = attendee.reservations.filter(
+        (reservation) => reservation.meeting.toString() !== meetingID
+      );
+
+      // Save the updated attendee
+      await attendee.save();
+
+      // get the host's name
+      const hostName = `${meeting.host.firstName} ${meeting.host.lastName}`;
+
+      // notify each attendee of the meeting cancellation
+      const notification = new Notification({
+        user: attendee._id,
+        title: "Meeting Cancelled",
+        message: `${hostName} has cancelled the meeting "${meeting.title}".`,
+        date: Date.now(),
+      });
+
+      await notification.save();
+
+      // add notification to host's notifications array
+      await User.findByIdAndUpdate(attendee._id, {
+        $push: { Notifications: notification._id },
+      });
     }
 
     // Log number of attendees whose reservations were updated

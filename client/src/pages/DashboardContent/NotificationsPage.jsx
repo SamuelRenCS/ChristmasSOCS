@@ -1,48 +1,38 @@
 import React, { useState, useEffect } from "react";
 import styles from "../../styles/NotificationsPage.module.css";
-
+import {
+  fetchNotifications,
+  deleteNotification,
+  deleteAllNotifications,
+} from "../../api/api";
+import { useAuth } from "../../context/AuthContext";
+import { timeAgo } from "../../utils/timeUtils";
 
 const NotificationsPage = () => {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    
-    const fetchNotifications = async () => {
-      const mockNotifications = [
-        {
-          id: 1,
-          user: "John Doe",
-          message: "Meeting Cancelled",
-          date: "2024-12-18T14:00:00Z",
-        },
-        {
-          id: 2,
-          user: "Jane Smith",
-          message: "Meeting Cancelled",
-          date: "2024-12-19T10:00:00Z",
-        },
-        {
-          id: 3,
-          user: "Jane Smith",
-          message: "Meeting Cancelled",
-          date: "2024-12-19T10:00:00Z",
-        },
-      ];
-
-      setNotifications(mockNotifications);
-    };
-
-    fetchNotifications();
-  }, []);
-
-  const handleClearNotifications = () => {
-    setNotifications([]); // Clear all notifications
+  const getNotifications = async () => {
+    try {
+      const response = await fetchNotifications(user.id);
+      setNotifications(response);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
   };
 
-  const handleDeleteNotification = (id) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.filter((notification) => notification.id !== id)
-    ); // Delete individual notification by id
+  useEffect(() => {
+    getNotifications();
+  }, []);
+
+  const handleClearNotifications = async () => {
+    await deleteAllNotifications(user.id);
+    await getNotifications();
+  };
+
+  const handleDeleteNotification = async (id) => {
+    await deleteNotification(id);
+    await getNotifications();
   };
 
   return (
@@ -58,23 +48,16 @@ const NotificationsPage = () => {
       </div>
       {notifications.length > 0 ? (
         notifications.map((notification) => (
-          <div key={notification.id} className={styles.notificationItem}>
+          <div key={notification._id} className={styles.notificationItem}>
             <div className={styles.info}>
-            <p>
-              <b>User:</b> {notification.user}
-            </p>
-            <p>
-              <b>Message:</b> {notification.message}
-            </p>
-            <p>
-              <b>Date:</b>{" "}
-              {new Date(notification.date).toLocaleString()}
-            </p>
+              <h3 className={styles.notificationTitle}>{notification.title}</h3>
+              <p className={styles.message}>{notification.message}</p>
+              <p>{timeAgo(notification.date)}</p>
             </div>
             <div className={styles.deleteButton}>
               <button
                 className={styles.deleteButton}
-                onClick={() => handleDeleteNotification(notification.id)}
+                onClick={() => handleDeleteNotification(notification._id)}
               >
                 &#10006;
               </button>

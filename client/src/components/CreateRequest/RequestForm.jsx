@@ -28,7 +28,7 @@ const RequestForm = ({ hostID }) => {
   // Set initial values for date and time
   const now = new Date();
   const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
-  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+  const oneHourLater = new Date(fiveMinutesLater.getTime() + 60 * 60 * 1000);
 
   // State for form fields
   const [formData, setFormData] = useState({

@@ -3,6 +3,7 @@ import RequestItem from "./RequestItem";
 import { fetchRequests, acceptRequest, rejectRequest } from "../../api/api";
 import styles from "./RequestsSubPage.module.css";
 import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const RequestsSubPage = ({ requestType }) => {
   const { user } = useAuth();
@@ -25,18 +26,26 @@ const RequestsSubPage = ({ requestType }) => {
 
   const handleAccept = async (id) => {
     try {
-      await acceptRequest(id);
+      const response = await acceptRequest(id);
       await getRequests();
+
+      // Notify user of request acceptance
+      toast.success(response.message);
     } catch (error) {
+      toast.error("Error accepting request");
       console.error("Error accepting request:", error);
     }
   };
 
   const handleReject = async (id) => {
     try {
-      await rejectRequest(id);
+      const response = await rejectRequest(id);
       await getRequests();
+
+      // Notify user of request rejection
+      toast.success(response.message);
     } catch (error) {
+      toast.error("Error cancelling request");
       console.error("Error cancelling request:", error);
     }
   };
