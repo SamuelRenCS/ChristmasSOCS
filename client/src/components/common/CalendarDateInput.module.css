@@ -55,29 +55,12 @@
 
 :global(.react-calendar__tile:enabled:hover),
 :global(.react-calendar__tile:enabled:focus) {
-  background-color: #f3f4f6;
+  background-color: var(--secondary);
+  color: white;
 }
 
 :global(.react-calendar__tile--now) {
   background-color: transparent;
-}
-
-/* Highlighted dates style */
-:global(.react-calendar__tile.highlight) {
-  color: #2563eb;
-  font-weight: bold;
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-:global(.react-calendar__tile.highlight:enabled:hover) {
-  background-color: #eff6ff;
-}
-
-/* Disabled dates */
-:global(.react-calendar__tile:disabled) {
-  background-color: transparent;
-  color: #d1d5db;
-  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Selected date style */
@@ -85,6 +68,26 @@
 :global(.react-calendar__tile.selected:enabled:hover) {
   background-color: #2563eb;
   color: white;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Highlighted dates style */
+:global(.react-calendar__tile.highlight) {
+  color: var(primary);
+  font-weight: bold;
+  background-color: #c6deff;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+:global(.react-calendar__tile.highlight:enabled:hover) {
+  background-color: var(--secondary);
+  color: white;
+}
+
+/* Disabled dates */
+:global(.react-calendar__tile:disabled) {
+  background-color: transparent;
+  color: #d1d5db;
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
