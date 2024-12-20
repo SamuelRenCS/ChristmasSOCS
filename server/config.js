@@ -15,6 +15,7 @@ const config = {
     process.env.MONGODB__URL || "mongodb://localhost:27017/ChristmasSOCS",
   allowedOrigins: process.env.ALLOWED_ORIGINS || ["http://localhost:5173"],
 };
+console.log("Config: ", config);
 
 // validate required environment variables
 const requiredEnvVars = ["SECRET_KEY"];
