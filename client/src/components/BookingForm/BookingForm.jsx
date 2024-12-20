@@ -71,11 +71,17 @@ const BookingForm = ({ token }) => {
         //keep the date part of the datetime
         const dateObj = new Date(startDate);
 
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth is zero-indexed
+        const day = String(dateObj.getDate()).padStart(2, '0');
+
+        const meetingDate = `${year}-${month}-${day}`;
+
         // Prepopulate form fields
         setFormData({
           attendee: user ? `${user.firstName} ${user.lastName}` : "",
           meetingID: meetingID,
-          meetingDate: dateObj.toISOString().split("T")[0],
+          meetingDate: meetingDate,
           userID: user ? `${user.id}` : "",
         });
       } catch (error) {

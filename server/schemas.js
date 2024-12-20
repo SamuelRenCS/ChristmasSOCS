@@ -56,3 +56,13 @@ module.exports.meetingSlotSchema = Joi.object({
   startTime: Joi.string().required(),
   endTime: Joi.string().required(),
 });
+
+// define the schema for booking a meeting slot
+module.exports.bookingSchema = Joi.object({
+  attendee: Joi.string().required().escapeHTML(),
+  meetingID: Joi.string().required(),
+  userID: Joi.string().allow(""),
+  meetingDate: Joi.date().required(),
+  timeSlot: Joi.string().required(),
+  seats: Joi.number().required(),
+});

@@ -3,28 +3,76 @@ const router = express.Router();
 const User = require("../models/user");
 const Meeting = require("../models/meeting");
 const MeetingSlot = require("../models/meetingSlot");
-const Notification = require("../models/notification");
-const { formatDateTime } = require("../utils");
+const { validateBooking } = require("../middleware");
+const {
+  calculateDates,
+  calculateWeeklyDates,
+} = require("../utils");
 
 // POST /api/bookings/new to create a new booking
-router.post("/new", async (req, res) => {
-  // console.log("Booking request:");
-  // console.log(req.body);
+router.post("/new", validateBooking, async (req, res) => {
   const { attendee, meetingID, userID, meetingDate, timeSlot, seats } =
     req.body;
 
-  // console.log("User ID:", userID);
-  // server-side validation
-  if (!attendee || !meetingID || !meetingDate || !timeSlot || !seats) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
   try {
-    // check if a booking slot already exists for that time slot
-
-    // console.log("Meeting date:", meetingDate);
 
     const meeting = await Meeting.findById(meetingID).populate("meetingSlots");
+
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
+    let dates = [];
+    let formattedDates = [];
+    const repeat = meeting.repeat;
+    const startDate = meeting.startDate;
+    const endRepeatDate = meeting.endRepeatDate;
+    const repeatingDays = meeting.repeatDays;
+    const intervalCheck = meeting.interval;
+
+    // Retrieve the dates for the meeting based on the repeat value
+    if (repeat === "None") {
+      if (
+        intervalCheck !== 10 &&
+        intervalCheck !== 15 &&
+        intervalCheck !== 20 &&
+        intervalCheck !== 30 &&
+        intervalCheck !== 60
+      ) {
+        dates = calculateDates(startDate, startDate); // Single start date
+      } else {
+        dates = calculateDates(startDate, endRepeatDate); // Multiple dates
+      }
+    } else if (repeat === "Daily") {
+      dates = calculateDates(startDate, endRepeatDate);
+    } else if (repeat === "Weekly") {
+      dates = calculateWeeklyDates(repeatingDays, endRepeatDate);
+    } else {
+      return res.status(400).json({ message: "Invalid repeat value" });
+    }
+
+    formattedDates = dates.map((date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    });
+
+    //check if the is contained in the meeting dates
+    if (!formattedDates.includes(meetingDate)) {
+      return res.status(400).json({
+        message: "The selected date is not available for booking",
+      });
+    }
+
+    //check if the time slot is contained in the meeting slots
+    const slots = meeting.meetingSlots.map((slot) => slot.startTime);
+    if (!slots.includes(timeSlot)) {
+      return res.status(400).json({
+        message: "The selected time slot is not available for booking",
+      });
+    }
+
     const existingSlots = meeting.meetingSlots.filter(
       (slot) => slot.occurrenceDate.toISOString().split("T")[0] === meetingDate
     );
@@ -266,25 +314,6 @@ router.delete("/:bookingID/:userID", async (req, res) => {
     // Save the updated user and booking slot
     await registeree.save();
     await booking.save();
-
-    // notify the host that the booking has been cancelled
-    const notification = new Notification({
-      user: booking.meeting.host._id,
-      title: "Booking Cancelled",
-      message: `${userName} has cancelled their booking for the meeting on ${formatDateTime(
-        booking.startTime
-      )}.`,
-      date: Date.now(),
-    });
-
-    console.log("Notification:", notification);
-
-    await notification.save();
-
-    // add notification to host's notifications array
-    await User.findByIdAndUpdate(booking.meeting.host._id, {
-      $push: { Notifications: notification._id },
-    });
 
     // console.log("Successfully deleted booking");
     res.status(200).json({ message: "Booking deleted successfully" });
