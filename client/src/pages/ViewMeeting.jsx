@@ -30,6 +30,7 @@ const ViewMeeting = () => {
     token: "",
     meetingId: null,
   });
+  const [isDateSelected, setIsDateSelected] = useState(false);
 
   const getEndTime = (startTime, interval, endTime) => {
     // start time format is HH:MM AM/PM (e.g. 12:00 PM)
@@ -141,6 +142,7 @@ const ViewMeeting = () => {
       setTimeSlots(slots);
 
       setMeetingDate(date);
+      setIsDateSelected(true);
     } catch (error) {
       console.error("Error fetching slots for the date:", error);
       toast.error("Error fetching available slots.");
@@ -234,6 +236,7 @@ const ViewMeeting = () => {
             padding={"20px"}
             overflow={"auto"}
           >
+            {!isDateSelected && <h3>Select a date</h3>}
             {timeSlots.map((slot) => (
               <TimeSlot
                 key={slot.time}
