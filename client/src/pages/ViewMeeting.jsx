@@ -207,7 +207,6 @@ const ViewMeeting = () => {
             <h3>Available Time Slots</h3>
             <CalendarDateInput
               label="Date:"
-              value={meetingDate}
               onChange={handleDateChange}
               highlightedDates={highlightedDates}
             />
@@ -246,7 +245,7 @@ const ViewMeeting = () => {
           </Container>
           <div className={styles.share}>
             <button className={styles.shareButton} onClick={handleGetIDClick}>
-              Share Meeting
+              Share Token
             </button>
             <button
               className={styles.deleteButton}
