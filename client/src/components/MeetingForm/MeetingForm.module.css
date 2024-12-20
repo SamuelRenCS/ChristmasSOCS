@@ -58,6 +58,23 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+.token {
+  background-color: #f4f4f4;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  word-break: break-all;
+  font-family: monospace;
+  font-size: 1rem;
+  color: #555;
+}
+
+.tokenText {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
 .popup-content {
   background-color: white;
   border-radius: 12px;
@@ -76,17 +93,6 @@
   color: #333;
   font-size: 1.5rem;
   font-weight: 600;
-}
-
-.popup-content p {
-  background-color: #f4f4f4;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  word-break: break-all;
-  font-family: monospace;
-  font-size: 1rem;
-  color: #555;
 }
 
 .popup-content button {
@@ -139,8 +145,6 @@
   }
 }
 
-
-
 @media screen and (max-width: 650px) {
   /* For very small screens, like phones */
   .meeting-form {
@@ -154,9 +158,9 @@
   .sectionContainer {
     width: 100%;
     display: flex;
-  flex-direction: column;
-  justify-content: center; /* Center content vertically within the section */
-  align-items: center; /* Center content horizontally within the section */
+    flex-direction: column;
+    justify-content: center; /* Center content vertically within the section */
+    align-items: center; /* Center content horizontally within the section */
   }
 
   .buttonContainer {
@@ -164,5 +168,4 @@
     justify-content: center;
     gap: 10px;
   }
-
 }

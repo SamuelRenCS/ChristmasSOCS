@@ -4,6 +4,8 @@
   height: auto;
   max-height: 85vh;
   overflow-y: auto;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .notificationsContainer h2 {

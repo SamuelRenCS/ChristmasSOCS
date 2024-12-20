@@ -135,15 +135,17 @@ const UserProfile = ({ user, onUpdatePassword }) => {
       <div className={styles.profileDetails}>
         <div className={styles.detailGroup}>
           <h3>Personal Information</h3>
-          <p>
-            <strong>First Name:</strong> {user.firstName}
-          </p>
-          <p>
-            <strong>Last Name:</strong> {user.lastName}
-          </p>
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
+          <div className={styles.personalInformation}>
+            <p className={styles.infoParagraph}>
+              <strong>First Name:</strong> {user.firstName}
+            </p>
+            <p className={styles.infoParagraph}>
+              <strong>Last Name:</strong> {user.lastName}
+            </p>
+            <p className={styles.infoParagraph}>
+              <strong>Email:</strong> {user.email}
+            </p>
+          </div>
         </div>
       </div>
       <div className={styles.passwordSection}>

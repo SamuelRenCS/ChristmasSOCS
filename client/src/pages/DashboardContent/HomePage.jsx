@@ -96,7 +96,7 @@ const HomePage = () => {
 
   return (
     <div className={styles.dashboardSection}>
-      <h1>Welcome, {user.firstName}!</h1>
+      <h1 className={styles.greeting}>Welcome, {user.firstName}!</h1>
       <div className={styles.mainContent}>
         <div className={styles.calendarSection}>
           <div className={styles.calendarHeader}>

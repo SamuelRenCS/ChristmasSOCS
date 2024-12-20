@@ -1,15 +1,15 @@
 .mobileMenu {
   position: absolute;
-  top: 15%;
+  top: 125px;
   width: 100%;
   height: auto;
   background-color: white;
   z-index: 1000;
-  padding: 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .mobileLinks {
@@ -17,13 +17,12 @@
   flex-direction: column;
   gap: 15px; /* Ensures links are stacked vertically with space between */
   width: 100%; /* Ensures links take full width */
+  border-bottom: 2px solid #eee;
 }
 
 .mobileAuthContainer {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
   display: flex;
+  padding: 20px;
   justify-content: flex-end; /* Moves AuthButtons to the right */
   width: 100%; /* Ensures full width */
 }

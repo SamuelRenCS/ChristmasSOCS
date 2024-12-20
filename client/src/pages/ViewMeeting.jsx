@@ -1,13 +1,18 @@
 import React, { useEffect } from "react";
-import "../styles/ViewMeeting.css";
 import Container from "../components/common/Container";
 import TimeSlot from "../components/ViewMeeting/TimeSlot";
 import CalendarDateInput from "../components/common/CalendarDateInput";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchMeeting, deleteMeeting, fetchMeetingAllSlots } from "../api/api";
+import {
+  fetchMeeting,
+  deleteMeeting,
+  fetchMeetingAllSlots,
+  fetchToken,
+} from "../api/api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import styles from "../styles/ViewMeeting.module.css";
 
 const ViewMeeting = () => {
   const navigate = useNavigate();
@@ -20,6 +25,11 @@ const ViewMeeting = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [interval, setInterval] = useState(0);
+  const [tokenPopup, setTokenPopup] = useState({
+    show: false,
+    token: "",
+    meetingId: null,
+  });
 
   const getEndTime = (startTime, interval, endTime) => {
     // start time format is HH:MM AM/PM (e.g. 12:00 PM)
@@ -137,6 +147,24 @@ const ViewMeeting = () => {
     }
   };
 
+  const handleGetIDClick = async (meetingId) => {
+    try {
+      const response = await fetchToken(meetingId);
+      //console.log("Response: ", response);
+      const meetingToken = response.data.token;
+      //console.log("Meeting token: ", meetingToken);
+
+      setTokenPopup({ show: true, token: meetingToken });
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      toast.error("Failed to fetch meeting token.");
+    }
+  };
+
+  const closePopup = () => {
+    setTokenPopup({ show: false, token: "", meetingId: null });
+  };
+
   const handleDelete = () => {
     if (isConfirmingDelete) {
       // If already confirming, delete the meeting
@@ -162,14 +190,14 @@ const ViewMeeting = () => {
   };
 
   return (
-    <main className="main">
-      <div className="top-section">
-        <div className="title">
+    <main className={styles.main}>
+      <div className={styles["top-section"]}>
+        <div className={styles.title}>
           <h1>Monday Office Hours for COMP 307</h1>
         </div>
       </div>
-      <div className="content">
-        <div className="left-section">
+      <div className={styles.content}>
+        <div className={styles["left-section"]}>
           <Container
             padding={"20px"}
             height={"auto"}
@@ -185,7 +213,7 @@ const ViewMeeting = () => {
             />
           </Container>
         </div>
-        <div className="right-section">
+        <div className={styles["right-section"]}>
           {/* Meeting Details */}
           <Container
             maxHeight={"200px"}
@@ -216,10 +244,12 @@ const ViewMeeting = () => {
               ></TimeSlot>
             ))}
           </Container>
-          <div className="share">
-            <button className="shareButton">Share Meeting</button>
+          <div className={styles.share}>
+            <button className={styles.shareButton} onClick={handleGetIDClick}>
+              Share Meeting
+            </button>
             <button
-              className="deleteButton"
+              className={styles.deleteButton}
               onClick={handleDelete}
               onBlur={handleCancelDelete}
             >
@@ -228,6 +258,23 @@ const ViewMeeting = () => {
           </div>
         </div>
       </div>
+
+      {tokenPopup.show && (
+        <div className={styles["token-popup"]}>
+          <div className={styles["popup-content"]}>
+            <h3>Meeting Token</h3>
+            <p className={styles.tokenText}>
+              Copy the token below to share the meeting
+            </p>
+            <p className={styles.token}>
+              {typeof tokenPopup.token === "string"
+                ? tokenPopup.token
+                : JSON.stringify(tokenPopup.token)}
+            </p>
+            <button onClick={closePopup}>Close</button>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

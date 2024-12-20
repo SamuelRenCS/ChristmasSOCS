@@ -75,3 +75,12 @@
   font-size: 0.8em;
   margin-top: 5px;
 }
+
+.personalInformation {
+  justify-content: left;
+}
+
+.infoParagraph {
+  width: fit-content;
+  text-align: left;
+}

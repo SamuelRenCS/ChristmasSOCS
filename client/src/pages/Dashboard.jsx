@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../styles/Dashboard.module.css";
 import {
   Home,
@@ -63,6 +63,19 @@ const Dashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
+
+  // Auto-collapse sidebar on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768 && !isSidebarCollapsed) {
+        setIsSidebarCollapsed(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    // Initial check
+    handleResize();
+  }, [window.innerWidth]);
 
   // Find the component for the active section
   const ActiveComponent =
