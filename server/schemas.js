@@ -33,3 +33,26 @@ module.exports.userSchema = Joi.object({
   password: Joi.string().min(8).required(),
   confirmPassword: Joi.ref("password"),
 });
+
+// define the schema for meeting creation
+module.exports.meetingSchema = Joi.object({
+  title: Joi.string().required().escapeHTML(),
+  host: Joi.string().required(),
+  startDate: Joi.date().required(),
+  endDate: Joi.date().required(),
+  location: Joi.string().required().escapeHTML(),
+  description: Joi.string().allow("").escapeHTML(),
+  interval: Joi.number().required(),
+  seatsPerSlot: Joi.number().required(),
+  repeat: Joi.string().valid("None", "Daily", "Weekly").required(),
+  endRepeatDate: Joi.date(),
+  repeatDays: Joi.array().items(Joi.date()),
+  
+});
+
+// define the schema for meeting slot creation
+module.exports.meetingSlotSchema = Joi.object({
+  occurrenceDate: Joi.date().required(),
+  startTime: Joi.string().required(),
+  endTime: Joi.string().required(),
+});

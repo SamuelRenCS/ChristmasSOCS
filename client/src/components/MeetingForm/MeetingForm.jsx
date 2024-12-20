@@ -268,6 +268,8 @@ const MeetingForm = () => {
       repeatDays: formattedRepeatDays,
     };
 
+    console.log("Formatted data:", formattedData);
+
     try {
       const response = await createMeeting(formattedData);
 

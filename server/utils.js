@@ -5,18 +5,20 @@ module.exports.checkIsMcGillMember = (email) => {
   return email.endsWith("@mcgill.ca") || email.endsWith("@mail.mcgill.ca");
 };
 
+// Function to calculate the dates between the start and end date
 module.exports.calculateDates = (startDate, endDate) => {
   const dates = [];
-  // Create new Date objects to avoid mutating the originals
+  
   let current = new Date(startDate);
   const end = new Date(endDate);
 
-  // Create comparison dates without changing the originals
+  // Create comparison dates without changing the originals and set the time to midnight to compare only the dates
   const startCompare = new Date(startDate);
   startCompare.setUTCHours(0, 0, 0, 0);
   const endCompare = new Date(endDate);
   endCompare.setUTCHours(23, 59, 59, 999);
 
+  //  
   while (current <= end) {
     dates.push(new Date(current));
     current.setDate(current.getDate() + 1);
@@ -25,6 +27,7 @@ module.exports.calculateDates = (startDate, endDate) => {
   return dates;
 };
 
+// Function to calculate the weekly dates based on the repeating days
 module.exports.calculateWeeklyDates = (repeatingDays, endDate) => {
   const dates = [];
 

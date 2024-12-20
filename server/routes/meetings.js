@@ -6,6 +6,7 @@ const MeetingSlot = require("../models/meetingSlot");
 const Notification = require("../models/notification");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
+const { validateMeeting } = require("../middleware");
 const {
   generateSlots,
   calculateDates,
@@ -13,7 +14,7 @@ const {
 } = require("../utils");
 
 // POST /api/meetings/new to handle new meeting creation
-router.post("/new", async (req, res) => {
+router.post("/new", validateMeeting, async (req, res) => {
   const {
     title,
     host,
@@ -28,33 +29,71 @@ router.post("/new", async (req, res) => {
     repeatDays,
   } = req.body;
 
-  // server-side validation
-  if (
-    !title ||
-    !host ||
-    !startDate ||
-    !endDate ||
-    !location ||
-    !interval ||
-    !seatsPerSlot ||
-    !repeat
-  ) {
-    return res.status(400).json({ message: "All fields are required" });
+  //Start of additional validation
+
+  //check start date is not before today
+  const today = new Date();
+  const cmpStartDate = new Date(startDate);
+  const cmpEndDate = new Date(endDate);
+  
+  if (cmpStartDate < today) {
+    return res.status(400).json({ message: "Start time cannot be before now" });
   }
 
-  // If repeat is selected, check for an endDate
-  if (repeat !== "None" && !endDate) {
-    return res
-      .status(400)
-      .json({ message: "End date is required for repeating meetings" });
+  //check end date is not before start date or today
+  if (cmpEndDate < cmpStartDate || cmpEndDate < today) {
+    return res.status(400).json({ message: "End time cannot be before start time or now" });
   }
+
+  //if the interval is not 10, 15, 20, 30, or 60, check if its equal to the minutes between the start and end date.
+  if ( interval !== 10 && interval !== 15 && interval !== 20 && interval !== 30 && interval !== 60) {
+    const diff = Math.floor((cmpEndDate - cmpStartDate) / (1000 * 60));
+    if (diff % interval !== 0) {
+      return res.status(400).json({ message: "Invalid interval time" });
+    }
+  }
+
+  //check that the seats per slot is greater than 0
+  if (seatsPerSlot <= 0) {
+    return res.status(400).json({ message: "Seats per slot must be at least 1" });
+  }
+
+  //if repeat is other than none, check that the start and end time are on the same day
+  if (repeat !== "None" && cmpStartDate.toISOString().split("T")[0] !== cmpEndDate.toISOString().split("T")[0]) {
+    return res.status(400).json({ message: "Start and end date must be on the same day for repeating meetings" });
+  }
+
+  // If repeat is selected, check for an endDate and check that the endRepeatDate is after the start date
+  if (repeat !== "None" && !endRepeatDate) {
+    return res.status(400).json({ message: "End repeat date is required for repeating meetings" });
+  }
+
+  if (repeat !== "None" && new Date(endRepeatDate) < cmpStartDate) {
+    return res.status(400).json({ message: "End repeat date must be after the start date" });
+  }
+
+  // If repeat is weekly, check for repeating days
+  if (repeat === "Weekly" && (!repeatDays || repeatDays.length === 0)) {
+    return res.status(400).json({ message: "Repeating start days are required for weekly meetings" });
+  }
+
+  // check that the repeating days are not before the start date
+  if (repeat === "Weekly") {
+    for (let i = 0; i < repeatDays.length; i++) {
+      const cmpRepeatDate = new Date(repeatDays[i]);
+      if (cmpRepeatDate < cmpStartDate) {
+        return res.status(400).json({ message: "Repeating days cannot be before the start date" });
+      }
+    }
+  }
+
+  //End of additional validation
 
   try {
-    // Create new meeting
-
+    // Retrieve all valid time slots for the meeting
     const allSlots = generateSlots(startDate, endDate, interval);
-    // console.log("All slots:", allSlots);
 
+    // Create a new meeting object
     const newMeeting = new Meeting({
       title,
       host,
@@ -69,37 +108,32 @@ router.post("/new", async (req, res) => {
       repeatingDays: repeatDays,
       validSlots: allSlots,
     });
-
     await newMeeting.save();
 
-    //save the meeting under the host
+    // save the meeting under the host
     const hostUser = await User.findById(host);
-    // console.log("Host user:", hostUser);
-
     if (hostUser) {
-      // Push the meeting ID to the meetings array
-      // Initialize meetings array if it doesn't exist
+      // push the meeting ID to the meetings array
+      // initialize meetings array if it doesn't exist
       if (!hostUser.meetings) {
         hostUser.meetings = [];
       }
       hostUser.meetings.push(newMeeting._id);
-      // Save the user
       await hostUser.save();
     }
 
-    const payload = { ID: newMeeting._id };
-
+    // Create a token for the new meeting that can be used to fetch the meeting
+    const payload = { ID: newMeeting._id }; // Create a payload with the meeting ID
     const newToken = jwt.sign(payload, config.secretKey, {
       algorithm: "HS256",
     });
-
     res.status(201).json({
       message: "Meeting created successfully",
       msgToken: newToken,
     });
+
   } catch (error) {
     console.error("Meeting creation error:", error);
-
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -107,14 +141,13 @@ router.post("/new", async (req, res) => {
         errors: messages,
       });
     }
-
     res
       .status(500)
       .json({ message: "Meeting creation failed", error: error.message });
   }
 });
 
-// GET /api/meetings/token/:meetingID to generate a token for a meeting
+// GET /api/meetings/token/:meetingID to generate a token for the requested meeting
 router.get("/token/:meetingID", async (req, res) => {
   const { meetingID } = req.params;
 
@@ -122,13 +155,17 @@ router.get("/token/:meetingID", async (req, res) => {
     if (!meetingID) {
       return res.status(400).json({ message: "Meeting ID is required" });
     }
+    //check if the meeting ID exists by checking if the meeting is in the database
+    const meeting = await Meeting.findById
+    if (!meeting) {
+      return res.status(404).json({ message: "Requested meeting not valid" });
+    }
 
     const payload = { ID: meetingID };
     const token = jwt.sign(payload, config.secretKey, { algorithm: "HS256" });
 
-    // console.log("Token:", token);
-
     res.status(200).json({ data: { token } });
+
   } catch (error) {
     console.error("Token generation error:", error);
     res
@@ -188,6 +225,7 @@ router.get("/:token", async (req, res) => {
     let dates = [];
     let formattedDates = [];
 
+    // Retrieve the dates for the meeting based on the repeat value
     if (repeat === "None") {
       if (
         interval !== 10 &&
@@ -196,69 +234,42 @@ router.get("/:token", async (req, res) => {
         interval !== 30 &&
         interval !== 60
       ) {
-        dates = calculateDates(startDate, startDate);
+        dates = calculateDates(startDate, startDate); // Single start date
       } else {
-        dates = calculateDates(startDate, endRepeatDate);
+        dates = calculateDates(startDate, endRepeatDate); // Multiple dates
       }
-
-      formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
-      return res.status(200).json({
-        data: {
-          title,
-          host,
-          startDate,
-          endDate,
-          location,
-          description,
-          interval,
-          seatsPerSlot,
-          repeat,
-          endRepeatDate,
-          formattedDates,
-          meetingID,
-        },
-      });
     } else if (repeat === "Daily") {
       dates = calculateDates(startDate, endRepeatDate);
-      formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
-      return res.status(200).json({
-        data: {
-          title,
-          host,
-          startDate,
-          endDate,
-          location,
-          description,
-          interval,
-          seatsPerSlot,
-          repeat,
-          endRepeatDate,
-          formattedDates,
-          meetingID,
-        },
-      });
     } else if (repeat === "Weekly") {
       dates = calculateWeeklyDates(repeatingDays, endRepeatDate);
-      formattedDates = dates.map((date) => date.toISOString().split("T")[0]);
-      return res.status(200).json({
-        data: {
-          title,
-          host,
-          startDate,
-          endDate,
-          location,
-          description,
-          interval,
-          seatsPerSlot,
-          repeat,
-          endRepeatDate,
-          formattedDates,
-          meetingID,
-        },
-      });
     } else {
       return res.status(400).json({ message: "Invalid repeat value" });
     }
+
+    formattedDates = dates.map((date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    });
+
+    return res.status(200).json({
+      data: {
+        title,
+        host,
+        startDate,
+        endDate,
+        location,
+        description,
+        interval,
+        seatsPerSlot,
+        repeat,
+        endRepeatDate,
+        formattedDates,
+        meetingID,
+      },
+    });
+
   } catch (error) {
     console.error("Meeting fetch error:", error);
     res
@@ -268,7 +279,6 @@ router.get("/:token", async (req, res) => {
 });
 
 // GET /api/meetings/:meetingID/:date to fetch all slots for a meeting on a specific date
-// Meeting contains a list of slots called meetingSlots
 router.get("/:meetingID/:date", async (req, res) => {
   const { meetingID, date } = req.params;
 
@@ -281,38 +291,33 @@ router.get("/:meetingID/:date", async (req, res) => {
 
     const meeting = await Meeting.findById(meetingID).populate("meetingSlots");
 
-    //retrieve the meeting start and end date and interval
+    if (!meeting) {
+      return res.status(404).json({ message: "Meeting not found" });
+    }
+
     const startDate = new Date(meeting.startDate);
     const endDate = new Date(meeting.endDate);
-    //const interval = meeting.interval;
-
-    // console.log("Start Date:", startDate);
-    // console.log("End Date:", endDate);
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
-    const cmpDate = new Date(date).toISOString().split("T")[0]; // Get date portion in UTC
-    // console.log("cmpDate", cmpDate);
-    //CHECK IF DATE COMPARISON IS VALID
+    const cmpDate = new Date(date).toISOString().split("T")[0]; // Get date portion 
+    
     const populatedMeetingSlots = await meeting.populate("meetingSlots");
     const meetingSlots = populatedMeetingSlots.meetingSlots;
 
-    // console.log("Meeting slots:", meetingSlots);
+    // get the slots that match the date
     const fileteredSlots = meetingSlots.filter(
       (slot) =>
         new Date(slot.occurrenceDate).toISOString().split("T")[0] === cmpDate
     );
 
-    // console.log("fileteredSlots", fileteredSlots);
-
-    // find slots that have 0 seats available
+    // get the slots that have no seats available
     const slotsWithNoSeats = fileteredSlots
       .filter((slot) => slot.seatsAvailable <= 0)
       .map((slot) => slot.startTime);
 
-    // console.log("slotsWithNoSeats", slotsWithNoSeats);
-
+    // format the slots with no seats
     formattedNoSeats = slotsWithNoSeats.map((slot) => {
       const date = new Date(slot);
       return date.toLocaleTimeString("en-US", {
@@ -322,32 +327,23 @@ router.get("/:meetingID/:date", async (req, res) => {
       });
     });
 
-    // console.log("formattedNoSeats", formattedNoSeats);
-
+    // retrieve the valid slots for the meeting
     const allSlots = meeting.validSlots;
-    // console.log("allSlots", allSlots);
-
     let possibleSlots = [];
 
-    const cmpStartDate = new Date(startDate).toISOString().split("T")[0]; // Get date portion in UTC
-    // console.log("cmpStartDate", cmpStartDate);
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
 
-    const cmpEndDate = new Date(endDate).toISOString().split("T")[0]; // Get date portion in UTC
-    // console.log("cmpEndDate", cmpEndDate);
+    const cmpStartDate = `${startDateObj.getFullYear()}-${String(startDateObj.getMonth() + 1).padStart(2, '0')}-${String(startDateObj.getDate()).padStart(2, '0')}`;
+    const cmpEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
 
     if (cmpStartDate === cmpEndDate) {
-      // Case 1: Start and end dates are the same day
       possibleSlots = allSlots[0];
     } else if (cmpDate === cmpStartDate) {
-      //   console.log("Start date");
       possibleSlots = allSlots[0];
     } else if (cmpDate === cmpEndDate) {
-      // Case 3: Current date is the end date
-      //   console.log("End date");
       possibleSlots = allSlots[allSlots.length - 1];
     } else if (cmpDate > cmpStartDate && cmpDate < cmpEndDate) {
-      // Case 4: Date is between start and end dates
-      //   console.log("In between");
       const diff = Math.floor(
         (new Date(date).setHours(0, 0, 0, 0) -
           new Date(startDate).setHours(0, 0, 0, 0)) /
@@ -358,13 +354,10 @@ router.get("/:meetingID/:date", async (req, res) => {
       return res.status(400).json({ message: "Invalid date" });
     }
 
-    // console.log("possibleSlots", possibleSlots);
-
     // remove slots that are booked and have no seats available
     const finalSlots = possibleSlots.filter(
       (slot) => !formattedNoSeats.includes(slot)
     );
-    // console.log("finalSlots", finalSlots);
 
     res.status(200).json({ data: { finalSlots } });
   } catch (error) {
@@ -377,9 +370,6 @@ router.get("/:meetingID/:date", async (req, res) => {
 // GET /api/meetings/allslots/:meetingID/:date to fetch all slots for a meeting on a specific date
 router.get("/allslots/:meetingID/:date", async (req, res) => {
   const { meetingID, date } = req.params;
-
-  // console.log("Meeting ID:", meetingID);
-  // console.log("Date:", date);
 
   try {
     if (!meetingID || !date) {
@@ -397,10 +387,12 @@ router.get("/allslots/:meetingID/:date", async (req, res) => {
 
     // Get the possible slots from validSlots array
     const cmpDate = new Date(date).toISOString().split("T")[0];
-    const cmpStartDate = new Date(meeting.startDate)
-      .toISOString()
-      .split("T")[0];
-    const cmpEndDate = new Date(meeting.endDate).toISOString().split("T")[0];
+    const startDateObj = new Date(meeting.startDate);
+    const endDateObj = new Date(meeting.endDate);
+
+    const cmpStartDate = `${startDateObj.getFullYear()}-${String(startDateObj.getMonth() + 1).padStart(2, '0')}-${String(startDateObj.getDate()).padStart(2, '0')}`;
+    const cmpEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
+    
 
     let possibleSlots = [];
 
@@ -500,20 +492,18 @@ router.get("/:meetingID/:date/:slot", async (req, res) => {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-    //TODO COMPARE WITH THE ACTUAL TIME
+    // Find the meeting slot that matches the slot time
     const meetingSlot = meeting.meetingSlots.find((slot) => {
       return (
         new Date(slot.startTime).getTime() === new Date(slotTime).getTime()
       );
     });
-    // console.log("Meeting slot:", meetingSlot);
-
+  
     // if no meeting slot is found, return the max seats for the meeting
     if (!meetingSlot) {
       return res.status(200).json({ data: { seats: meeting.seatsPerSlot } });
     } else {
       const seatsLeft = meetingSlot.seatsAvailable;
-      //   console.log("Seats left:", seatsLeft);
       res.status(200).json({ data: { seats: seatsLeft } });
     }
   } catch (error) {
