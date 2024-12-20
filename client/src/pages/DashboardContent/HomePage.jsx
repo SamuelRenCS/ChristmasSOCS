@@ -112,7 +112,7 @@ const HomePage = () => {
         </div>
 
         <div className={styles.meetingsSection}>
-          <h2>Meeting Times {selectedDate.toDateString()}</h2>
+          <h2>{selectedDate.toDateString()}</h2>
           {filteredMeetings.length > 0 ? (
             <ul>
               {filteredMeetings.map((meeting, index) => (
