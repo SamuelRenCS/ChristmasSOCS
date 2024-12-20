@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { login } from "../api/api.js"; // import the login function from api.js
 import "../styles/Login.css";
-import Input from "../components/Input";
-import Button from "../components/Button";
+import Input from "../components/common/Input";
+import Button from "../components/common/Button";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";

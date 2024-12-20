@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 
-import { createBooking } from "../api/api";
-import { fetchMeeting } from "../api/api"; // onload to get the general meeting details
-import { fetchMeetingSlot } from "../api/api";
-import { fetchSeats } from "../api/api";
+import { createBooking } from "../../api/api";
+import { fetchMeeting } from "../../api/api"; // onload to get the general meeting details
+import { fetchMeetingSlot } from "../../api/api";
+import { fetchSeats } from "../../api/api";
 
-import CalendarDateInput from "./CalendarDateInput";
-import InputField from "./InputField";
-import SelectField from "./SelectField";
-import Button from "./Button";
-import ErrorPage from "../pages/ErrorPage";
+import CalendarDateInput from "../common/CalendarDateInput";
+import InputField from "../common/InputField";
+import SelectField from "../common/SelectField";
+import Button from "../common/Button";
+import ErrorPage from "../../pages/ErrorPage";
 import styles from "./BookingForm.module.css";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 

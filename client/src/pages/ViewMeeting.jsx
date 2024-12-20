@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import "../styles/ViewMeeting.css";
-import Container from "../components/Container";
-import TimeSlot from "../components/TimeSlot";
-import CalendarDateInput from "../components/CalendarDateInput";
+import Container from "../components/common/Container";
+import TimeSlot from "../components/ViewMeeting/TimeSlot";
+import CalendarDateInput from "../components/common/CalendarDateInput";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchMeeting, deleteMeeting, fetchMeetingAllSlots } from "../api/api";

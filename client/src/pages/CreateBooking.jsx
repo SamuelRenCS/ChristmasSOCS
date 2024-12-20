@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/CreateBooking.module.css";
-import BookingForm from "../components/BookingForm";
+import BookingForm from "../components/BookingForm/BookingForm";
 const CreateBooking = () => {
   const { token } = useParams();
 

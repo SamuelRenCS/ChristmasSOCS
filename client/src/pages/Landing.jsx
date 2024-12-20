@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Landing.css";
-import Description from "../components/Description";
-import exampleImage from "../assets/landing-page.png";
+import Description from "../components/Landing/Description";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import mcgillImage from "/Mcgill.jpg";
@@ -92,8 +91,8 @@ export default function Landing() {
               meetings effortlessly.
             </li>
             <li>
-              <b>Create a Meeting:</b> Set up and manage your own meetings
-              with ease.
+              <b>Create a Meeting:</b> Set up and manage your own meetings with
+              ease.
             </li>
             <li>
               <b>View Scheduled Meetings:</b> Keep track of all your upcoming

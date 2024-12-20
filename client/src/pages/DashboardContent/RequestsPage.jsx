@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "../../styles/RequestPage.module.css";
-import RequestsSubPage from "../../components/RequestsSubPage";
+import RequestsSubPage from "../../components/Requests/RequestsSubPage";
 import { CheckCircle, InboxIcon, SendIcon } from "lucide-react";
 
 const RequestsPage = () => {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import RequestItem from "./RequestItem";
-import { fetchRequests, acceptRequest, rejectRequest } from "../api/api";
+import { fetchRequests, acceptRequest, rejectRequest } from "../../api/api";
 import styles from "./RequestsSubPage.module.css";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const RequestsSubPage = ({ requestType }) => {
   const { user } = useAuth();

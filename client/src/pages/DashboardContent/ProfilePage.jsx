@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserProfile from "./UserProfile";
+import UserProfile from "../../components/Profile/UserProfile";
 import { updatePassword } from "../../api/api";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import InputField from "../../components/InputField";
-import Button from "../../components/Button";
+import InputField from "../common/InputField";
+import Button from "../common/Button";
 import { toast } from "react-toastify";
 import styles from "./UserProfile.module.css";
 

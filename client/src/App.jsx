@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Registration from "./pages/Registration";
 import styles from "./App.module.css";
 import { ToastContainer, toast } from "react-toastify";
-import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoute from "./components/Routing/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 import CreateMeeting from "./pages/CreateMeeting";
 import Header from "./partials/Header";

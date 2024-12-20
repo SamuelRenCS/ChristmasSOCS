@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { fetchUserMeetings } from "../../api/api";
 import { fetchToken } from "../../api/api";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
+import Button from "../../components/common/Button";
 
 import styles from "../../styles/MeetingsList.module.css";
 //import { fetchUser } from "../../api/api";

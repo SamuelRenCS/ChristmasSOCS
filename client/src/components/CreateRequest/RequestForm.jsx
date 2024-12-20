@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import InputField from "../InputField";
-import Button from "../Button";
+import InputField from "../common/InputField";
+import Button from "../common/Button";
 import styles from "./RequestForm.module.css";
 import { fetchUser, createRequest } from "../../api/api";
 import ErrorPage from "../../pages/ErrorPage";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import TextAreaField from "../TextAreaField";
+import TextAreaField from "../common/TextAreaField";
 
 const RequestForm = ({ hostID }) => {
   const { user } = useAuth();

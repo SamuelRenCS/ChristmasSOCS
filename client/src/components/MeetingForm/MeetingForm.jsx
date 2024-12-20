@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { createMeeting } from "../../api/api";
-import InputField from "../InputField";
-import SelectField from "../SelectField";
-import TextAreaField from "../TextAreaField";
+import InputField from "../common/InputField";
+import SelectField from "../common/SelectField";
+import TextAreaField from "../common/TextAreaField";
 import styles from "./MeetingForm.module.css";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Button from "../Button";
+import Button from "../common/Button";
 import WeekdaySelector from "./WeekdaySelector";
 
 const MeetingForm = () => {
