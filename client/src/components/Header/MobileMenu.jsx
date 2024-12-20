@@ -19,9 +19,16 @@ const MobileMenu = ({ links, isAuthenticated, onClose, onLogout }) => {
 
   return (
     <div className={styles.mobileMenu}>
-      <div className={styles.mobileLinks}>
-        <NavLinks links={links} isMobile={true} onLinkClick={handleLinkClick} />
-      </div>
+      {isAuthenticated && (
+        <div className={styles.mobileLinks}>
+          <NavLinks
+            links={links}
+            isMobile={true}
+            onLinkClick={handleLinkClick}
+          />
+        </div>
+      )}
+
       <div className={styles.mobileAuthContainer}>
         <AuthButtons
           isAuthenticated={isAuthenticated}
