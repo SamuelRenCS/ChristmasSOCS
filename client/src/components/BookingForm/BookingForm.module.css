@@ -45,6 +45,9 @@
   border-radius: 50px;
   align-items: center;
   justify-content: space-between;
+  white-space: nowrap;
+  overflow: hidden;   /* Optional, to prevent overflow issues */
+  text-overflow: ellipsis;
 }
 
 .text {
@@ -146,4 +149,26 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+@media screen and (max-width: 768px) {
+  .bookingForm {
+    grid-template-columns: 1fr;
+  }
+
+  .leftColumn {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .rightColumn {
+    padding-left: 0;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .requestContainer {
+    flex-direction: column;
+  }
+  
 }
