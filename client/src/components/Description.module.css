@@ -56,7 +56,7 @@
   .ctaButton:hover {
     background-color: var(--primary); /* Button hover color */
   }
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 900px) {
     .descriptionSection {
       flex-direction: column; /* Stack content and image vertically */
       gap: 1.5rem;
