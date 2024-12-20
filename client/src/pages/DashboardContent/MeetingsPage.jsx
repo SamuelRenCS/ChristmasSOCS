@@ -64,12 +64,6 @@ const MeetingsPage = () => {
     }
   };
 
-  const handleCopyToken = () => {
-    navigator.clipboard.writeText(tokenPopup.token).then(() => {
-      toast.info("Token copied to clipboard");
-    });
-  };
-
   const closePopup = () => {
     setTokenPopup({ show: false, token: "", meetingId: null });
   };
@@ -115,12 +109,14 @@ const MeetingsPage = () => {
         <div className={styles["token-popup"]}>
           <div className={styles["popup-content"]}>
             <h3>Meeting Token</h3>
-            <p>
+            <p className={styles.tokenText}>
+              Copy the token below to share the meeting
+            </p>
+            <p className={styles.token}>
               {typeof tokenPopup.token === "string"
                 ? tokenPopup.token
                 : JSON.stringify(tokenPopup.token)}
             </p>
-            <button onClick={handleCopyToken}>Copy Token</button>
             <button onClick={closePopup}>Close</button>
           </div>
         </div>

@@ -98,3 +98,14 @@
 .mainContent.expanded {
   margin-left: 0;
 }
+
+/* handle mobile view */
+@media screen and (max-width: 768px) {
+  .sidebarToggle {
+    display: none;
+  }
+
+  .sidebar {
+    height: fit-content;
+  }
+}

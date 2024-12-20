@@ -13,7 +13,7 @@ const TimeSlot = ({ time, seatsReserved, isBooked }) => {
     display: "flex",
   };
   const styleSeatsNumber = {
-    textAlign: "left",
+    textAlign: "right",
     flexGrow: "1",
   };
 
