@@ -1,9 +1,10 @@
 import axios from "axios";
 import sha256 from "crypto-js/sha256";
+import config from "../../config";
 
 // create an axios instance with default configuration
 const api = axios.create({
-  baseURL: "http://fall2024-comp307-group12.cs.mcgill.ca:5000/api", // set backend's base URL
+  baseURL: config.backendBaseUrl, // set backend's base URL
   headers: {
     "Content-Type": "application/json",
   },

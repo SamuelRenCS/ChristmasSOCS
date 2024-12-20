@@ -4,6 +4,7 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const config = require("./config");
 
 // middleware
 const { validateUser } = require("./middleware");
@@ -12,12 +13,11 @@ const { validateUser } = require("./middleware");
 const User = require("./models/user");
 const Meeting = require("./models/meeting");
 const Request = require("./models/request");
-const e = require("express");
 const MeetingSlot = require("./models/meetingSlot");
 const Notification = require("./models/notification");
 
 // PUT IN ENV FILE LATER
-const SECRET_KEY = "ChristmasSOCS";
+// const SECRET_KEY = "ChristmasSOCS";
 
 // helper functions (MOVE TO SEPARATE FILE LATER)
 function checkIsMcGillMember(email) {
@@ -26,8 +26,7 @@ function checkIsMcGillMember(email) {
 }
 
 // connect to MongoDB
-const dbUrl = "mongodb://localhost:27017/ChristmasSOCS";
-mongoose.connect(dbUrl);
+mongoose.connect(config.mongoUrl);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -44,10 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 // enable CORS
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://fall2024-comp307-group12.cs.mcgill.ca:5000",
-    ],
+    origin: config.allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"], // allowed methods
     credentials: true,
   })
@@ -93,7 +89,7 @@ app.post("/api/login", async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
       },
-      SECRET_KEY,
+      config.secretKey,
       { expiresIn: "1h" }
     );
 
@@ -485,7 +481,9 @@ app.post("/api/meetings/new", async (req, res) => {
 
     const payload = { ID: newMeeting._id };
 
-    const newToken = jwt.sign(payload, SECRET_KEY, { algorithm: "HS256" });
+    const newToken = jwt.sign(payload, config.secretKey, {
+      algorithm: "HS256",
+    });
 
     console.log("Token:", newToken);
     res.status(201).json({
@@ -627,7 +625,7 @@ app.get("/api/meetings/:token", async (req, res) => {
       meeting = await Meeting.findById(iToken);
     } catch (error) {
       // if the token is not a meeting ID, try decoding it
-      const decoded = jwt.verify(iToken, SECRET_KEY);
+      const decoded = jwt.verify(iToken, config.secretKey);
       meetingID = decoded.ID;
 
       if (!meetingID) {
@@ -1240,7 +1238,7 @@ app.get("/api/token/:meetingID", async (req, res) => {
     }
 
     const payload = { ID: meetingID };
-    const token = jwt.sign(payload, SECRET_KEY, { algorithm: "HS256" });
+    const token = jwt.sign(payload, config.secretKey, { algorithm: "HS256" });
 
     console.log("Token:", token);
 
@@ -1513,6 +1511,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
 });
 
-app.listen(5000, () => {
-  console.log("Server is running on port 5000");
+app.listen(config.port, () => {
+  console.log(`Server is running on port ${config.port}`);
 });
