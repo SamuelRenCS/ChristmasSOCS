@@ -3,11 +3,13 @@ const router = express.Router();
 const User = require("../models/user");
 const Meeting = require("../models/meeting");
 const MeetingSlot = require("../models/meetingSlot");
+const Notification = require("../models/notification");
 const { validateBooking } = require("../middleware");
 const {
   calculateDates,
   calculateWeeklyDates,
 } = require("../utils");
+const meeting = require("../models/meeting");
 
 // POST /api/bookings/new to create a new booking
 router.post("/new", validateBooking, async (req, res) => {
@@ -31,6 +33,7 @@ router.post("/new", validateBooking, async (req, res) => {
     const intervalCheck = meeting.interval;
 
     // Retrieve the dates for the meeting based on the repeat value
+    // Note: Cannot reuse the logic from the meeting creation route as the date is in a different format
     if (repeat === "None") {
       if (
         intervalCheck !== 10 &&
@@ -53,7 +56,7 @@ router.post("/new", validateBooking, async (req, res) => {
 
     formattedDates = dates.map((date) => {
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+      const month = String(date.getMonth() + 1).padStart(2, "0"); 
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     });
@@ -65,9 +68,36 @@ router.post("/new", validateBooking, async (req, res) => {
       });
     }
 
-    //check if the time slot is contained in the meeting slots
-    const slots = meeting.meetingSlots.map((slot) => slot.startTime);
-    if (!slots.includes(timeSlot)) {
+    const allSlots = meeting.validSlots;
+    let possibleSlots = [];
+
+    //Check if the received slot is valid
+    // Note: cannot reuse the logic from the meeting creation route as the date is in a different format
+    const receivedDate = new Date(meetingDate);
+    const cmpDate = receivedDate.toISOString().split("T")[0];
+    const startDateObj = new Date(meeting.startDate);
+    const endDateObj = new Date(meeting.endDate);
+    const cmpStartDate = `${startDateObj.getFullYear()}-${String(startDateObj.getMonth() + 1).padStart(2, '0')}-${String(startDateObj.getDate()).padStart(2, '0')}`;
+    const cmpEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
+
+    if (cmpStartDate === cmpEndDate) {
+      possibleSlots = allSlots[0];
+    } else if (cmpDate === cmpStartDate) {
+      possibleSlots = allSlots[0];
+    } else if (cmpDate === cmpEndDate) {
+      possibleSlots = allSlots[allSlots.length - 1];
+    } else if (cmpDate > cmpStartDate && cmpDate < cmpEndDate) {
+      const diff = Math.floor(
+        (new Date(receivedDate).setHours(0, 0, 0, 0) -
+          new Date(startDate).setHours(0, 0, 0, 0)) /
+          (1000 * 60 * 60 * 24)
+      );
+      possibleSlots = allSlots[diff];
+    } else {
+      return res.status(400).json({ message: "Invalid date" });
+    }
+
+    if (!possibleSlots.includes(timeSlot)) {
       return res.status(400).json({
         message: "The selected time slot is not available for booking",
       });
@@ -82,19 +112,15 @@ router.post("/new", validateBooking, async (req, res) => {
     const startTime = new Date(startString).toISOString();
     let endTime = new Date(startTime); // Create a new Date object to avoid mutating the original
 
-    //console.log("end time 1", endTime);
-
     endTime.setMinutes(endTime.getMinutes() + interval);
 
-    // console.log("end time 2", endTime);
-
-    //TODO WRONG
     const endTimeHours = endTime.getHours();
     const endTimeMinutes = endTime.getMinutes();
 
     const meetingEndDateHours = meeting.endDate.getHours();
     const meetingEndDateMinutes = meeting.endDate.getMinutes();
 
+    // Check if the end time exceeds the slot and set it to the slot's end time
     if (
       meeting.repeat === "Daily" &&
       (endTimeHours > meetingEndDateHours ||
@@ -125,10 +151,15 @@ router.post("/new", validateBooking, async (req, res) => {
 
     endTime = endTime.toISOString();
 
-    // console.log("Start time:", startTime);
-    // console.log("End time:", endTime);
-
     if (existingSlots.length === 0) {
+
+      //check if the slot is full
+      if (seats > meeting.seatsPerSlot) {
+        return res.status(400).json({
+          message: "The number of seats booked exceeds the available seats",
+        });
+      }
+
       const newSlot = new MeetingSlot({
         meeting: meetingID,
         occurrenceDate: savedDate.toISOString(),
@@ -144,10 +175,31 @@ router.post("/new", validateBooking, async (req, res) => {
       //add the booking to the meeting
       meeting.meetingSlots.push(newSlot);
       await meeting.save();
+      // notify the host of the new booking
+      const notification = new Notification({
+        user: meeting.host.toString(),
+        title: "New Booking",
+        // Format the message with the user's full name and the date of the booking
+        message: `${attendee} has booked a slot for ${meeting.title} on ${meetingDate}`,
+        date: Date.now(),
+      });
+  
+      await notification.save();
+  
+      await meeting.populate("host");
+      // add notification to host's notifications array
+      const host = await User.findById(meeting.host._id).populate("Notifications");
+
+     
+
+      host.Notifications.push(notification);
+
+      //save the host
+      await host.save();
+
       //check if a user is logged in and add the booking to the user
       if (userID && userID !== "") {
-        // console.log("User ID:", userID);
-
+        
         const user = await User.findById(userID);
         user.reservations.push(newSlot);
         await user.save();
@@ -160,12 +212,22 @@ router.post("/new", validateBooking, async (req, res) => {
         await newSlot.save();
       }
       return res.status(201).json({ message: "Booking created successfully" });
-    } else {
+    } else {  
       // check is there is a slot for that date and time
+
       const existingSlot = existingSlots.find(
         (slot) => slot.startTime === startTime
       );
+
+      //check if the slot is full
+
       if (!existingSlot) {
+
+        if (seats > meeting.seatsPerSlot) {
+          return res.status(400).json({
+            message: "The number of seats booked exceeds the available seats",
+          });
+        }
         const newSlot = new MeetingSlot({
           meeting: meetingID,
           occurrenceDate: savedDate.toISOString(),
@@ -181,6 +243,27 @@ router.post("/new", validateBooking, async (req, res) => {
         //add the booking to the meeting
         meeting.meetingSlots.push(newSlot);
         await meeting.save();
+
+        // notify the host of the new booking
+        const notification = new Notification({
+          user: meeting.host.toString(),
+          title: "New Booking",
+          // Format the message with the user's full name and the date of the booking
+          message: `${attendee} has booked a slot for ${meeting.title} on ${meetingDate}`,
+          date: Date.now(),
+        });
+    
+        await notification.save();
+    
+        await meeting.populate("host");
+        // add notification to host's notifications array
+        const host = await User.findById(meeting.host._id).populate("Notifications");
+
+        host.Notifications.push(notification);
+
+        //save the host
+        await host.save();
+
         //check if a user is logged in and add the booking to the user
         if (userID && userID !== "") {
           console.log("User ID:", userID);
@@ -188,7 +271,6 @@ router.post("/new", validateBooking, async (req, res) => {
           user.reservations.push(newSlot);
           await user.save();
 
-          //add the user to the list of registered attendees for the slot
           newSlot.registeredAttendees.push({
             attendeeId: userID, // The user's ID
             seatsBooked: seats, // Number of seats booked
@@ -200,11 +282,43 @@ router.post("/new", validateBooking, async (req, res) => {
           .status(201)
           .json({ message: "Booking created successfully" });
       } else {
+
+
+        //check if the slot is full
+        if (seats > existingSlot.seatsAvailable) {
+          return res.status(400).json({
+            message: "The number of seats booked exceeds the available seats",
+          });
+        }
+
         //push the attendee to the attendees array
         existingSlot.attendees.push(attendee);
         //update the seats available
         existingSlot.seatsAvailable -= seats;
         await existingSlot.save();
+
+        // notify the host of the new booking
+        const notification = new Notification({
+          user: meeting.host.toString(),
+          title: "New Booking",
+          // Format the message with the user's full name and the date of the booking
+          message: `${attendee} has booked a slot for ${meeting.title} on ${meetingDate}`,
+          date: Date.now(),
+        });
+    
+        await notification.save();
+    
+        //retrieve the meeting host
+        await meeting.populate("host");
+        // add notification to host's notifications array
+        //retrieve the meeting host
+
+        const host = await User.findById(meeting.host._id).populate("Notifications");
+
+        host.Notifications.push(notification);
+
+        //save the host
+        await host.save();
 
         //check if a user is logged in and add the booking to the user
         if (userID) {
@@ -242,9 +356,6 @@ router.post("/new", validateBooking, async (req, res) => {
 });
 
 // DELETE /api/bookings/:bookingID/:userID to delete a booking
-// When a booking is deleted, the seats available for the slot should be updated
-// The booking should be removed from the user's list of reservations
-// The booking should be removed from the slot's list of attendees and registered attendees
 router.delete("/:bookingID/:userID", async (req, res) => {
   const { bookingID, userID } = req.params;
 
@@ -285,6 +396,21 @@ router.delete("/:bookingID/:userID", async (req, res) => {
       (attendee) => attendee !== userName
     );
 
+    // notify the host of the new booking
+    const notification = new Notification({
+      user: booking.meeting.host._id,
+      title: "Booking Cancelled",
+      // Format the message with the user's full name and the date of the booking
+      message: `${userName} has cancelled their booking for ${booking.meeting.title} on ${booking.occurrenceDate}`,
+      date: Date.now(),
+    });
+
+    await notification.save();
+
+    //retrieve the meeting host
+    booking.meeting.host.Notifications.push(notification);
+    
+
     // Find the booking to remove from the registered attendees list
     // Find the booking to remove from the registered attendees list
     const bookingToRemove = booking.registeredAttendees.find(
@@ -295,15 +421,11 @@ router.delete("/:bookingID/:userID", async (req, res) => {
     if (bookingToRemove) {
       // Update the available seats by adding back the number of seats the user booked
       booking.seatsAvailable += bookingToRemove.seatsBooked;
-
-      // console.log("Seats available:", booking.seatsAvailable);
-
       // Remove the booking from the registered attendees list
       booking.registeredAttendees = booking.registeredAttendees.filter(
         (attendee) => attendee.attendeeId._id.toString() !== userID
       );
-
-      // console.log("Registered attendees:", booking.registeredAttendees);
+      
     }
 
     // Remove the booking from the user's list of reservations
