@@ -8,11 +8,18 @@
   height: 100%;
   width: auto;
   margin-right: 10px;
+  transition: all 0.3s ease-in-out;
 }
 
 /* handle mobile view */
 @media screen and (max-width: 768px) {
   .logoImage {
     height: 70px;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .logoImage {
+    height: 50px;
   }
 }

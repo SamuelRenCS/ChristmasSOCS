@@ -10,6 +10,8 @@ const api = axios.create({
   },
 });
 
+// AUTHENTICATION API FUNCTIONS
+
 // login function to send a POST request to /login
 export const login = async (credentials) => {
   try {
@@ -72,6 +74,8 @@ export const fetchUser = async (userID) => {
   }
 };
 
+// MEETING API FUNCTIONS
+
 // createMeeting function to send a POST request to /meetings
 export const createMeeting = async (meetingData) => {
   try {
@@ -107,16 +111,7 @@ export const fetchMeetingSlot = async (meetingID, date) => {
   }
 };
 
-export const createBooking = async (bookingData) => {
-  try {
-    const response = await api.post("/bookings/new", bookingData);
-    return response.data;
-  } catch (error) {
-    // this will throw an error that can be caught in the component
-    throw error;
-  }
-};
-
+// fetch the number of seats available for a specific meeting, date and slot
 export const fetchSeats = async (meetingID, date, slot) => {
   console.log("fetching seats for:", meetingID, date, slot);
   try {
@@ -127,6 +122,38 @@ export const fetchSeats = async (meetingID, date, slot) => {
     throw error;
   }
 };
+
+// Delete meeting function to send a DELETE request to /meetings
+export const deleteMeeting = async (meetingID) => {
+  try {
+    const response = await api.delete(`/meetings/${meetingID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//fetch token function to send a GET request to /token
+export const fetchToken = async (meetingID) => {
+  try {
+    const response = await api.get(`/meetings/token/${meetingID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//fetch meeting slots for a specific date function to send a GET request to /meetings
+export const fetchMeetingAllSlots = async (meetingID, date) => {
+  try {
+    const response = await api.get(`/meetings/allslots/${meetingID}/${date}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// REQUEST API FUNCTIONS
 
 // createRequest function to send a POST request to /requests
 export const createRequest = async (requestData) => {
@@ -142,33 +169,6 @@ export const createRequest = async (requestData) => {
 export const fetchRequests = async (userID) => {
   try {
     const response = await api.get(`/requests/${userID}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchUserMeetings = async (userID) => {
-  try {
-    const response = await api.get(`/dashboard/meetings/${userID}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchUserBookings = async (userID) => {
-  try {
-    const response = await api.get(`/dashboard/bookings/${userID}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchAllUserEvents = async (userID) => {
-  try {
-    const response = await api.get(`/dashboard/events/${userID}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -195,14 +195,47 @@ export const rejectRequest = async (requestID) => {
   }
 };
 
-//TODO
+// DASHBOARD API FUNCTIONS
 
-// Delete meeting function to send a DELETE request to /meetings
-export const deleteMeeting = async (meetingID) => {
+// fetch all bookings for a specific user
+export const fetchUserBookings = async (userID) => {
   try {
-    const response = await api.delete(`/meetings/${meetingID}`);
+    const response = await api.get(`/dashboard/bookings/${userID}`);
     return response.data;
   } catch (error) {
+    throw error;
+  }
+};
+
+// fetch all events for a specific user
+export const fetchAllUserEvents = async (userID) => {
+  try {
+    const response = await api.get(`/dashboard/events/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// fetch all meetings for a specific user
+export const fetchUserMeetings = async (userID) => {
+  try {
+    const response = await api.get(`/dashboard/meetings/${userID}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// BOOKING API FUNCTIONS
+
+// create a new booking
+export const createBooking = async (bookingData) => {
+  try {
+    const response = await api.post("/bookings/new", bookingData);
+    return response.data;
+  } catch (error) {
+    // this will throw an error that can be caught in the component
     throw error;
   }
 };
@@ -217,25 +250,7 @@ export const deleteBooking = async (bookingID, userID) => {
   }
 };
 
-//fetch token function to send a GET request to /token
-export const fetchToken = async (meetingID) => {
-  try {
-    const response = await api.get(`/meetings/token/${meetingID}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-//fetch meeting slots for a specific date function to send a GET request to /meetings
-export const fetchMeetingAllSlots = async (meetingID, date) => {
-  try {
-    const response = await api.get(`/meetings/allslots/${meetingID}/${date}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+// NOTIFICATION API FUNCTIONS
 
 //fetch all notifications function to send a GET request to /notifications
 export const fetchNotifications = async (userID) => {

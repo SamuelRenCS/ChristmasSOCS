@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng, Shotaro Nakamura, Samuel Ren
+
 import React, { useState } from "react";
 import { useEffect } from "react";
 
@@ -72,8 +74,8 @@ const BookingForm = ({ token }) => {
         const dateObj = new Date(startDate);
 
         const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // getMonth is zero-indexed
-        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // getMonth is zero-indexed
+        const day = String(dateObj.getDate()).padStart(2, "0");
 
         const meetingDate = `${year}-${month}-${day}`;
 
