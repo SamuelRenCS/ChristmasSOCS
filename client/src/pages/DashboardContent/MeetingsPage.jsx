@@ -26,7 +26,7 @@ const MeetingsPage = () => {
     const fetchMeetings = async () => {
       try {
         const response = await fetchUserMeetings(userId);
-        console.log("Meetings: ", response.data);
+        // console.log("Meetings: ", response.data);
         setMeetings(response.data);
         setLoading(false);
 
@@ -53,9 +53,9 @@ const MeetingsPage = () => {
   const handleGetIDClick = async (meetingId) => {
     try {
       const response = await fetchToken(meetingId);
-      console.log("Response: ", response);
+      //console.log("Response: ", response);
       const meetingToken = response.data.token;
-      console.log("Meeting token: ", meetingToken);
+      //console.log("Meeting token: ", meetingToken);
 
       setTokenPopup({ show: true, token: meetingToken });
     } catch (error) {

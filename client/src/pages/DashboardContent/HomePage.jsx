@@ -20,7 +20,7 @@ const HomePage = () => {
       // Fetch reservations for the user
       try {
         const response = await fetchAllUserEvents(userId);
-        console.log("All Events: ", response.data);
+        // console.log("All Events: ", response.data);
 
         // Sort meetings by date and time
         const sortedMeetings = response.data.sort((a, b) => {

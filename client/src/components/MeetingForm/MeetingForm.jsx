@@ -25,13 +25,14 @@ const MeetingForm = () => {
 
   // Set initial values for date and time
   const now = new Date();
+  const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
   const [formData, setFormData] = useState({
     title: "",
     host: user ? user.id : "",
-    startDate: formatDate(now), // Current date
-    startTime: formatTime(now), // Current time
+    startDate: formatDate(fiveMinutesLater), // Current date
+    startTime: formatTime(fiveMinutesLater), // Current time
     endDate: formatDate(oneHourLater), // Same date as startDate
     endTime: formatTime(oneHourLater), // One hour after current time
     location: "",
@@ -126,8 +127,8 @@ const MeetingForm = () => {
 
   const handleRepeatChange = (e) => {
     const { name, value } = e.target;
-    const startDate = new Date(formData.startDate);
-    const meetingDay = startDate.getDay(); // 0-6 numeric day
+    const startDate = new Date(`${formData.startDate}T${formData.startTime}`);
+    const meetingDay = startDate.getDay();
 
     setFormData({
       ...formData,
@@ -392,7 +393,9 @@ const MeetingForm = () => {
             repeatValue={repeatValue}
             selectedDays={formData.repeatDays}
             onDayToggle={handleDayToggle}
-            meetingDay={new Date(formData.startDate).getDay()} // Pass the meeting day
+            meetingDay={new Date(
+              `${formData.startDate}T${formData.startTime}`
+            ).getDay()} // Pass the meeting day
           />
 
           <div

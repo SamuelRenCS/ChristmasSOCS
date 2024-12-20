@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styles from "./RequestItem.module.css";
 
 const RequestItem = ({ request, onAccept, onReject, itemType }) => {
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat("en-US", {
@@ -12,6 +14,25 @@ const RequestItem = ({ request, onAccept, onReject, itemType }) => {
       minute: "2-digit",
       hour12: true,
     }).format(date);
+  };
+
+  const handleDelete = () => {
+    if (isConfirmingDelete) {
+      // If already confirming, delete the meeting
+      setIsConfirmingDelete(false); // Reset the state after deletion
+      onReject();
+    } else {
+      // If not confirming, show the confirmation state
+      setIsConfirmingDelete(true);
+    }
+    setTimeout(() => {
+      setIsConfirmingDelete(false);
+    }, 3000);
+  };
+
+  const handleCancelDelete = () => {
+    // Cancel deletion and reset the button
+    setIsConfirmingDelete(false);
   };
 
   return (
@@ -52,8 +73,12 @@ const RequestItem = ({ request, onAccept, onReject, itemType }) => {
         )}
 
         {itemType === "Confirmed" && (
-          <button onClick={onReject} className={styles.rejectButton}>
-            Cancel
+          <button
+            onClick={handleDelete}
+            onBlur={handleCancelDelete}
+            className={styles.rejectButton}
+          >
+            {isConfirmingDelete ? "Confirm" : "Cancel"}
           </button>
         )}
       </div>

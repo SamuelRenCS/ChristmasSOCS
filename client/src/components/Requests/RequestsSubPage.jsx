@@ -14,8 +14,6 @@ const RequestsSubPage = ({ requestType }) => {
       const response = await fetchRequests(user.id);
       const requests = response.data[`${requestType.toLowerCase()}Requests`];
       setCurrentRequests(requests);
-
-      console.log("Getting requests");
     } catch (error) {
       console.error(`Error fetching ${requestType} requests:`, error);
     }
@@ -49,7 +47,7 @@ const RequestsSubPage = ({ requestType }) => {
       {currentRequests.length > 0 ? (
         currentRequests.map((request) => (
           <RequestItem
-            key={request.id}
+            key={request._id}
             request={request}
             onAccept={() => handleAccept(request._id)}
             onReject={() => handleReject(request._id)}

@@ -27,9 +27,9 @@ const Joi = BaseJoi.extend(extension);
 
 // define the schema for user registration
 module.exports.userSchema = Joi.object({
-  firstName: Joi.string().min(2).max(30).required().escapeHTML(),
-  lastName: Joi.string().min(2).max(30).required().escapeHTML(),
+  firstName: Joi.string().required().escapeHTML(),
+  lastName: Joi.string().required().escapeHTML(),
   email: Joi.string().email().required().escapeHTML(),
-  password: Joi.string().required(),
+  password: Joi.string().min(8).required(),
   confirmPassword: Joi.ref("password"),
 });

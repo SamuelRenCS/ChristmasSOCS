@@ -33,15 +33,7 @@
   padding: 10px 20px;
   border-radius: 30px;
   cursor: pointer;
-}
-
-.acceptedButton {
-  background-color: white;
-  color: black;
-  border: 2px solid #007bff;
-  padding: 10px 20px;
-  border-radius: 30px;
-  cursor: pointer;
+  min-width: 100px;
 }
 
 .acceptButton:hover {
@@ -56,6 +48,8 @@
   padding: 10px 20px;
   border-radius: 30px;
   cursor: pointer;
+  min-width: 100px;
+  text-align: center;
 }
 
 .rejectButton:hover {

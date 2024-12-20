@@ -19,7 +19,7 @@ export const login = async (credentials) => {
       password: sha256(credentials.password).toString(),
     };
 
-    const response = await api.post("/login", secureCredentials);
+    const response = await api.post("/auth/login", secureCredentials);
     return response;
   } catch (error) {
     // this will throw an error that can be caught in the component
@@ -37,7 +37,7 @@ export const register = async (formData) => {
       confirmPassword: sha256(formData.confirmPassword).toString(),
     };
 
-    const response = await api.post("/register", secureFormData);
+    const response = await api.post("/auth/register", secureFormData);
     return response.data;
   } catch (error) {
     // this will throw an error that can be caught in the component
@@ -111,7 +111,7 @@ export const updatePassword = async (passwordData) => {
   };
 
   try {
-    const response = await api.put("/password", securePasswordData);
+    const response = await api.put("/auth/password", securePasswordData);
     return response.data;
   } catch (error) {
     throw error;
@@ -121,7 +121,7 @@ export const updatePassword = async (passwordData) => {
 // fetchUser function to send a GET request to /user
 export const fetchUser = async (userID) => {
   try {
-    const response = await api.get(`/user/${userID}`);
+    const response = await api.get(`/auth/user/${userID}`);
     return response.data.data;
   } catch (error) {
     throw error;
@@ -150,7 +150,6 @@ export const fetchRequests = async (userID) => {
 
 export const fetchUserMeetings = async (userID) => {
   try {
-    console.log("Fetching meetings for user:", userID);
     const response = await api.get(`/dashboard/meetings/${userID}`);
     return response.data;
   } catch (error) {
@@ -160,7 +159,6 @@ export const fetchUserMeetings = async (userID) => {
 
 export const fetchUserBookings = async (userID) => {
   try {
-    console.log("Fetching bookings for user:", userID);
     const response = await api.get(`/dashboard/bookings/${userID}`);
     return response.data;
   } catch (error) {
@@ -170,7 +168,6 @@ export const fetchUserBookings = async (userID) => {
 
 export const fetchAllUserEvents = async (userID) => {
   try {
-    console.log("Fetching all events for user:", userID);
     const response = await api.get(`/dashboard/events/${userID}`);
     return response.data;
   } catch (error) {
@@ -203,7 +200,7 @@ export const rejectRequest = async (requestID) => {
 // Delete meeting function to send a DELETE request to /meetings
 export const deleteMeeting = async (meetingID) => {
   try {
-    const response = await api.delete(`/meetings/delete/${meetingID}`);
+    const response = await api.delete(`/meetings/${meetingID}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -212,12 +209,8 @@ export const deleteMeeting = async (meetingID) => {
 
 // Delete booking function to send a DELETE request to /bookings
 export const deleteBooking = async (bookingID, userID) => {
-  console.log("Deleting booking:", bookingID);
-  console.log("User ID:", userID);
   try {
-    const response = await api.delete(
-      `/bookings/delete/${bookingID}/${userID}`
-    );
+    const response = await api.delete(`/bookings/${bookingID}/${userID}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -258,7 +251,7 @@ export const deleteNotification = async (notificationID) => {
 //fetch token function to send a GET request to /token
 export const fetchToken = async (meetingID) => {
   try {
-    const response = await api.get(`/token/${meetingID}`);
+    const response = await api.get(`/meetings/token/${meetingID}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -268,7 +261,7 @@ export const fetchToken = async (meetingID) => {
 //fetch meeting slots for a specific date function to send a GET request to /meetings
 export const fetchMeetingAllSlots = async (meetingID, date) => {
   try {
-    const response = await api.get(`/allslots/${meetingID}/${date}`);
+    const response = await api.get(`/meetings/allslots/${meetingID}/${date}`);
     return response.data;
   } catch (error) {
     throw error;

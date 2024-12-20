@@ -18,7 +18,7 @@ const HistoryPage = () => {
     const fetchMeetings = async () => {
       try {
         const response = await fetchUserBookings(userId);
-        console.log("Meetings: ", response.data);
+        // console.log("Meetings: ", response.data);
         setMeetings(response.data);
         setLoading(false);
 
@@ -31,20 +31,21 @@ const HistoryPage = () => {
               date: meeting.date,
               start: meeting.startTime,
               end: meeting.endTime,
-              isPast: new Date(meeting.date + " " + meeting.startTime) < new Date(), // Check if the meeting is in the past
+              isPast:
+                new Date(meeting.date + " " + meeting.startTime) < new Date(), // Check if the meeting is in the past
             }))
             .sort((a, b) => {
               const dateA = new Date(a.date + " " + a.start);
               const dateB = new Date(b.date + " " + b.start);
-        
+
               // First, compare by date (most recent first)
               if (dateA > dateB) return -1; // Reverse order
               if (dateA < dateB) return 1;
-        
+
               // If dates are the same, compare by start time (most recent first)
               if (a.start > b.start) return -1; // Reverse order
               if (a.start < b.start) return 1;
-        
+
               return 0; // If both date and start time are the same, return 0
             })
         );
@@ -61,28 +62,28 @@ const HistoryPage = () => {
   const handleCancelClick = async (bookingId) => {
     if (confirmingDeleteId === bookingId) {
       try {
-        console.log("Booking ID: ", bookingId);
-        console.log("User ID: ", userId);
+        // console.log("Booking ID: ", bookingId);
+        // console.log("User ID: ", userId);
         const response = await deleteBooking(bookingId, userId);
         console.log("Response: ", response);
         toast.success("Booking cancelled successfully");
         // Remove the cancelled booking from the list
-        setNotifications(notifications.filter((booking) => booking.id !== bookingId));
-        setConfirmingDeleteId(null); 
+        setNotifications(
+          notifications.filter((booking) => booking.id !== bookingId)
+        );
+        setConfirmingDeleteId(null);
       } catch (error) {
         console.error("Error cancelling booking:", error);
         toast.error("Failed to cancel booking");
       }
-    }
-    else {
+    } else {
       // If not confirming, show the confirmation state
       setConfirmingDeleteId(bookingId);
     }
     setTimeout(() => {
       setConfirmingDeleteId(null);
     }, 4000);
-  }
-
+  };
 
   const handleCancelDelete = () => {
     // Cancel deletion and reset the button
@@ -97,9 +98,10 @@ const HistoryPage = () => {
       {notifications.length > 0 ? (
         notifications.map((notification) => (
           <div
-          
             key={notification.id}
-            className={`${styles.notificationItem} ${notification.isPast ? styles.pastMeeting : ""}`}
+            className={`${styles.notificationItem} ${
+              notification.isPast ? styles.pastMeeting : ""
+            }`}
           >
             <div className={styles.info}>
               <p>
@@ -120,13 +122,16 @@ const HistoryPage = () => {
             </div>
             <div className={styles.requestActions}>
               {!notification.isPast && (
-                  <button
+                <button
                   className={styles.cancelButton}
                   onClick={() => handleCancelClick(notification.id)} // Pass meeting ID
-                onBlur={handleCancelDelete}>
-                  {confirmingDeleteId === notification.id ? "CONFIRM" : "CANCEL"}
+                  onBlur={handleCancelDelete}
+                >
+                  {confirmingDeleteId === notification.id
+                    ? "CONFIRM"
+                    : "CANCEL"}
                 </button>
-                )}
+              )}
             </div>
           </div>
         ))
