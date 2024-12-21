@@ -191,6 +191,10 @@ main {
   background-color: #e9ecef;
 }
 
+.h3 {
+  text-align: center;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

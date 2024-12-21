@@ -232,11 +232,8 @@ const ViewMeeting = () => {
             height={"auto"}
             padding={"20px"}
             overflow={"auto"}
-            alignItems={"center"}
-            justifyContent={"center"}
-            display={"flex"}
           >
-            {!isDateSelected && <h3>Select a date</h3>}
+            {!isDateSelected && <h3 className={styles.h3}>Select a date</h3>}
             {timeSlots.map((slot) => (
               <TimeSlot
                 key={slot.time}
