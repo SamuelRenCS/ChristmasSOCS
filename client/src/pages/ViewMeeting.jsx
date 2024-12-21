@@ -91,12 +91,6 @@ const ViewMeeting = () => {
         } = response.data;
         setHighlightedDates(formattedDates);
 
-        //keep the date part of the datetime
-        const dateObj = new Date(startDate);
-
-        // set the meeting date
-        setMeetingDate(dateObj.toISOString().split("T")[0]);
-
         // set the location
         setLocation(location);
 
@@ -211,6 +205,7 @@ const ViewMeeting = () => {
             <h3>Available Time Slots</h3>
             <CalendarDateInput
               label="Date:"
+              value={meetingDate}
               onChange={handleDateChange}
               highlightedDates={highlightedDates}
             />

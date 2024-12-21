@@ -32,21 +32,31 @@ router.post("/new", validateMeeting, async (req, res) => {
   //Start of additional validation
 
   //check start date is not before today
-  const today = new Date();
-  const cmpStartDate = new Date(startDate);
-  const cmpEndDate = new Date(endDate);
-  
+  const today = new Date().toLocaleString();
+  const cmpStartDate = new Date(startDate).toLocaleString();
+  const cmpEndDate = new Date(endDate).toLocaleString();
+  const onlyDateStart = new Date(startDate).toLocaleDateString();
+  const onlyDateEnd = new Date(endDate).toLocaleDateString();
+
   if (cmpStartDate < today) {
     return res.status(400).json({ message: "Start time cannot be before now" });
   }
 
   //check end date is not before start date or today
   if (cmpEndDate < cmpStartDate || cmpEndDate < today) {
-    return res.status(400).json({ message: "End time cannot be before start time or now" });
+    return res
+      .status(400)
+      .json({ message: "End time cannot be before start time or now" });
   }
 
   //if the interval is not 10, 15, 20, 30, or 60, check if its equal to the minutes between the start and end date.
-  if ( interval !== 10 && interval !== 15 && interval !== 20 && interval !== 30 && interval !== 60) {
+  if (
+    interval !== 10 &&
+    interval !== 15 &&
+    interval !== 20 &&
+    interval !== 30 &&
+    interval !== 60
+  ) {
     const diff = Math.floor((cmpEndDate - cmpStartDate) / (1000 * 60));
     if (diff % interval !== 0) {
       return res.status(400).json({ message: "Invalid interval time" });
@@ -55,26 +65,37 @@ router.post("/new", validateMeeting, async (req, res) => {
 
   //check that the seats per slot is greater than 0
   if (seatsPerSlot <= 0) {
-    return res.status(400).json({ message: "Seats per slot must be at least 1" });
+    return res
+      .status(400)
+      .json({ message: "Seats per slot must be at least 1" });
   }
 
   //if repeat is other than none, check that the start and end time are on the same day
-  if (repeat !== "None" && cmpStartDate.toISOString().split("T")[0] !== cmpEndDate.toISOString().split("T")[0]) {
-    return res.status(400).json({ message: "Start and end date must be on the same day for repeating meetings" });
+  if (repeat !== "None" && onlyDateStart !== onlyDateEnd) {
+    return res.status(400).json({
+      message:
+        "Start and end date must be on the same day for repeating meetings",
+    });
   }
 
   // If repeat is selected, check for an endDate and check that the endRepeatDate is after the start date
   if (repeat !== "None" && !endRepeatDate) {
-    return res.status(400).json({ message: "End repeat date is required for repeating meetings" });
+    return res
+      .status(400)
+      .json({ message: "End repeat date is required for repeating meetings" });
   }
 
   if (repeat !== "None" && new Date(endRepeatDate) < cmpStartDate) {
-    return res.status(400).json({ message: "End repeat date must be after the start date" });
+    return res
+      .status(400)
+      .json({ message: "End repeat date must be after the start date" });
   }
 
   // If repeat is weekly, check for repeating days
   if (repeat === "Weekly" && (!repeatDays || repeatDays.length === 0)) {
-    return res.status(400).json({ message: "Repeating start days are required for weekly meetings" });
+    return res.status(400).json({
+      message: "Repeating start days are required for weekly meetings",
+    });
   }
 
   // check that the repeating days are not before the start date
@@ -82,7 +103,9 @@ router.post("/new", validateMeeting, async (req, res) => {
     for (let i = 0; i < repeatDays.length; i++) {
       const cmpRepeatDate = new Date(repeatDays[i]);
       if (cmpRepeatDate < cmpStartDate) {
-        return res.status(400).json({ message: "Repeating days cannot be before the start date" });
+        return res
+          .status(400)
+          .json({ message: "Repeating days cannot be before the start date" });
       }
     }
   }
@@ -131,7 +154,6 @@ router.post("/new", validateMeeting, async (req, res) => {
       message: "Meeting created successfully",
       msgToken: newToken,
     });
-
   } catch (error) {
     console.error("Meeting creation error:", error);
     if (error.name === "ValidationError") {
@@ -156,7 +178,7 @@ router.get("/token/:meetingID", async (req, res) => {
       return res.status(400).json({ message: "Meeting ID is required" });
     }
     //check if the meeting ID exists by checking if the meeting is in the database
-    const meeting = await Meeting.findById
+    const meeting = await Meeting.findById;
     if (!meeting) {
       return res.status(404).json({ message: "Requested meeting not valid" });
     }
@@ -165,7 +187,6 @@ router.get("/token/:meetingID", async (req, res) => {
     const token = jwt.sign(payload, config.secretKey, { algorithm: "HS256" });
 
     res.status(200).json({ data: { token } });
-
   } catch (error) {
     console.error("Token generation error:", error);
     res
@@ -269,7 +290,6 @@ router.get("/:token", async (req, res) => {
         meetingID,
       },
     });
-
   } catch (error) {
     console.error("Meeting fetch error:", error);
     res
@@ -301,8 +321,8 @@ router.get("/:meetingID/:date", async (req, res) => {
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found" });
     }
-    const cmpDate = new Date(date).toISOString().split("T")[0]; // Get date portion 
-    
+    const cmpDate = new Date(date).toISOString().split("T")[0]; // Get date portion
+
     const populatedMeetingSlots = await meeting.populate("meetingSlots");
     const meetingSlots = populatedMeetingSlots.meetingSlots;
 
@@ -334,8 +354,12 @@ router.get("/:meetingID/:date", async (req, res) => {
     const startDateObj = new Date(startDate);
     const endDateObj = new Date(endDate);
 
-    const cmpStartDate = `${startDateObj.getFullYear()}-${String(startDateObj.getMonth() + 1).padStart(2, '0')}-${String(startDateObj.getDate()).padStart(2, '0')}`;
-    const cmpEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
+    const cmpStartDate = `${startDateObj.getFullYear()}-${String(
+      startDateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(startDateObj.getDate()).padStart(2, "0")}`;
+    const cmpEndDate = `${endDateObj.getFullYear()}-${String(
+      endDateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(endDateObj.getDate()).padStart(2, "0")}`;
 
     if (cmpStartDate === cmpEndDate) {
       possibleSlots = allSlots[0];
@@ -390,9 +414,12 @@ router.get("/allslots/:meetingID/:date", async (req, res) => {
     const startDateObj = new Date(meeting.startDate);
     const endDateObj = new Date(meeting.endDate);
 
-    const cmpStartDate = `${startDateObj.getFullYear()}-${String(startDateObj.getMonth() + 1).padStart(2, '0')}-${String(startDateObj.getDate()).padStart(2, '0')}`;
-    const cmpEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
-    
+    const cmpStartDate = `${startDateObj.getFullYear()}-${String(
+      startDateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(startDateObj.getDate()).padStart(2, "0")}`;
+    const cmpEndDate = `${endDateObj.getFullYear()}-${String(
+      endDateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(endDateObj.getDate()).padStart(2, "0")}`;
 
     let possibleSlots = [];
 
@@ -498,7 +525,7 @@ router.get("/:meetingID/:date/:slot", async (req, res) => {
         new Date(slot.startTime).getTime() === new Date(slotTime).getTime()
       );
     });
-  
+
     // if no meeting slot is found, return the max seats for the meeting
     if (!meetingSlot) {
       return res.status(200).json({ data: { seats: meeting.seatsPerSlot } });
