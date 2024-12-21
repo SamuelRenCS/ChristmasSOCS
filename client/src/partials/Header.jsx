@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState, useEffect } from "react";
 import NavbarLogo from "../components/Header/NavbarLogo";
 import NavLinks from "../components/Header/NavLinks";

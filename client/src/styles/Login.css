@@ -1,4 +1,4 @@
-/*Shotaro Nakamura*/
+/* Contributors: Shotaro Nakamura */
 
 .login-container {
   background-color: white;
@@ -16,30 +16,30 @@
 }
 
 .password-strength {
-    font-size: 0.9rem;
-    margin-top: 5px;
-  }
-  
-  .password-strength.weak {
-    color: red;
-  }
-  
-  .password-strength.strong {
-    color: green;
-  }
-  
-  .error-text {
-    color: red;
-    font-size: 11px;
-    margin-top: 5px;
-    opacity: 0; /* Initially hidden */
-    
-    transition: opacity 0.3s ease, 
-  }
-  
-  .error-text.show {
-    opacity: 1; /* Show the error text */
-  }
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.password-strength.weak {
+  color: red;
+}
+
+.password-strength.strong {
+  color: green;
+}
+
+.error-text {
+  color: red;
+  font-size: 11px;
+  margin-top: 5px;
+  opacity: 0; /* Initially hidden */
+
+  transition: opacity 0.3s ease;
+}
+
+.error-text.show {
+  opacity: 1; /* Show the error text */
+}
 
 .login-container h1 {
   margin-bottom: 20px;
@@ -71,41 +71,40 @@ img {
   transform-origin: top right; /* Ensures the image slides from the top-right corner */
   transition: all 0.4s ease-in-out; /* Smooth shrinking effect */
 }
-  
-  .password-rules {
-    font-size: 10px;
-    margin: 10px 0;
-    padding: 0;
-    list-style: none;
-    color: red;
-  }
-  
-  .password-rules li {
-    margin: 5px 0;
-  }
 
-  .no-account {
-    text-align: left;
-    margin-bottom: 10px;
-  }
-  
-  .no-account a {
-    color: #007bff;
-    text-decoration: none; 
-    font-weight: bold; 
-    font-size: 14px; 
-  }
-  
-  .no-account a:hover {
-    text-decoration: underline; 
-    color: #0056b3; 
-  }
-  
-  .no-account a:focus {
-    outline: none; 
-    color: #0056b3; 
-  }
-  
+.password-rules {
+  font-size: 10px;
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+  color: red;
+}
+
+.password-rules li {
+  margin: 5px 0;
+}
+
+.no-account {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.no-account a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.no-account a:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+.no-account a:focus {
+  outline: none;
+  color: #0056b3;
+}
 
 /* Responsive Design for Smaller Screens */
 @media (max-width: 768px) {

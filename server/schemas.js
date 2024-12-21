@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng, Samuel Ren
+
 const BaseJoi = require("joi");
 const sanitizeHtml = require("sanitize-html");
 
@@ -47,7 +49,6 @@ module.exports.meetingSchema = Joi.object({
   repeat: Joi.string().valid("None", "Daily", "Weekly").required(),
   endRepeatDate: Joi.date(),
   repeatDays: Joi.array().items(Joi.date()),
-  
 });
 
 // define the schema for meeting slot creation

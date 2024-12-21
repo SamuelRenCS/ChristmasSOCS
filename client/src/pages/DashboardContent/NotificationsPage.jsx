@@ -1,3 +1,5 @@
+// Contributors: Shotaro Nakamura, Samuel Ren
+
 import React, { useState, useEffect } from "react";
 import styles from "../../styles/NotificationsPage.module.css";
 import {

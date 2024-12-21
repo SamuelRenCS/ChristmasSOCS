@@ -1,4 +1,4 @@
-//Shotaro Nakamura
+// Contributors: Shotaro Nakamura
 
 import React, { useState } from "react";
 import "../styles/Landing.css";

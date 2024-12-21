@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
@@ -14,7 +16,6 @@ import ViewMeeting from "./pages/ViewMeeting";
 import CreateRequest from "./pages/CreateRequest";
 import CreateBooking from "./pages/CreateBooking";
 import ErrorPage from "./pages/ErrorPage";
-//import MeetingPage from "./pages/MeetingPage";
 import Dashboard from "./pages/Dashboard";
 
 function App() {

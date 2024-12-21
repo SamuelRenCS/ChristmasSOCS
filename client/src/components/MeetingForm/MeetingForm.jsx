@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren, Eric Cheng
+
 import React, { useState } from "react";
 import { createMeeting } from "../../api/api";
 import InputField from "../common/InputField";
@@ -267,8 +269,6 @@ const MeetingForm = () => {
       endRepeatDate: endRepeatDate,
       repeatDays: formattedRepeatDays,
     };
-
-    console.log("Formatted data:", formattedData);
 
     try {
       const response = await createMeeting(formattedData);

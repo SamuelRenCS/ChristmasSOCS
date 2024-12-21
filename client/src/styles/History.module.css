@@ -1,4 +1,4 @@
-/*Shotaro Nakamura*/
+/* Contributors: Shotaro Nakamura, Samuel Ren */
 
 .notificationsContainer {
   padding: 20px;
@@ -31,36 +31,46 @@
   padding: 10px 20px;
   border-radius: 30px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .cancelButton:hover {
   background-color: #fd6e6b;
-  transition: 0.3s;
 }
 
 .notificationItem {
   background-color: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 30px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 15px;
 }
 
 .info {
-  display: flex;
-  justify-content: space-between;
-  text-align: left;
-  flex: 3;
-  flex-direction: column;
-  padding: 20px;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  align-items: start;
 }
 
-.notificationItem p {
-  font-size: 16px;
-  margin: 0.5rem 0;
+.info p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.info p b {
+  color: black;
+  margin-right: 8px;
+}
+
+.requestActions {
+  flex-shrink: 0;
 }
 
 .deleteButton {
@@ -75,34 +85,37 @@
   color: #d24341;
 }
 
+.pastMeeting {
+  background-color: #f0f0f0;
+  color: #999;
+}
+
+/* Responsive Breakpoints */
 @media screen and (max-width: 768px) {
   .notificationsContainer {
-    padding: 10px;
+    padding: 15px;
   }
 
   .notificationsContainer h2 {
     font-size: 1.5rem;
   }
 
-  .notificationItem {
-    padding: 10px;
-  }
-
   .info {
-    padding: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
   }
 
-  .notificationItem p {
-    font-size: 14px;
+  .notificationItem {
+    padding: 12px;
   }
 
-  .clearButton {
+  .info p {
+    font-size: 0.85rem;
+  }
+
+  .cancelButton {
     padding: 8px 16px;
-    font-size: 14px;
-  }
-
-  .deleteButton {
-    font-size: 20px;
+    font-size: 0.9rem;
   }
 }
 
@@ -112,15 +125,27 @@
   }
 
   .info {
-    padding: 10px;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .info p {
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .info p:last-child {
+    border-bottom: none;
+  }
+
+  .requestActions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
   }
 
   .header {
     flex-direction: column;
   }
-}
-
-.pastMeeting {
-  background-color: #f0f0f0; /* Light grey background */
-  color: #999; /* Slightly dimmed text */
 }

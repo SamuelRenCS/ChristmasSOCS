@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng
+
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
@@ -5,11 +7,8 @@ const Meeting = require("../models/meeting");
 const MeetingSlot = require("../models/meetingSlot");
 const Notification = require("../models/notification");
 const { validateBooking } = require("../middleware");
-const {
-  calculateDates,
-  calculateWeeklyDates,
-} = require("../utils");
-const meeting = require("../models/meeting");
+const { calculateDates, calculateWeeklyDates } = require("../utils");
+const { formatDateTime } = require("../utils");
 
 // POST /api/bookings/new to create a new booking
 router.post("/new", validateBooking, async (req, res) => {
@@ -17,7 +16,6 @@ router.post("/new", validateBooking, async (req, res) => {
     req.body;
 
   try {
-
     const meeting = await Meeting.findById(meetingID).populate("meetingSlots");
 
     if (!meeting) {
@@ -56,7 +54,7 @@ router.post("/new", validateBooking, async (req, res) => {
 
     formattedDates = dates.map((date) => {
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0"); 
+      const month = String(date.getMonth() + 1).padStart(2, "0");
       const day = String(date.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     });
@@ -77,8 +75,12 @@ router.post("/new", validateBooking, async (req, res) => {
     const cmpDate = receivedDate.toISOString().split("T")[0];
     const startDateObj = new Date(meeting.startDate);
     const endDateObj = new Date(meeting.endDate);
-    const cmpStartDate = `${startDateObj.getFullYear()}-${String(startDateObj.getMonth() + 1).padStart(2, '0')}-${String(startDateObj.getDate()).padStart(2, '0')}`;
-    const cmpEndDate = `${endDateObj.getFullYear()}-${String(endDateObj.getMonth() + 1).padStart(2, '0')}-${String(endDateObj.getDate()).padStart(2, '0')}`;
+    const cmpStartDate = `${startDateObj.getFullYear()}-${String(
+      startDateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(startDateObj.getDate()).padStart(2, "0")}`;
+    const cmpEndDate = `${endDateObj.getFullYear()}-${String(
+      endDateObj.getMonth() + 1
+    ).padStart(2, "0")}-${String(endDateObj.getDate()).padStart(2, "0")}`;
 
     if (cmpStartDate === cmpEndDate) {
       possibleSlots = allSlots[0];
@@ -152,7 +154,6 @@ router.post("/new", validateBooking, async (req, res) => {
     endTime = endTime.toISOString();
 
     if (existingSlots.length === 0) {
-
       //check if the slot is full
       if (seats > meeting.seatsPerSlot) {
         return res.status(400).json({
@@ -180,17 +181,19 @@ router.post("/new", validateBooking, async (req, res) => {
         user: meeting.host.toString(),
         title: "New Booking",
         // Format the message with the user's full name and the date of the booking
-        message: `${attendee} has booked a slot for ${meeting.title} on ${meetingDate}`,
+        message: `${attendee} has booked a slot for "${
+          meeting.title
+        }" on ${formatDateTime(startTime)}`,
         date: Date.now(),
       });
-  
+
       await notification.save();
-  
+
       await meeting.populate("host");
       // add notification to host's notifications array
-      const host = await User.findById(meeting.host._id).populate("Notifications");
-
-     
+      const host = await User.findById(meeting.host._id).populate(
+        "Notifications"
+      );
 
       host.Notifications.push(notification);
 
@@ -199,7 +202,6 @@ router.post("/new", validateBooking, async (req, res) => {
 
       //check if a user is logged in and add the booking to the user
       if (userID && userID !== "") {
-        
         const user = await User.findById(userID);
         user.reservations.push(newSlot);
         await user.save();
@@ -212,7 +214,7 @@ router.post("/new", validateBooking, async (req, res) => {
         await newSlot.save();
       }
       return res.status(201).json({ message: "Booking created successfully" });
-    } else {  
+    } else {
       // check is there is a slot for that date and time
 
       const existingSlot = existingSlots.find(
@@ -222,7 +224,6 @@ router.post("/new", validateBooking, async (req, res) => {
       //check if the slot is full
 
       if (!existingSlot) {
-
         if (seats > meeting.seatsPerSlot) {
           return res.status(400).json({
             message: "The number of seats booked exceeds the available seats",
@@ -249,15 +250,19 @@ router.post("/new", validateBooking, async (req, res) => {
           user: meeting.host.toString(),
           title: "New Booking",
           // Format the message with the user's full name and the date of the booking
-          message: `${attendee} has booked a slot for ${meeting.title} on ${meetingDate}`,
+          message: `${attendee} has booked a slot for "${
+            meeting.title
+          }" on ${formatDateTime(startTime)}`,
           date: Date.now(),
         });
-    
+
         await notification.save();
-    
+
         await meeting.populate("host");
         // add notification to host's notifications array
-        const host = await User.findById(meeting.host._id).populate("Notifications");
+        const host = await User.findById(meeting.host._id).populate(
+          "Notifications"
+        );
 
         host.Notifications.push(notification);
 
@@ -282,8 +287,6 @@ router.post("/new", validateBooking, async (req, res) => {
           .status(201)
           .json({ message: "Booking created successfully" });
       } else {
-
-
         //check if the slot is full
         if (seats > existingSlot.seatsAvailable) {
           return res.status(400).json({
@@ -302,18 +305,22 @@ router.post("/new", validateBooking, async (req, res) => {
           user: meeting.host.toString(),
           title: "New Booking",
           // Format the message with the user's full name and the date of the booking
-          message: `${attendee} has booked a slot for ${meeting.title} on ${meetingDate}`,
+          message: `${attendee} has booked a slot for "${
+            meeting.title
+          }" on ${formatDateTime(startTime)}`,
           date: Date.now(),
         });
-    
+
         await notification.save();
-    
+
         //retrieve the meeting host
         await meeting.populate("host");
         // add notification to host's notifications array
         //retrieve the meeting host
 
-        const host = await User.findById(meeting.host._id).populate("Notifications");
+        const host = await User.findById(meeting.host._id).populate(
+          "Notifications"
+        );
 
         host.Notifications.push(notification);
 
@@ -367,20 +374,22 @@ router.delete("/:bookingID/:userID", async (req, res) => {
         .json({ message: "Booking ID and User ID are required" });
     }
 
-    // Find the booking slot and populate necessary fields
-    const booking = await MeetingSlot.findById(bookingID)
-      .populate({
-        path: "registeredAttendees.attendeeId", // Populate attendeeId inside registeredAttendees
-        model: "User", // Refers to the User model
-      })
-      .populate({
-        path: "meeting",
-        populate: { path: "host" }, // Optionally populate meeting and host details if needed
-      });
-
-    if (!booking) {
+    // First, find the booking without population to verify it exists
+    const bookingExists = await MeetingSlot.findById(bookingID);
+    if (!bookingExists) {
       return res.status(404).json({ message: "Booking not found" });
     }
+
+    // Now find with explicit population of all nested paths
+    const booking = await MeetingSlot.findById(bookingID).populate({
+      path: "meeting",
+      populate: {
+        path: "host",
+      },
+    });
+
+    // Separately populate registeredAttendees
+    await booking.populate("registeredAttendees.attendeeId");
 
     // Find the user
     const registeree = await User.findById(userID);
@@ -396,51 +405,66 @@ router.delete("/:bookingID/:userID", async (req, res) => {
       (attendee) => attendee !== userName
     );
 
-    // notify the host of the new booking
+    // Create notification
     const notification = new Notification({
       user: booking.meeting.host._id,
       title: "Booking Cancelled",
-      // Format the message with the user's full name and the date of the booking
-      message: `${userName} has cancelled their booking for ${booking.meeting.title} on ${booking.occurrenceDate}`,
+      message: `${userName} has cancelled their booking for "${
+        booking.meeting.title
+      }" on ${formatDateTime(booking.startTime)}`,
       date: Date.now(),
     });
 
     await notification.save();
 
-    //retrieve the meeting host
-    booking.meeting.host.Notifications.push(notification);
-    
+    // Update host's notifications
+    await User.findByIdAndUpdate(booking.meeting.host._id, {
+      $push: { Notifications: notification._id },
+    });
 
-    // Find the booking to remove from the registered attendees list
-    // Find the booking to remove from the registered attendees list
+    // Find the booking in registeredAttendees
     const bookingToRemove = booking.registeredAttendees.find(
-      (attendee) => attendee.attendeeId._id.toString() === userID
+      (attendee) =>
+        attendee.attendeeId && attendee.attendeeId._id.toString() === userID
     );
-    // console.log("Booking to remove:", bookingToRemove);
 
     if (bookingToRemove) {
-      // Update the available seats by adding back the number of seats the user booked
+      // Update seats available
       booking.seatsAvailable += bookingToRemove.seatsBooked;
-      // Remove the booking from the registered attendees list
+
+      // Remove from registeredAttendees
       booking.registeredAttendees = booking.registeredAttendees.filter(
-        (attendee) => attendee.attendeeId._id.toString() !== userID
+        (attendee) =>
+          attendee.attendeeId && attendee.attendeeId._id.toString() !== userID
       );
-      
     }
 
-    // Remove the booking from the user's list of reservations
-    registeree.reservations = registeree.reservations.filter(
-      (reservation) => reservation.toString() !== bookingID
-    );
+    // Remove from user's reservations using $pull
+    await User.findByIdAndUpdate(userID, {
+      $pull: { reservations: bookingID },
+    });
 
-    // Save the updated user and booking slot
-    await registeree.save();
+    // Check if the booking has any remaining registrations
+    if (booking.registeredAttendees.length === 0) {
+      // If no registrations left, remove the booking from the meeting
+      await Meeting.findByIdAndUpdate(booking.meeting._id, {
+        $pull: { meetingSlots: bookingID },
+      });
+
+      // Delete the booking completely
+      await MeetingSlot.findByIdAndDelete(bookingID);
+
+      return res.status(200).json({
+        message: "Booking deleted successfully and removed from meeting",
+      });
+    }
+
+    // If there are still other registrations, just save the updated booking
     await booking.save();
 
-    // console.log("Successfully deleted booking");
     res.status(200).json({ message: "Booking deleted successfully" });
   } catch (error) {
-    console.error("Error deleting booking:", error.message);
+    console.error("Error deleting booking:", error);
     res
       .status(500)
       .json({ message: "Booking deletion failed", error: error.message });

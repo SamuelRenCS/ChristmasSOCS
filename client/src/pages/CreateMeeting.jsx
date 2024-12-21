@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import { useState } from "react";
 import styles from "../styles/CreateMeeting.module.css";
 import MeetingForm from "../components/MeetingForm/MeetingForm";

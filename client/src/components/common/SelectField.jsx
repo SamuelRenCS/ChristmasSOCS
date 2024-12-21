@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React from "react";
 import styles from "./SelectField.module.css";
 

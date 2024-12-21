@@ -1,3 +1,5 @@
+// Contributors: Shotaro Nakamura
+
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
@@ -7,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../components/common/Button";
 
 import styles from "../../styles/MeetingsList.module.css";
-//import { fetchUser } from "../../api/api";
 
 const MeetingsPage = () => {
   const navigate = useNavigate();

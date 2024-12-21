@@ -1,3 +1,5 @@
+// Contributors: Shotaro Nakamura, Samuel Ren
+
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
@@ -13,40 +15,53 @@ const HistoryPage = () => {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // On load fetch all meetings
+  // Format ISO string to local date
+  const formatDate = (isoString) => {
+    return new Date(isoString).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
+  // Format ISO string to local time
+  const formatTime = (isoString) => {
+    return new Date(isoString).toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   useEffect(() => {
     const fetchMeetings = async () => {
       try {
         const response = await fetchUserBookings(userId);
-        // console.log("Meetings: ", response.data);
         setMeetings(response.data);
         setLoading(false);
 
+        const now = new Date();
+
         setNotifications(
           response.data
-            .map((meeting) => ({
-              title: meeting.title,
-              id: meeting.id,
-              location: meeting.location,
-              date: meeting.date,
-              start: meeting.startTime,
-              end: meeting.endTime,
-              isPast:
-                new Date(meeting.date + " " + meeting.startTime) < new Date(), // Check if the meeting is in the past
-            }))
+            .map((meeting) => {
+              const startDateTime = new Date(meeting.startTime);
+
+              return {
+                title: meeting.title,
+                id: meeting.id,
+                location: meeting.location,
+                date: formatDate(meeting.startTime),
+                start: formatTime(meeting.startTime),
+                end: formatTime(meeting.endTime),
+                isPast: startDateTime < now,
+                // Store original date time for sorting
+                dateTime: startDateTime,
+              };
+            })
             .sort((a, b) => {
-              const dateA = new Date(a.date + " " + a.start);
-              const dateB = new Date(b.date + " " + b.start);
-
-              // First, compare by date (most recent first)
-              if (dateA > dateB) return -1; // Reverse order
-              if (dateA < dateB) return 1;
-
-              // If dates are the same, compare by start time (most recent first)
-              if (a.start > b.start) return -1; // Reverse order
-              if (a.start < b.start) return 1;
-
-              return 0; // If both date and start time are the same, return 0
+              // Sort by date/time, most recent first
+              return b.dateTime - a.dateTime;
             })
         );
       } catch (error) {
@@ -62,12 +77,8 @@ const HistoryPage = () => {
   const handleCancelClick = async (bookingId) => {
     if (confirmingDeleteId === bookingId) {
       try {
-        // console.log("Booking ID: ", bookingId);
-        // console.log("User ID: ", userId);
         const response = await deleteBooking(bookingId, userId);
-        console.log("Response: ", response);
         toast.success("Booking cancelled successfully");
-        // Remove the cancelled booking from the list
         setNotifications(
           notifications.filter((booking) => booking.id !== bookingId)
         );
@@ -77,7 +88,6 @@ const HistoryPage = () => {
         toast.error("Failed to cancel booking");
       }
     } else {
-      // If not confirming, show the confirmation state
       setConfirmingDeleteId(bookingId);
     }
     setTimeout(() => {
@@ -86,7 +96,6 @@ const HistoryPage = () => {
   };
 
   const handleCancelDelete = () => {
-    // Cancel deletion and reset the button
     setConfirmingDeleteId(null);
   };
 
@@ -124,7 +133,7 @@ const HistoryPage = () => {
               {!notification.isPast && (
                 <button
                   className={styles.cancelButton}
-                  onClick={() => handleCancelClick(notification.id)} // Pass meeting ID
+                  onClick={() => handleCancelClick(notification.id)}
                   onBlur={handleCancelDelete}
                 >
                   {confirmingDeleteId === notification.id

@@ -1,3 +1,5 @@
+// Contributors: Shotaro Nakamura
+
 import React, { useState } from "react";
 import styles from "../../styles/RequestPage.module.css";
 import RequestsSubPage from "../../components/Requests/RequestsSubPage";

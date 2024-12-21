@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng, Samuel Ren
+
 const { userSchema, meetingSchema, bookingSchema } = require("./schemas");
 
 // define the middleware to validate the user registration input
@@ -32,4 +34,3 @@ module.exports.validateBooking = (req, res, next) => {
     next();
   }
 };
-

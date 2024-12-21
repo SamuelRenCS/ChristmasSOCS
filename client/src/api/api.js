@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren, Eric Cheng
+
 import axios from "axios";
 import sha256 from "crypto-js/sha256";
 import config from "../../config";
@@ -113,7 +115,6 @@ export const fetchMeetingSlot = async (meetingID, date) => {
 
 // fetch the number of seats available for a specific meeting, date and slot
 export const fetchSeats = async (meetingID, date, slot) => {
-  console.log("fetching seats for:", meetingID, date, slot);
   try {
     const response = await api.get(`/meetings/${meetingID}/${date}/${slot}`);
     return response.data;

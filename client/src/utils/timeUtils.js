@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 export function timeAgo(date) {
   const now = new Date();
   const seconds = Math.floor((now - new Date(date)) / 1000);

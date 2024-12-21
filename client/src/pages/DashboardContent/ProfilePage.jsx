@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState, useEffect } from "react";
 import UserProfile from "../../components/Profile/UserProfile";
 import { updatePassword } from "../../api/api";

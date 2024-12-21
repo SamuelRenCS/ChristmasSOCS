@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng
+
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
@@ -36,7 +38,6 @@ router.get("/meetings/:userID", async (req, res) => {
 router.get("/bookings/:userID", async (req, res) => {
   const { userID } = req.params;
 
-  // console.log("User ID:", userID);
   try {
     if (!userID) {
       return res.status(400).json({ message: "User ID is required" });
@@ -49,34 +50,20 @@ router.get("/bookings/:userID", async (req, res) => {
       },
     });
 
-    // Return a list of meeting IDs with the corresponding title, location
     const bookingList = user.reservations.map((booking) => {
-      // Format the occurrence date (keep it in UTC and extract the date portion)
+      // Get full ISO strings for all dates/times
       const occurrenceDate = new Date(booking.occurrenceDate);
-      const formattedDate = `${occurrenceDate.getUTCFullYear()}-${(
-        occurrenceDate.getUTCMonth() + 1
-      )
-        .toString()
-        .padStart(2, "0")}-${occurrenceDate
-        .getUTCDate()
-        .toString()
-        .padStart(2, "0")}`;
-
-      // Format the start time (keep it in UTC)
       const startTime = new Date(booking.startTime);
-      const formattedStartTime = startTime.toISOString().substring(11, 16); // HH:mm format (UTC)
-
-      // Format the end time (keep it in UTC)
       const endTime = new Date(booking.endTime);
-      const formattedEndTime = endTime.toISOString().substring(11, 16); // HH:mm format (UTC)
 
       return {
         id: booking._id,
         title: booking.meeting.title,
         location: booking.meeting.location,
-        date: formattedDate, // UTC formatted occurrence date
-        startTime: formattedStartTime, // UTC formatted start time
-        endTime: formattedEndTime, // UTC formatted end time
+        // Include full ISO strings with timezone information
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        occurrenceDate: occurrenceDate.toISOString(),
       };
     });
 

@@ -1,4 +1,4 @@
-/*Shotaro Nakamura*/
+/* Contributors: Shotaro Nakamura */
 
 .dashboardContainer {
   display: flex;
@@ -112,42 +112,41 @@
   }
 }
 
-
 @media screen and (max-width: 600px) {
   .dashboardContainer {
     flex-direction: column;
   }
 
   .sidebar {
-    width: 100%; 
+    width: 100%;
     min-width: unset;
     height: auto;
-    flex-direction: row; 
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
     padding: 10px;
     margin: 0;
     border-radius: 0;
-    overflow-x: auto; 
+    overflow-x: auto;
   }
 
   .sidebar.collapsed {
-    width: 100%; 
+    width: 100%;
   }
 
   .sidebarItem {
-    justify-content: center; 
+    justify-content: center;
     padding: 5px 10px;
-    flex-direction: column; 
+    flex-direction: column;
   }
 
   .label {
-    display: none; 
+    display: none;
   }
 
   .sidebarToggle {
-    position: static; 
-    margin-left: auto; 
+    position: static;
+    margin-left: auto;
     margin-right: 10px;
   }
 

@@ -1,3 +1,5 @@
+// Contributors: Shotaro Nakamura
+
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../styles/CreateBooking.module.css";

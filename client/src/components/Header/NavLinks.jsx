@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./NavLinks.module.css";

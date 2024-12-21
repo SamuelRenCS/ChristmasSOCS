@@ -1,4 +1,4 @@
-//Shotaro Nakamura
+// Contributors: Shotaro Nakamura, Samuel Ren
 
 import React, { useEffect } from "react";
 import Container from "../components/common/Container";
@@ -244,7 +244,10 @@ const ViewMeeting = () => {
             ))}
           </Container>
           <div className={styles.share}>
-            <button className={styles.shareButton} onClick={handleGetIDClick}>
+            <button
+              className={styles.shareButton}
+              onClick={() => handleGetIDClick(meetingId)}
+            >
               Share Token
             </button>
             <button

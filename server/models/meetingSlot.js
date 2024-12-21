@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -9,7 +11,7 @@ const MeetingSlotSchema = new Schema({
   occurrenceDate: { type: Date, required: true }, // The specific date of this occurrence
   startTime: { type: String, required: true },
   endTime: { type: String, required: true },
-  
+
   attendees: [
     {
       type: String,
@@ -29,7 +31,6 @@ const MeetingSlotSchema = new Schema({
       },
     },
   ],
-
 });
 
 module.exports = mongoose.model("MeetingSlot", MeetingSlotSchema);

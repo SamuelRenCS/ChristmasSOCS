@@ -1,3 +1,5 @@
+// Contributors: Shotaro Nakamura
+
 import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
@@ -14,28 +16,23 @@ const HomePage = () => {
   const { user } = useAuth();
   const userId = user ? user.id : "";
 
-  // Mock meetings data (replace this with API call to fetch meetings)
+  const getLocalDateString = (utcString) => {
+    // Create date object in local time zone
+    const date = new Date(utcString);
+    // Format date in user's local time zone
+    return date.toLocaleDateString("en-CA", {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+  };
+
   useEffect(() => {
     const fetchMeetings = async () => {
-      // Fetch reservations for the user
       try {
         const response = await fetchAllUserEvents(userId);
-        // console.log("All Events: ", response.data);
 
-        // Sort meetings by date and time
+        // Sort meetings by date and time in local time zone
         const sortedMeetings = response.data.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-
-          // Compare by date first
-          if (dateA.getTime() !== dateB.getTime()) {
-            return dateA.getTime() - dateB.getTime();
-          }
-
-          // If the dates are the same, compare by start time
-          const timeA = new Date(a.startTime);
-          const timeB = new Date(b.startTime);
-          return timeA.getTime() - timeB.getTime();
+          return new Date(a.startTime) - new Date(b.startTime);
         });
 
         setMeetings(sortedMeetings);
@@ -49,48 +46,57 @@ const HomePage = () => {
 
   // Filter meetings for the selected date
   useEffect(() => {
-    const selectedDateString = selectedDate.toISOString().split("T")[0]; // Get 'yyyy-mm-dd' format
-    const todayMeetings = meetings.filter((meeting) => {
-      // Convert meeting.date to 'yyyy-mm-dd' format
-      const meetingDateString = new Date(meeting.date)
-        .toISOString()
-        .split("T")[0];
-      return meetingDateString === selectedDateString; // Compare only the date part
+    const selectedLocalDate = selectedDate.toLocaleDateString("en-CA", {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-    setFilteredMeetings(todayMeetings);
+
+    const todayMeetings = meetings.filter((meeting) => {
+      const meetingDateString = getLocalDateString(meeting.startTime);
+      return meetingDateString === selectedLocalDate;
+    });
+
+    const sortedFilteredMeetings = todayMeetings.sort((a, b) => {
+      return new Date(a.startTime) - new Date(b.startTime);
+    });
+
+    setFilteredMeetings(sortedFilteredMeetings);
   }, [selectedDate, meetings]);
 
-  // Function to handle date selection
   const onDateChange = (date) => {
     setSelectedDate(date);
   };
 
-  // Highlight dates with meetings
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
-      // Convert the calendar tile date to 'yyyy-mm-dd'
-      const dateString = date.toISOString().split("T")[0];
+      const tileDateString = date.toLocaleDateString("en-CA", {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
 
-      // Loop through meetings and compare the date in 'yyyy-mm-dd' format
       if (
-        meetings.some((meeting) => {
-          const meetingDate = new Date(meeting.date); // Convert meeting.date to Date object
-          const meetingDateString = meetingDate.toISOString().split("T")[0]; // Convert to 'yyyy-mm-dd'
-          return meetingDateString === dateString;
-        })
+        meetings.some(
+          (meeting) => getLocalDateString(meeting.startTime) === tileDateString
+        )
       ) {
-        return styles.highlightDate; // Add a class to highlight the date
+        return styles.highlightDate;
       }
     }
-    return null; // No class if no events
+    return null;
+  };
+
+  const formatLocalTime = (utcTimeString) => {
+    return new Date(utcTimeString).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
   };
 
   const getDuration = (startTime, endTime) => {
     const start = new Date(startTime);
     const end = new Date(endTime);
-    const durationInMs = end - start; // Duration in milliseconds
-    const hours = Math.floor(durationInMs / 3600000); // Hours
-    const minutes = Math.floor((durationInMs % 3600000) / 60000); // Minutes
+    const durationInMs = end - start;
+    const hours = Math.floor(durationInMs / 3600000);
+    const minutes = Math.floor((durationInMs % 3600000) / 60000);
     return `${hours}h ${minutes}m`;
   };
 
@@ -112,17 +118,20 @@ const HomePage = () => {
         </div>
 
         <div className={styles.meetingsSection}>
-          <h2>{selectedDate.toDateString()}</h2>
+          <h2>
+            {selectedDate.toLocaleDateString(undefined, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            })}
+          </h2>
           {filteredMeetings.length > 0 ? (
             <ul>
               {filteredMeetings.map((meeting, index) => (
                 <li key={index} className={styles.meetingItem}>
-                  <b>
-                    {new Date(meeting.startTime).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </b>{" "}
+                  <b>{formatLocalTime(meeting.startTime)}</b>
                   <br />
                   <span>Title: {meeting.title}</span>
                   <br />

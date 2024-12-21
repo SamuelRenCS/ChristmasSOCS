@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState } from "react";
 import styles from "./RequestItem.module.css";
 

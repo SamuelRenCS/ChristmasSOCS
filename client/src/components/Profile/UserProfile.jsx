@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState } from "react";
 import InputField from "../common/InputField";
 import Button from "../common/Button";

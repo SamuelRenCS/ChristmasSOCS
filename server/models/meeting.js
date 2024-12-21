@@ -1,3 +1,5 @@
+// Contributors: Eric Cheng
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -52,12 +54,14 @@ const MeetingSchema = new Schema({
       ref: "MeetingSlot",
     },
   ],
-  validSlots: [[
-    {
-      type: String,
-      required: true,
-    },
-  ]],
+  validSlots: [
+    [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+  ],
 });
 
 module.exports = mongoose.model("Meeting", MeetingSchema);

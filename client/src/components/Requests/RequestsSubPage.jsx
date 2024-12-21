@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState, useEffect } from "react";
 import RequestItem from "./RequestItem";
 import { fetchRequests, acceptRequest, rejectRequest } from "../../api/api";

@@ -1,3 +1,5 @@
+// Contributors: Samuel Ren
+
 import React, { useState } from "react";
 import logoSrc from "../../assets/logo.svg";
 import styles from "./NavbarLogo.module.css";
