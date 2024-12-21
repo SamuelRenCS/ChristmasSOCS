@@ -27,7 +27,7 @@ router.post("/new", validateBooking, async (req, res) => {
     const repeat = meeting.repeat;
     const startDate = meeting.startDate;
     const endRepeatDate = meeting.endRepeatDate;
-    const repeatingDays = meeting.repeatDays;
+    const repeatingDays = meeting.repeatingDays;
     const intervalCheck = meeting.interval;
 
     // Retrieve the dates for the meeting based on the repeat value
