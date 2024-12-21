@@ -32,6 +32,8 @@ const ViewMeeting = () => {
     token: "",
     meetingId: null,
   });
+  const [title, setTitle] = useState("");
+
   const [isDateSelected, setIsDateSelected] = useState(false);
 
   const getEndTime = (startTime, interval, endTime) => {
@@ -96,6 +98,9 @@ const ViewMeeting = () => {
 
         // set the description
         setDescription(description);
+
+        // set the title
+        setTitle(title);
 
         // set the start time
         const startTime = new Date(startDate).toLocaleTimeString("en-US", {
@@ -191,7 +196,7 @@ const ViewMeeting = () => {
     <main className={styles.main}>
       <div className={styles["top-section"]}>
         <div className={styles.title}>
-          <h1>Monday Office Hours for COMP 307</h1>
+          <h1>{title}</h1>
         </div>
       </div>
       <div className={styles.content}>

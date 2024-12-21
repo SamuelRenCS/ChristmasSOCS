@@ -76,6 +76,7 @@ const BookingForm = ({ token }) => {
           meetingID: meetingID,
           meetingDate: "",
           userID: user ? `${user.id}` : "",
+          seats: 1,
         });
       } catch (error) {
         setIsValidToken(false);
@@ -264,7 +265,7 @@ const BookingForm = ({ token }) => {
               type="number"
               min="1"
               max={maxSeats}
-              value={formData.seats || ""}
+              value={formData.seats}
               onChange={handleChange}
               placeholder="1"
             />
